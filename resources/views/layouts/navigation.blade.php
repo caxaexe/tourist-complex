@@ -24,6 +24,11 @@
                         Панель сотрудника
                     </x-nav-link>
 
+                    <x-nav-link :href="route('room-types.index')" :active="request()->routeIs('room-types.*')">
+                        Типы номеров
+                    </x-nav-link>
+
+
                     @if(auth()->user()?->hasRole('admin'))
                         <x-nav-link :href="url('/admin')" :active="request()->is('admin')">
                             Админ-панель
@@ -93,6 +98,11 @@
             <x-responsive-nav-link :href="url('/staff')" :active="request()->is('staff')">
                 Панель сотрудника
             </x-responsive-nav-link>
+
+            <x-nav-link :href="route('room-types.index')" :active="request()->routeIs('room-types.*')">
+                Типы номеров
+            </x-nav-link>
+
 
             @if(auth()->user()?->hasRole('admin'))
                 <x-responsive-nav-link :href="url('/admin')" :active="request()->is('admin')">

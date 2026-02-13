@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoomTypeController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,6 +29,11 @@ Route::middleware('auth')->group(function () {
 
     // CRUD клиентов (admin + employee)
     Route::resource('clients', ClientController::class)->middleware('role:admin,employee');
+
+    // CRUD типов комнат
+    Route::resource('room-types', RoomTypeController::class)
+    ->middleware('role:admin,employee');
+
 });
 
 require __DIR__.'/auth.php';
