@@ -15,7 +15,22 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                        Клиенты
+                    </x-nav-link>
+
+                    <x-nav-link :href="url('/staff')" :active="request()->is('staff')">
+                        Панель сотрудника
+                    </x-nav-link>
+
+                    @if(auth()->user()?->hasRole('admin'))
+                        <x-nav-link :href="url('/admin')" :active="request()->is('admin')">
+                            Админ-панель
+                        </x-nav-link>
+                    @endif
                 </div>
+
             </div>
 
             <!-- Settings Dropdown -->
@@ -70,7 +85,22 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                Клиенты
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="url('/staff')" :active="request()->is('staff')">
+                Панель сотрудника
+            </x-responsive-nav-link>
+
+            @if(auth()->user()?->hasRole('admin'))
+                <x-responsive-nav-link :href="url('/admin')" :active="request()->is('admin')">
+                    Админ-панель
+                </x-responsive-nav-link>
+            @endif
         </div>
+
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">

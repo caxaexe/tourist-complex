@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,21 +14,19 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
 
-    // 🔹 ПРОФИЛЬ (оставляем как есть)
+    // Профиль
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 🔹 НОВОЕ: Админ-панель
-    Route::get('/admin', function () {
-        return 'Admin area';
-    })->middleware('role:admin');
+    // Только admin
+    Route::get('/admin', fn () => 'Admin area')->middleware('role:admin');
 
-    // 🔹 НОВОЕ: Панель сотрудника
-    Route::get('/staff', function () {
-        return 'Staff area';
-    })->middleware('role:admin,employee');
+    // admin + employee
+    Route::get('/staff', fn () => 'Staff area')->middleware('role:admin,employee');
 
+    // CRUD клиентов (admin + employee)
+    Route::resource('clients', ClientController::class)->middleware('role:admin,employee');
 });
 
 require __DIR__.'/auth.php';
