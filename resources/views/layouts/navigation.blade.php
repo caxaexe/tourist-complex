@@ -32,6 +32,11 @@
                         Номера
                     </x-nav-link>
 
+                    <x-nav-link :href="route('amenities.index')" :active="request()->routeIs('amenities.*')">
+                        Удобства
+                    </x-nav-link>
+
+
                     @if(auth()->user()?->hasRole('admin'))
                         <x-nav-link :href="url('/admin')" :active="request()->is('admin')">
                             Админ-панель
@@ -108,6 +113,10 @@
 
             <x-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.*')">
                 Номера
+            </x-nav-link>
+
+            <x-nav-link :href="route('amenities.index')" :active="request()->routeIs('amenities.*')">
+                Удобства
             </x-nav-link>
 
             @if(auth()->user()?->hasRole('admin'))

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\RoomTypeController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\AmenityController;
 
 
 use Illuminate\Support\Facades\Route;
@@ -37,8 +38,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('room-types', RoomTypeController::class)
     ->middleware('role:admin,employee');
 
-    // CRUD 
+    // CRUD комнат
     Route::resource('rooms', RoomController::class)
+    ->middleware('role:admin,employee');
+
+    // CRUD удобств
+    Route::resource('amenities', AmenityController::class)
     ->middleware('role:admin,employee');
 
 });
