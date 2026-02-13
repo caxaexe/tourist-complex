@@ -46,11 +46,19 @@ class RoomController extends Controller
 
     public function edit(Room $room)
     {
+        $roomTypes = RoomType::orderBy('name')->get();
+
         $amenities = \App\Models\Amenity::orderBy('name')->get();
         $selectedAmenityIds = $room->amenities()->pluck('amenities.id')->toArray();
 
-        return view('rooms.edit', compact('room', 'roomTypes', 'amenities', 'selectedAmenityIds'));
+        return view('rooms.edit', compact(
+            'room',
+            'roomTypes',
+            'amenities',
+            'selectedAmenityIds'
+        ));
     }
+
 
     public function update(UpdateRoomRequest $request, Room $room)
     {
