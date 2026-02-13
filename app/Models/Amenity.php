@@ -10,7 +10,7 @@ class Amenity extends Model
 
     public function rooms()
     {
-        return $this->belongsToMany(Room::class);
+        return $this->belongsToMany(\App\Models\Room::class, 'room_amenity');
     }
 
     public function amenities()
