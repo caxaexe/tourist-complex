@@ -28,6 +28,9 @@
                         Типы номеров
                     </x-nav-link>
 
+                    <x-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.*')">
+                        Номера
+                    </x-nav-link>
 
                     @if(auth()->user()?->hasRole('admin'))
                         <x-nav-link :href="url('/admin')" :active="request()->is('admin')">
@@ -103,6 +106,9 @@
                 Типы номеров
             </x-nav-link>
 
+            <x-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.*')">
+                Номера
+            </x-nav-link>
 
             @if(auth()->user()?->hasRole('admin'))
                 <x-responsive-nav-link :href="url('/admin')" :active="request()->is('admin')">

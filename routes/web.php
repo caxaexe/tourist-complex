@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomTypeController;
+use App\Http\Controllers\RoomController;
+
+
+use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function () {
@@ -32,6 +35,10 @@ Route::middleware('auth')->group(function () {
 
     // CRUD типов комнат
     Route::resource('room-types', RoomTypeController::class)
+    ->middleware('role:admin,employee');
+
+    // CRUD 
+    Route::resource('rooms', RoomController::class)
     ->middleware('role:admin,employee');
 
 });
