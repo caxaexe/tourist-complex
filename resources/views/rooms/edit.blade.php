@@ -56,6 +56,24 @@
                         @error('description') <div class="text-red-600">{{ $message }}</div> @enderror
                     </div>
 
+                    <div>
+
+                    <label class="block mb-2 text-gray-700 dark:text-gray-200">Удобства</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        @foreach($amenities as $a)
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" name="amenities[]" value="{{ $a->id }}"
+                                    @checked(in_array($a->id, old('amenities', $selectedAmenityIds ?? [])))>
+                                <span class="text-gray-700 dark:text-gray-200">{{ $a->name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    @error('amenities') <div class="text-red-600">{{ $message }}</div> @enderror
+                    @error('amenities.*') <div class="text-red-600">{{ $message }}</div> @enderror
+                    </div>  
+
+
                     <div class="flex items-center gap-2">
                         <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $room->is_active))>
                         <span class="text-gray-700 dark:text-gray-200">Активен</span>
