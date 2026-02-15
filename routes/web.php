@@ -8,6 +8,8 @@ use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\BookingInvoiceController;
 
 
 Route::get('/', function () {
@@ -56,7 +58,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('services', ServiceController::class)
     ->middleware('role:admin,employee');
 
+    Route::resource('invoices', InvoiceController::class)
+        ->middleware('role:admin,employee');
 
+    Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])
+        ->middleware('role:admin,employee')
+        ->name('bookings.invoices.store');
 
 });
 

@@ -117,6 +117,19 @@
                         </div>
                     </div>
 
+                    <hr class="my-6">
+
+                    <form method="POST" action="{{ route('bookings.invoices.store', $booking) }}">
+                        @csrf
+                        <button class="px-4 py-2 bg-gray-800 text-white rounded">
+                            Создать счёт (Invoice)
+                        </button>
+                    </form>
+
+                    @error('invoice')
+                        <div class="text-red-600 mt-2">{{ $message }}</div>
+                    @enderror
+
 
                         @error('services') <div class="text-red-600 mt-2">{{ $message }}</div> @enderror
                         @error('services.*.id') <div class="text-red-600 mt-2">{{ $message }}</div> @enderror

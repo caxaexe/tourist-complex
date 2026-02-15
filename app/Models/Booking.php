@@ -32,11 +32,15 @@ class Booking extends Model
     }
 
     public function services()
-{
-    return $this->belongsToMany(Service::class, 'booking_service')
-        ->withPivot(['quantity', 'price'])
-        ->withTimestamps();
-}
+    {
+        return $this->belongsToMany(Service::class, 'booking_service')
+            ->withPivot(['quantity', 'price'])
+            ->withTimestamps();
+    }
 
+    public function invoices()
+    {
+        return $this->hasMany(\App\Models\Invoice::class);
+    }
 
 }

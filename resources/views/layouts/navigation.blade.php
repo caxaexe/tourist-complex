@@ -44,6 +44,10 @@
                         Услуги
                     </x-nav-link>
 
+                    <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+                        Счета
+                    </x-nav-link>
+
 
                     @auth
                         @if(auth()->user()->hasRole('admin'))
@@ -135,6 +139,10 @@
 
             <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">
                 Услуги
+            </x-nav-link>
+
+            <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+                Счета
             </x-nav-link>
 
 
