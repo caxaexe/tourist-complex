@@ -28,6 +28,9 @@ class UpdateBookingRequest extends FormRequest
             'date_to' => ['required', 'date', 'after:date_from'],
             'note' => ['nullable', 'string'],
             'status' => ['nullable', 'in:pending,confirmed,cancelled,checked_in,checked_out'],
+            'services' => ['sometimes', 'array'],
+            'services.*.id' => ['required', 'integer', 'exists:services,id'],
+            'services.*.quantity' => ['required', 'integer', 'min:1'],
         ];
     }
 }

@@ -76,6 +76,53 @@
                                   rows="3">{{ old('note', $booking->note) }}</textarea>
                     </div>
 
+                    <div class="mt-6">
+                        <h3 class="font-semibold mb-2">Дополнительные услуги</h3>
+
+                        <div class="space-y-3">
+                            @foreach($services as $index => $service)
+
+                                @php
+                                    $selected = isset($selectedServices[$service->id]);
+                                    $quantity = old("services.$index.quantity") ??
+                                                ($selected ? $selectedServices[$service->id]['quantity'] : null);
+                                @endphp
+
+                                <div class="flex items-center gap-4">
+
+                                    <input type="hidden"
+                                        name="services[{{ $index }}][id]"
+                                        value="{{ $service->id }}">
+
+                                    <input type="checkbox"
+                                        onchange="this.nextElementSibling.disabled = !this.checked"
+                                        {{ $selected ? 'checked' : '' }}>
+
+                                    <div class="flex-1">
+                                        {{ $service->name }}
+                                        <span class="text-sm text-gray-500">
+                                            ({{ number_format($service->price,2,'.',' ') }})
+                                        </span>
+                                    </div>
+
+                                    <input type="number"
+                                        name="services[{{ $index }}][quantity]"
+                                        min="1"
+                                        value="{{ $quantity }}"
+                                        class="border rounded px-3 py-2 w-24"
+                                        {{ $selected ? '' : 'disabled' }}>
+                                </div>
+
+                            @endforeach
+                        </div>
+                    </div>
+
+
+                        @error('services') <div class="text-red-600 mt-2">{{ $message }}</div> @enderror
+                        @error('services.*.id') <div class="text-red-600 mt-2">{{ $message }}</div> @enderror
+                        @error('services.*.quantity') <div class="text-red-600 mt-2">{{ $message }}</div> @enderror
+                    </div>
+
                     <div class="flex gap-3">
                         <button class="px-4 py-2 bg-blue-600 text-white rounded">
                             Сохранить

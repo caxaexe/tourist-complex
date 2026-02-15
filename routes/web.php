@@ -6,7 +6,7 @@ use App\Http\Controllers\RoomTypeController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\BookingController;
-
+use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -51,6 +51,12 @@ Route::middleware('auth')->group(function () {
     // CRUD бронирований
     Route::resource('bookings', BookingController::class)
     ->middleware('role:admin,employee');
+
+    // CRUD сервисов
+    Route::resource('services', ServiceController::class)
+    ->middleware('role:admin,employee');
+
+
 
 });
 

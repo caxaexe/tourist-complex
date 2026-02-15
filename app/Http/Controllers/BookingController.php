@@ -18,14 +18,38 @@ use Carbon\Carbon;
 class BookingController extends Controller
 {
     public function index(Request $request)
-    {
-        $bookings = Booking::query()
-            ->with(['client', 'room.roomType'])
-            ->orderBy('id', 'desc')
-            ->paginate(10);
+{
+    $bookings = Booking::query()
+        ->with(['client', 'room.roomType'])
+        ->orderBy('id', 'desc')
+        ->paginate(10);
 
-        return view('bookings.index', compact('bookings'));
-    }
+    $today = now()->toDateString();
+
+    $activeCount = Booking::whereNotIn('status', ['cancelled', 'checked_out'])->count();
+
+    $checkInToday = Booking::whereDate('date_from', $today)
+        ->where('status', '!=', 'cancelled')
+        ->count();
+
+    $checkOutToday = Booking::whereDate('date_to', $today)
+        ->where('status', '!=', 'cancelled')
+        ->count();
+
+    $confirmedCount = Booking::where('status', 'confirmed')->count();
+
+    $sumTotal = Booking::sum('total');
+
+    return view('bookings.index', compact(
+        'bookings',
+        'activeCount',
+        'checkInToday',
+        'checkOutToday',
+        'confirmedCount',
+        'sumTotal'
+    ));
+}
+
 
     public function create()
     {
@@ -75,15 +99,35 @@ class BookingController extends Controller
     }
 
     public function edit(Booking $booking)
-    {
-        $clients = Client::orderBy('full_name')->get();
-        $rooms = Room::with('roomType')
-            ->where('is_active', true)
-            ->orderBy('number')
-            ->get();
+{
+    $clients = Client::orderBy('full_name')->get();
 
-        return view('bookings.edit', compact('booking', 'clients', 'rooms'));
-    }
+    $rooms = Room::with('roomType')
+        ->where('is_active', true)
+        ->orderBy('number')
+        ->get();
+
+    $services = Service::orderBy('name')->get();
+
+    $selectedServices = $booking->services
+        ->keyBy('id')
+        ->map(fn($s) => [
+            'quantity' => $s->pivot->quantity,
+            'price' => $s->pivot->price
+        ])
+        ->toArray();
+
+    return view('bookings.edit', compact(
+        'booking',
+        'clients',
+        'rooms',
+        'services',
+        'selectedServices'
+    ));
+
+
+}
+
 
     public function update(UpdateBookingRequest $request, Booking $booking)
     {
@@ -110,6 +154,40 @@ class BookingController extends Controller
         $data['total'] = $nights * (float)$room->price_per_night;
 
         $booking->update($data);
+        // Собираем sync массив: [service_id => ['quantity'=>X, 'price'=>snapshotPrice]]
+        $sync = [];
+
+        foreach ($request->input('services', []) as $row) {
+
+        $serviceId = (int)$row['id'];
+        $qty = (int)$row['quantity'];
+
+        $service = Service::find($serviceId);
+        if (!$service) continue;
+
+        $sync[$serviceId] = [
+            'quantity' => $qty,
+            'price' => (float)$service->price,
+        ];
+    }
+
+        $booking->services()->sync($sync);
+
+        $room = Room::findOrFail($data['room_id']);
+        $from = \Carbon\Carbon::parse($data['date_from']);
+        $to = \Carbon\Carbon::parse($data['date_to']);
+
+        $nights = $from->diffInDays($to);
+        $stayTotal = $nights * (float)$room->price_per_night;
+
+        $servicesTotal = $booking->services()
+            ->get()
+            ->sum(fn($s) => $s->pivot->quantity * $s->pivot->price);
+
+        $booking->update([
+            'total' => $stayTotal + $servicesTotal
+        ]);
+
 
         return redirect()->route('bookings.index')
             ->with('success', 'Бронирование обновлено');

@@ -14,10 +14,69 @@
                 </div>
             @endif
 
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Активные</div>
+                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $activeCount }}</div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Заезд сегодня</div>
+                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $checkInToday }}</div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Выезд сегодня</div>
+                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $checkOutToday }}</div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Подтверждено</div>
+                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $confirmedCount }}</div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Сумма всего</div>
+                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                        {{ number_format($sumTotal, 2, '.', ' ') }}
+                    </div>
+                </div>
+            </div>
+
             <a href="{{ route('bookings.create') }}"
                class="px-4 py-2 bg-blue-600 text-white rounded">
                 + Создать бронирование
             </a>
+
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white shadow rounded p-4">
+                    <div class="text-sm text-gray-500">Активные</div>
+                    <div class="text-2xl font-semibold">{{ $activeCount }}</div>
+                </div>
+
+                <div class="bg-white shadow rounded p-4">
+                    <div class="text-sm text-gray-500">Заезд сегодня</div>
+                    <div class="text-2xl font-semibold">{{ $checkInToday }}</div>
+                </div>
+
+                <div class="bg-white shadow rounded p-4">
+                    <div class="text-sm text-gray-500">Выезд сегодня</div>
+                    <div class="text-2xl font-semibold">{{ $checkOutToday }}</div>
+                </div>
+
+                <div class="bg-white shadow rounded p-4">
+                    <div class="text-sm text-gray-500">Подтверждено</div>
+                    <div class="text-2xl font-semibold">{{ $confirmedCount }}</div>
+                </div>
+
+                <div class="bg-white shadow rounded p-4">
+                    <div class="text-sm text-gray-500">Общая сумма</div>
+                    <div class="text-2xl font-semibold">
+                        {{ number_format($sumTotal, 2, '.', ' ') }}
+                    </div>
+                </div>
+</div>
+
 
             <div class="mt-4 bg-white dark:bg-gray-800 shadow rounded p-4">
                 <table class="w-full">
