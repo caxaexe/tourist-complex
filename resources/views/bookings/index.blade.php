@@ -61,6 +61,7 @@
                             <th>Ночей</th>
                             <th>Цена/ночь</th>
                             <th>Статус</th>
+                            <th>Оплата</th>
                             <th>Сумма</th>
                             <th class="text-right">Действия</th>
                         </tr>
@@ -69,6 +70,7 @@
                     <tbody>
                         @forelse($bookings as $booking)
                             @php
+                                // статус бронирования
                                 $map = [
                                     'pending' => 'bg-yellow-100 text-yellow-800',
                                     'confirmed' => 'bg-green-100 text-green-800',
@@ -77,11 +79,28 @@
                                     'checked_out' => 'bg-purple-100 text-purple-800',
                                 ];
                                 $cls = $map[$booking->status] ?? 'bg-gray-100 text-gray-800';
+
                                 $nights = $booking->date_from->diffInDays($booking->date_to);
+
+                                // оплата
+                                $paid = (float) ($booking->payments_sum_amount ?? 0);
+                                $due  = (float) ($booking->total ?? 0);
+
+                                if ($paid <= 0) {
+                                    $payText = 'UNPAID';
+                                    $payCls  = 'bg-red-100 text-red-800';
+                                } elseif ($paid + 0.01 < $due) {
+                                    $payText = 'PARTIAL';
+                                    $payCls  = 'bg-yellow-100 text-yellow-800';
+                                } else {
+                                    $payText = 'PAID';
+                                    $payCls  = 'bg-green-100 text-green-800';
+                                }
                             @endphp
 
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="py-2">{{ $booking->id }}</td>
+
                                 <td>{{ $booking->client->full_name }}</td>
 
                                 <td>
@@ -100,12 +119,24 @@
                                 </td>
 
                                 <td>{{ $nights }}</td>
+
                                 <td>{{ number_format($booking->room->price_per_night, 2, '.', ' ') }}</td>
 
                                 <td>
                                     <span class="px-2 py-1 rounded text-sm {{ $cls }}">
                                         {{ $booking->status }}
                                     </span>
+                                </td>
+
+                                <td>
+                                    <a href="{{ route('payments.create', ['booking_id' => $booking->id]) }}"
+                                       class="inline-block px-2 py-1 rounded text-sm {{ $payCls }}">
+                                        {{ $payText }}
+                                    </a>
+
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        {{ number_format($paid, 2, '.', ' ') }} / {{ number_format($due, 2, '.', ' ') }}
+                                    </div>
                                 </td>
 
                                 <td>{{ number_format($booking->total, 2, '.', ' ') }}</td>
@@ -130,9 +161,10 @@
                                     @endif
                                 </td>
                             </tr>
+
                         @empty
                             <tr>
-                                <td colspan="9" class="py-4 text-center text-gray-500">
+                                <td colspan="10" class="py-4 text-center text-gray-500">
                                     Нет бронирований
                                 </td>
                             </tr>

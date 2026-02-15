@@ -21,6 +21,7 @@ class BookingController extends Controller
 {
     $bookings = Booking::query()
         ->with(['client', 'room.roomType'])
+        ->withSum('payments', 'amount') // даст поле payments_sum_amount
         ->orderBy('id', 'desc')
         ->paginate(10);
 
