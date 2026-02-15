@@ -10,6 +10,7 @@ use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\BookingInvoiceController;
+use App\Http\Controllers\PaymentController;
 
 
 Route::get('/', function () {
@@ -65,6 +66,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin,employee')
         ->name('bookings.invoices.store');
 
+    Route::resource('payments', PaymentController::class)
+        ->only(['index', 'create', 'store', 'destroy'])
+        ->middleware('role:admin,employee');
 });
 
 require __DIR__.'/auth.php';

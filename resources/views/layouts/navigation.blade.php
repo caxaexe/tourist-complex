@@ -48,6 +48,10 @@
                         Счета
                     </x-nav-link>
 
+                    <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                        Оплаты
+                    </x-nav-link>
+
 
                     @auth
                         @if(auth()->user()->hasRole('admin'))
@@ -145,6 +149,9 @@
                 Счета
             </x-nav-link>
 
+            <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                Оплаты
+            </x-nav-link>
 
             @auth
                 @if(auth()->user()->hasRole('admin'))

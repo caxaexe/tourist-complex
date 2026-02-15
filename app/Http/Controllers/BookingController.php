@@ -98,8 +98,16 @@ class BookingController extends Controller
             ->with('success', 'Бронирование создано');
     }
 
-    public function edit(Booking $booking)
+public function edit(Booking $booking)
 {
+    // Подгружаем связи заранее (чтобы не было N+1 и чтобы работало в view)
+    $booking->load([
+        'client',
+        'room.roomType',
+        'services',   // pivot quantity/price
+        'payments',   // оплаты
+    ]);
+
     $clients = Client::orderBy('full_name')->get();
 
     $rooms = Room::with('roomType')
@@ -109,24 +117,32 @@ class BookingController extends Controller
 
     $services = Service::orderBy('name')->get();
 
+    // [service_id => ['quantity'=>..., 'price'=>...]]
     $selectedServices = $booking->services
         ->keyBy('id')
-        ->map(fn($s) => [
-            'quantity' => $s->pivot->quantity,
-            'price' => $s->pivot->price
+        ->map(fn ($s) => [
+            'quantity' => (int)$s->pivot->quantity,
+            'price' => (float)$s->pivot->price,
         ])
         ->toArray();
+
+    // Мини-статистика по оплатам для конкретной брони
+    $paidTotal = (float)$booking->payments->sum('amount');
+    $dueTotal = (float)$booking->total;
+    $balance = max(0, $dueTotal - $paidTotal);
 
     return view('bookings.edit', compact(
         'booking',
         'clients',
         'rooms',
         'services',
-        'selectedServices'
+        'selectedServices',
+        'paidTotal',
+        'dueTotal',
+        'balance'
     ));
-
-
 }
+
 
 
     public function update(UpdateBookingRequest $request, Booking $booking)
