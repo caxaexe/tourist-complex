@@ -27,8 +27,8 @@ Route::middleware('auth')->group(function () {
 
     // Только admin
     Route::get('/admin', function () {
-        return 'Admin area';
-    })->middleware('role:admin');
+        return view('admin.dashboard');
+    })->middleware(['auth', 'role:admin'])->name('admin.dashboard');
 
     // admin + employee
     Route::get('/staff', fn () => 'Staff area')->middleware('role:admin,employee');
