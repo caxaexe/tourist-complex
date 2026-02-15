@@ -19,6 +19,28 @@
                 + Создать бронирование
             </a>
 
+            <div class="mt-4 flex flex-wrap items-center gap-2">
+                <a href="{{ route('bookings.index') }}"
+                class="px-3 py-2 rounded border {{ empty($payment) ? 'bg-gray-100' : '' }}">
+                    Все
+                </a>
+
+                <a href="{{ route('bookings.index', ['payment' => 'unpaid']) }}"
+                class="px-3 py-2 rounded border {{ ($payment ?? '') === 'unpaid' ? 'bg-gray-100' : '' }}">
+                    UNPAID
+                </a>
+
+                <a href="{{ route('bookings.index', ['payment' => 'partial']) }}"
+                class="px-3 py-2 rounded border {{ ($payment ?? '') === 'partial' ? 'bg-gray-100' : '' }}">
+                    PARTIAL
+                </a>
+
+                <a href="{{ route('bookings.index', ['payment' => 'paid']) }}"
+                class="px-3 py-2 rounded border {{ ($payment ?? '') === 'paid' ? 'bg-gray-100' : '' }}">
+                    PAID
+                </a>
+            </div>
+
             {{-- Мини-статистика --}}
             <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-white dark:bg-gray-800 shadow rounded p-4">

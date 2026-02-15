@@ -19,12 +19,27 @@ class BookingController extends Controller
 {
     public function index(Request $request)
 {
-    $bookings = Booking::query()
-        ->with(['client', 'room.roomType'])
-        ->withSum('payments', 'amount') // даст поле payments_sum_amount
-        ->orderBy('id', 'desc')
-        ->paginate(10);
+    $payment = $request->query('payment'); // unpaid | partial | paid | null
 
+    $query = Booking::query()
+        ->with(['client', 'room.roomType'])
+        ->withSum('payments', 'amount');
+
+    // Фильтр по оплате (через HAVING, потому что payments_sum_amount — агрегат)
+    if ($payment === 'unpaid') {
+        $query->havingRaw('COALESCE(payments_sum_amount, 0) <= 0');
+    } elseif ($payment === 'partial') {
+        $query->havingRaw('COALESCE(payments_sum_amount, 0) > 0 AND COALESCE(payments_sum_amount, 0) < total');
+    } elseif ($payment === 'paid') {
+        $query->havingRaw('COALESCE(payments_sum_amount, 0) >= total');
+    }
+
+    $bookings = $query
+        ->orderBy('id', 'desc')
+        ->paginate(10)
+        ->withQueryString();
+
+    // Мини-статистика (как было)
     $today = now()->toDateString();
 
     $activeCount = Booking::whereNotIn('status', ['cancelled', 'checked_out'])->count();
@@ -43,6 +58,7 @@ class BookingController extends Controller
 
     return view('bookings.index', compact(
         'bookings',
+        'payment',
         'activeCount',
         'checkInToday',
         'checkOutToday',
@@ -50,6 +66,7 @@ class BookingController extends Controller
         'sumTotal'
     ));
 }
+
 
 
     public function create()
