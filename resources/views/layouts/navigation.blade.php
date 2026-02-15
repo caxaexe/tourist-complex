@@ -40,6 +40,11 @@
                         Бронирования
                     </x-nav-link>
 
+                    <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">
+                        Услуги
+                    </x-nav-link>
+
+
                     @auth
                         @if(auth()->user()->hasRole('admin'))
                             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
@@ -127,6 +132,11 @@
             <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.*')">
                 Бронирования
             </x-nav-link>
+
+            <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">
+                Услуги
+            </x-nav-link>
+
 
             @auth
                 @if(auth()->user()->hasRole('admin'))
