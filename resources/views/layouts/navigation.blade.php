@@ -36,6 +36,9 @@
                         Удобства
                     </x-nav-link>
 
+                    <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.*')">
+                        Бронирования
+                    </x-nav-link>
 
                     @if(auth()->user()?->hasRole('admin'))
                         <x-nav-link :href="url('/admin')" :active="request()->is('admin')">
@@ -117,6 +120,10 @@
 
             <x-nav-link :href="route('amenities.index')" :active="request()->routeIs('amenities.*')">
                 Удобства
+            </x-nav-link>
+
+            <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.*')">
+                Бронирования
             </x-nav-link>
 
             @if(auth()->user()?->hasRole('admin'))

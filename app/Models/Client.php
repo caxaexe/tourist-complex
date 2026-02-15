@@ -15,4 +15,10 @@ class Client extends Model
         'birth_date',
         'address',
     ];
+
+
+    public function bookings()
+    {
+        return $this->hasMany(\App\Models\Booking::class);
+    }
 }
