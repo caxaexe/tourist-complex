@@ -26,7 +26,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Только admin
-    Route::get('/admin', fn () => 'Admin area')->middleware('role:admin');
+    Route::get('/admin', function () {
+        return 'Admin area';
+    })->middleware('role:admin');
 
     // admin + employee
     Route::get('/staff', fn () => 'Staff area')->middleware('role:admin,employee');

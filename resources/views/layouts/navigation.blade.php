@@ -40,8 +40,8 @@
                         Бронирования
                     </x-nav-link>
 
-                    @if(auth()->user()?->hasRole('admin'))
-                        <x-nav-link :href="url('/admin')" :active="request()->is('admin')">
+                    @if(auth()->user()->roles()->where('name', 'admin')->exists())
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                             Админ-панель
                         </x-nav-link>
                     @endif
@@ -126,10 +126,10 @@
                 Бронирования
             </x-nav-link>
 
-            @if(auth()->user()?->hasRole('admin'))
-                <x-responsive-nav-link :href="url('/admin')" :active="request()->is('admin')">
+            @if(auth()->user()->roles()->where('name', 'admin')->exists())
+                <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                     Админ-панель
-                </x-responsive-nav-link>
+                </x-nav-link>
             @endif
         </div>
 
