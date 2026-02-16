@@ -25,7 +25,12 @@ if (! function_exists('logAudit')) {
                 'method' => $request?->method(),
             ]);
         } catch (\Throwable $e) {
-            // Чтобы логирование НИКОГДА не ломало приложение
+            \Log::error('AuditLog failed', [
+                'message' => $e->getMessage(),
+                'action' => $action ?? null,
+                'entity' => $entity ? get_class($entity) : null,
+            ]);
         }
+
     }
 }
