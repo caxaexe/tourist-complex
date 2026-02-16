@@ -18,34 +18,55 @@
                 <table class="w-full">
                     <thead>
                         <tr class="text-left border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-2">№</th>
-                            <th>Бронь</th>
-                            <th>Клиент</th>
-                            <th>Дата</th>
-                            <th>Статус</th>
-                            <th>Сумма</th>
-                            <th class="text-right">Открыть</th>
+                            <th class="py-2 text-gray-700 dark:text-gray-200">№</th>
+                            <th class="text-gray-700 dark:text-gray-200">Бронь</th>
+                            <th class="text-gray-700 dark:text-gray-200">Клиент</th>
+                            <th class="text-gray-700 dark:text-gray-200">Дата</th>
+                            <th class="text-gray-700 dark:text-gray-200">Статус</th>
+                            <th class="text-gray-700 dark:text-gray-200">Сумма</th>
+                            <th class="text-right text-gray-700 dark:text-gray-200">Открыть</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @forelse($invoices as $inv)
                             <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="py-2">{{ $inv->number }}</td>
-                                <td>#{{ $inv->booking_id }}</td>
-                                <td>{{ $inv->booking->client->full_name ?? '—' }}</td>
-                                <td>{{ optional($inv->issued_at)->format('d.m.Y') }}</td>
-                                <td>{{ $inv->status }}</td>
-                                <td>{{ number_format($inv->total, 2, '.', ' ') }}</td>
+                                <td class="py-2 text-gray-800 dark:text-gray-200">
+                                    {{ $inv->number }}
+                                </td>
+
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    #{{ $inv->booking_id }}
+                                </td>
+
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ $inv->booking->client->full_name ?? '—' }}
+                                </td>
+
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ optional($inv->issued_at)->format('d.m.Y') }}
+                                </td>
+
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ $inv->status }}
+                                </td>
+
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ number_format($inv->total, 2, '.', ' ') }}
+                                </td>
+
                                 <td class="text-right">
-                                    <a class="text-blue-600" href="{{ route('invoices.show', $inv) }}">
+                                    <a class="text-blue-600"
+                                       href="{{ route('invoices.show', $inv) }}">
                                         Просмотр
                                     </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-4 text-center text-gray-500">Нет счетов</td>
+                                <td colspan="7" class="py-4 text-center text-gray-500">
+                                    Нет счетов
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>

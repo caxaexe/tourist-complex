@@ -14,29 +14,39 @@
                 </div>
             @endif
 
-            <a href="{{ route('bookings.create') }}"
-               class="px-4 py-2 bg-blue-600 text-white rounded">
-                + Создать бронирование
-            </a>
+            <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
+                <a href="{{ route('bookings.create') }}"
+                   class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded">
+                    + Создать бронирование
+                </a>
+            </div>
 
-            <div class="mt-4 flex flex-wrap items-center gap-2">
+            <div class="mb-4 flex flex-wrap items-center gap-2">
                 <a href="{{ route('bookings.index') }}"
-                class="px-3 py-2 rounded border {{ empty($payment) ? 'bg-gray-100' : '' }}">
+                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
+                          {{ empty($payment) ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
+                          text-gray-800 dark:text-gray-200">
                     Все
                 </a>
 
                 <a href="{{ route('bookings.index', ['payment' => 'unpaid']) }}"
-                class="px-3 py-2 rounded border {{ ($payment ?? '') === 'unpaid' ? 'bg-gray-100' : '' }}">
+                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
+                          {{ ($payment ?? '') === 'unpaid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
+                          text-gray-800 dark:text-gray-200">
                     UNPAID
                 </a>
 
                 <a href="{{ route('bookings.index', ['payment' => 'partial']) }}"
-                class="px-3 py-2 rounded border {{ ($payment ?? '') === 'partial' ? 'bg-gray-100' : '' }}">
+                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
+                          {{ ($payment ?? '') === 'partial' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
+                          text-gray-800 dark:text-gray-200">
                     PARTIAL
                 </a>
 
                 <a href="{{ route('bookings.index', ['payment' => 'paid']) }}"
-                class="px-3 py-2 rounded border {{ ($payment ?? '') === 'paid' ? 'bg-gray-100' : '' }}">
+                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
+                          {{ ($payment ?? '') === 'paid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
+                          text-gray-800 dark:text-gray-200">
                     PAID
                 </a>
             </div>
@@ -76,23 +86,22 @@
                 <table class="w-full">
                     <thead>
                         <tr class="text-left border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-2">ID</th>
-                            <th>Клиент</th>
-                            <th>Номер</th>
-                            <th>Даты</th>
-                            <th>Ночей</th>
-                            <th>Цена/ночь</th>
-                            <th>Статус</th>
-                            <th>Оплата</th>
-                            <th>Сумма</th>
-                            <th class="text-right">Действия</th>
+                            <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
+                            <th class="text-gray-700 dark:text-gray-200">Клиент</th>
+                            <th class="text-gray-700 dark:text-gray-200">Номер</th>
+                            <th class="text-gray-700 dark:text-gray-200">Даты</th>
+                            <th class="text-gray-700 dark:text-gray-200">Ночей</th>
+                            <th class="text-gray-700 dark:text-gray-200">Цена/ночь</th>
+                            <th class="text-gray-700 dark:text-gray-200">Статус</th>
+                            <th class="text-gray-700 dark:text-gray-200">Оплата</th>
+                            <th class="text-gray-700 dark:text-gray-200">Сумма</th>
+                            <th class="text-right text-gray-700 dark:text-gray-200">Действия</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @forelse($bookings as $booking)
                             @php
-                                // статус бронирования
                                 $map = [
                                     'pending' => 'bg-yellow-100 text-yellow-800',
                                     'confirmed' => 'bg-green-100 text-green-800',
@@ -104,7 +113,6 @@
 
                                 $nights = $booking->date_from->diffInDays($booking->date_to);
 
-                                // оплата
                                 $paid = (float) ($booking->payments_sum_amount ?? 0);
                                 $due  = (float) ($booking->total ?? 0);
 
@@ -121,11 +129,13 @@
                             @endphp
 
                             <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="py-2">{{ $booking->id }}</td>
+                                <td class="py-2 text-gray-800 dark:text-gray-200">{{ $booking->id }}</td>
 
-                                <td>{{ $booking->client->full_name }}</td>
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ $booking->client->full_name }}
+                                </td>
 
-                                <td>
+                                <td class="text-gray-800 dark:text-gray-200">
                                     №{{ $booking->room->number }}
                                     @if($booking->room->roomType)
                                         <div class="text-xs text-gray-500">
@@ -134,23 +144,25 @@
                                     @endif
                                 </td>
 
-                                <td>
+                                <td class="text-gray-800 dark:text-gray-200">
                                     {{ $booking->date_from->format('d.m.Y') }}
                                     —
                                     {{ $booking->date_to->format('d.m.Y') }}
                                 </td>
 
-                                <td>{{ $nights }}</td>
+                                <td class="text-gray-800 dark:text-gray-200">{{ $nights }}</td>
 
-                                <td>{{ number_format($booking->room->price_per_night, 2, '.', ' ') }}</td>
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ number_format($booking->room->price_per_night, 2, '.', ' ') }}
+                                </td>
 
-                                <td>
+                                <td class="text-gray-800 dark:text-gray-200">
                                     <span class="px-2 py-1 rounded text-sm {{ $cls }}">
                                         {{ $booking->status }}
                                     </span>
                                 </td>
 
-                                <td>
+                                <td class="text-gray-800 dark:text-gray-200">
                                     <a href="{{ route('payments.create', ['booking_id' => $booking->id]) }}"
                                        class="inline-block px-2 py-1 rounded text-sm {{ $payCls }}">
                                         {{ $payText }}
@@ -161,7 +173,9 @@
                                     </div>
                                 </td>
 
-                                <td>{{ number_format($booking->total, 2, '.', ' ') }}</td>
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ number_format($booking->total, 2, '.', ' ') }}
+                                </td>
 
                                 <td class="text-right">
                                     <a class="text-blue-600"
@@ -176,14 +190,11 @@
                                               onsubmit="return confirm('Удалить бронирование?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="text-red-600 ml-3">
-                                                Удалить
-                                            </button>
+                                            <button class="text-red-600 ml-3">Удалить</button>
                                         </form>
                                     @endif
                                 </td>
                             </tr>
-
                         @empty
                             <tr>
                                 <td colspan="10" class="py-4 text-center text-gray-500">

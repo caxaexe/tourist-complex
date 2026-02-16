@@ -48,4 +48,28 @@
                                     <form method="POST"
                                           action="{{ route('room-types.destroy', $type) }}"
                                           class="inline"
-                                          onsubmit="return confirm('Удалить тип?
+                                          onsubmit="return confirm('Удалить тип?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="text-red-600 ml-3">Удалить</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-4 text-center text-gray-500">
+                                    Нет типов номеров
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+
+                <div class="mt-4">
+                    {{ $roomTypes->links() }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</x-app-layout>
