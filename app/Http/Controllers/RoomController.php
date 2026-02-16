@@ -39,7 +39,10 @@ class RoomController extends Controller
         $data = $request->validated();
         $data['is_active'] = (bool)($data['is_active'] ?? false);
 
-        Room::create($data);
+        $room = Room::create($data);
+
+        // ✅ AUDIT: created
+        logAudit('created', $room, null, $room->toArray());
 
         return redirect()->route('rooms.index')
             ->with('success', 'Номер добавлен');
@@ -54,13 +57,17 @@ class RoomController extends Controller
         return view('rooms.edit', compact('room', 'roomTypes', 'amenities', 'selectedAmenityIds'));
     }
 
-
     public function update(UpdateRoomRequest $request, Room $room)
     {
         $data = $request->validated();
         $data['is_active'] = (bool)($data['is_active'] ?? false);
 
+        $old = $room->toArray();
+
         $room->update($data);
+
+        // ✅ AUDIT: updated
+        logAudit('updated', $room, $old, $room->toArray());
 
         return redirect()->route('rooms.index')
             ->with('success', 'Номер обновлён');
@@ -68,7 +75,12 @@ class RoomController extends Controller
 
     public function destroy(Room $room)
     {
+        $old = $room->toArray();
+
         $room->delete();
+
+        // ✅ AUDIT: deleted
+        logAudit('deleted', $room, $old, null);
 
         return redirect()->route('rooms.index')
             ->with('success', 'Номер удалён');

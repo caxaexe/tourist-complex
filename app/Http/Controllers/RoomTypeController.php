@@ -22,7 +22,10 @@ class RoomTypeController extends Controller
 
     public function store(StoreRoomTypeRequest $request)
     {
-        RoomType::create($request->validated());
+        $roomType = RoomType::create($request->validated());
+
+        // ✅ AUDIT: created
+        logAudit('created', $roomType, null, $roomType->toArray());
 
         return redirect()
             ->route('room-types.index')
@@ -36,7 +39,12 @@ class RoomTypeController extends Controller
 
     public function update(UpdateRoomTypeRequest $request, RoomType $room_type)
     {
+        $old = $room_type->toArray();
+
         $room_type->update($request->validated());
+
+        // ✅ AUDIT: updated
+        logAudit('updated', $room_type, $old, $room_type->toArray());
 
         return redirect()
             ->route('room-types.index')
@@ -45,7 +53,12 @@ class RoomTypeController extends Controller
 
     public function destroy(RoomType $room_type)
     {
+        $old = $room_type->toArray();
+
         $room_type->delete();
+
+        // ✅ AUDIT: deleted
+        logAudit('deleted', $room_type, $old, null);
 
         return redirect()
             ->route('room-types.index')

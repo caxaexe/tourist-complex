@@ -21,7 +21,10 @@ class AmenityController extends Controller
 
     public function store(StoreAmenityRequest $request)
     {
-        Amenity::create($request->validated());
+        $amenity = Amenity::create($request->validated());
+
+        // ✅ AUDIT: created
+        logAudit('created', $amenity, null, $amenity->toArray());
 
         return redirect()->route('amenities.index')
             ->with('success', 'Удобство добавлено');
@@ -34,7 +37,12 @@ class AmenityController extends Controller
 
     public function update(UpdateAmenityRequest $request, Amenity $amenity)
     {
+        $old = $amenity->toArray();
+
         $amenity->update($request->validated());
+
+        // ✅ AUDIT: updated
+        logAudit('updated', $amenity, $old, $amenity->toArray());
 
         return redirect()->route('amenities.index')
             ->with('success', 'Удобство обновлено');
@@ -42,7 +50,12 @@ class AmenityController extends Controller
 
     public function destroy(Amenity $amenity)
     {
+        $old = $amenity->toArray();
+
         $amenity->delete();
+
+        // ✅ AUDIT: deleted
+        logAudit('deleted', $amenity, $old, null);
 
         return redirect()->route('amenities.index')
             ->with('success', 'Удобство удалено');

@@ -38,7 +38,6 @@ class PaymentController extends Controller
         return view('payments.create', compact('bookings', 'bookingId', 'invoiceId', 'invoice'));
     }
 
-
     public function store(StorePaymentRequest $request)
     {
         $data = $request->validated();
@@ -54,6 +53,9 @@ class PaymentController extends Controller
         }
 
         $payment = Payment::create($data);
+
+        // ✅ AUDIT: created
+        logAudit('created', $payment, null, $payment->toArray());
 
         // Обновим статус счета после оплаты
         if (!empty($payment->invoice_id)) {
@@ -82,12 +84,16 @@ class PaymentController extends Controller
         $invoice->update(['status' => $status]);
     }
 
-
     public function destroy(Payment $payment)
     {
         $invoiceId = $payment->invoice_id;
 
+        // ✅ AUDIT: deleted (берём old до удаления)
+        $old = $payment->toArray();
+
         $payment->delete();
+
+        logAudit('deleted', $payment, $old, null);
 
         if ($invoiceId) {
             $this->recalcInvoiceStatus(\App\Models\Invoice::find($invoiceId));
@@ -96,5 +102,4 @@ class PaymentController extends Controller
         return redirect()->route('payments.index')
             ->with('success', 'Оплата удалена');
     }
-
 }

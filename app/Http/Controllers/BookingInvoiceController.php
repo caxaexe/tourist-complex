@@ -84,5 +84,9 @@ class BookingInvoiceController extends Controller
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', 'Счёт создан');
+
+        logAudit('created', $invoice, null, $invoice->toArray());
     }
+
+    
 }

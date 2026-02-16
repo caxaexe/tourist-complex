@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\BookingInvoiceController;
 use App\Http\Controllers\PaymentController;
-
+use App\Http\Controllers\AuditLogController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -69,6 +69,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('payments', PaymentController::class)
         ->only(['index', 'create', 'store', 'destroy'])
         ->middleware('role:admin,employee');
+
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])
+        ->middleware(['auth', 'role:admin'])
+        ->name('audit-logs.index');
 });
 
 require __DIR__.'/auth.php';

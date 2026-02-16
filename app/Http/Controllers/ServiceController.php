@@ -21,7 +21,10 @@ class ServiceController extends Controller
 
     public function store(StoreServiceRequest $request)
     {
-        Service::create($request->validated());
+        $service = Service::create($request->validated());
+
+        // ✅ AUDIT: created
+        logAudit('created', $service, null, $service->toArray());
 
         return redirect()->route('services.index')
             ->with('success', 'Услуга добавлена');
@@ -34,7 +37,12 @@ class ServiceController extends Controller
 
     public function update(UpdateServiceRequest $request, Service $service)
     {
+        $old = $service->toArray();
+
         $service->update($request->validated());
+
+        // ✅ AUDIT: updated
+        logAudit('updated', $service, $old, $service->toArray());
 
         return redirect()->route('services.index')
             ->with('success', 'Услуга обновлена');
@@ -42,7 +50,12 @@ class ServiceController extends Controller
 
     public function destroy(Service $service)
     {
+        $old = $service->toArray();
+
         $service->delete();
+
+        // ✅ AUDIT: deleted
+        logAudit('deleted', $service, $old, null);
 
         return redirect()->route('services.index')
             ->with('success', 'Услуга удалена');

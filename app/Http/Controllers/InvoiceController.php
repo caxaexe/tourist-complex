@@ -20,6 +20,10 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         $invoice->load(['booking.client', 'booking.room', 'items', 'payments']);
+
+        // ✅ AUDIT: viewed
+        logAudit('viewed', $invoice, null, null);
+
         return view('invoices.show', compact('invoice'));
     }
 

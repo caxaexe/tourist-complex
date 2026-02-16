@@ -33,7 +33,10 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request)
     {
-        Client::create($request->validated());
+        $client = Client::create($request->validated());
+
+        // ✅ AUDIT: created
+        logAudit('created', $client, null, $client->toArray());
 
         return redirect()
             ->route('clients.index')
@@ -47,7 +50,12 @@ class ClientController extends Controller
 
     public function update(UpdateClientRequest $request, Client $client)
     {
+        $old = $client->toArray();
+
         $client->update($request->validated());
+
+        // ✅ AUDIT: updated
+        logAudit('updated', $client, $old, $client->toArray());
 
         return redirect()
             ->route('clients.index')
@@ -56,7 +64,12 @@ class ClientController extends Controller
 
     public function destroy(Client $client)
     {
+        $old = $client->toArray();
+
         $client->delete();
+
+        // ✅ AUDIT: deleted
+        logAudit('deleted', $client, $old, null);
 
         return redirect()
             ->route('clients.index')

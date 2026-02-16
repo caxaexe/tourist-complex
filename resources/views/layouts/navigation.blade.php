@@ -53,6 +53,12 @@
                     </x-nav-link>
 
 
+                    @if(auth()->user()->hasRole('admin'))
+                        <x-nav-link :href="route('audit-logs.index')" :active="request()->routeIs('audit-logs.*')">
+                            Журнал
+                        </x-nav-link>
+                    @endif
+
                     @auth
                         @if(auth()->user()->hasRole('admin'))
                             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
@@ -152,6 +158,12 @@
             <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
                 Оплаты
             </x-nav-link>
+            
+            @if(auth()->user()->hasRole('admin'))
+                <x-nav-link :href="route('audit-logs.index')" :active="request()->routeIs('audit-logs.*')">
+                    Журнал
+                </x-nav-link>
+            @endif
 
             @auth
                 @if(auth()->user()->hasRole('admin'))
