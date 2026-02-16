@@ -8,6 +8,7 @@ class Payment extends Model
 {
     protected $fillable = [
         'booking_id',
+        'invoice_id',   // ✅ добавили
         'amount',
         'method',
         'paid_at',
@@ -21,5 +22,10 @@ class Payment extends Model
     public function booking()
     {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(\App\Models\Invoice::class);
     }
 }

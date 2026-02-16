@@ -27,6 +27,7 @@ class StorePaymentRequest extends FormRequest
             'method' => ['required', 'in:cash,card,transfer'],
             'paid_at' => ['nullable', 'date'],
             'note' => ['nullable', 'string'],
+            'invoice_id' => ['nullable', 'exists:invoices,id'],
         ];
     }
 }

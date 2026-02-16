@@ -19,7 +19,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['booking.client', 'booking.room', 'items']);
+        $invoice->load(['booking.client', 'booking.room', 'items', 'payments']);
         return view('invoices.show', compact('invoice'));
     }
 
