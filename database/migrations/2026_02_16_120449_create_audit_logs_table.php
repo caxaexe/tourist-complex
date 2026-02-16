@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        // ✅ если таблица уже есть — просто выходим, деплой не падает
+        if (Schema::hasTable('audit_logs')) {
+            return;
+        }
+
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
 
@@ -37,3 +42,4 @@ return new class extends Migration {
         Schema::dropIfExists('audit_logs');
     }
 };
+
