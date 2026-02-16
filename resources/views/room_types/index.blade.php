@@ -5,62 +5,47 @@
         </h2>
     </x-slot>
 
-    <div class="py-6 max-w-7xl mx-auto">
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-        @if(session('success'))
-            <div class="mb-4 p-3 bg-green-100 rounded">
-                {{ session('success') }}
+            @if(session('success'))
+                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
+                <a href="{{ route('room-types.create') }}"
+                   class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded">
+                    + Добавить тип
+                </a>
             </div>
-        @endif
 
-        <a href="{{ route('room-types.create') }}"
-           class="px-4 py-2 bg-blue-600 text-white rounded">
-            + Добавить тип
-        </a>
-
-        <div class="mt-4 bg-white shadow rounded p-4">
-            <table class="w-full">
-                <thead>
-                    <tr class="border-b">
-                        <th>ID</th>
-                        <th>Название</th>
-                        <th>Описание</th>
-                        <th class="text-right">Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($roomTypes as $type)
-                        <tr class="border-b">
-                            <td>{{ $type->id }}</td>
-                            <td>{{ $type->name }}</td>
-                            <td>{{ $type->description }}</td>
-                            <td class="text-right">
-                                <a href="{{ route('room-types.edit', $type) }}"
-                                   class="text-blue-600">Редактировать</a>
-
-                                <form method="POST"
-                                      action="{{ route('room-types.destroy', $type) }}"
-                                      class="inline"
-                                      onsubmit="return confirm('Удалить тип?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="text-red-600 ml-2">Удалить</button>
-                                </form>
-                            </td>
+            <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left border-b border-gray-200 dark:border-gray-700">
+                            <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
+                            <th class="text-gray-700 dark:text-gray-200">Название</th>
+                            <th class="text-gray-700 dark:text-gray-200">Описание</th>
+                            <th class="text-right text-gray-700 dark:text-gray-200">Действия</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center py-4">
-                                Нет типов номеров
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($roomTypes as $type)
+                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                <td class="py-2 text-gray-800 dark:text-gray-200">{{ $type->id }}</td>
+                                <td class="text-gray-800 dark:text-gray-200">{{ $type->name }}</td>
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ $type->description ?? '—' }}
+                                </td>
+                                <td class="text-right">
+                                    <a href="{{ route('room-types.edit', $type) }}"
+                                       class="text-blue-600">
+                                        Редактировать
+                                    </a>
 
-            <div class="mt-4">
-                {{ $roomTypes->links() }}
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+                                    <form method="POST"
+                                          action="{{ route('room-types.destroy', $type) }}"
+                                          class="inline"
+                                          onsubmit="return confirm('Удалить тип?
