@@ -24,7 +24,6 @@ class RoomTypeController extends Controller
     {
         $roomType = RoomType::create($request->validated());
 
-        // ✅ AUDIT: created
         logAudit('created', $roomType, null, $roomType->toArray());
 
         return redirect()
@@ -43,7 +42,6 @@ class RoomTypeController extends Controller
 
         $room_type->update($request->validated());
 
-        // ✅ AUDIT: updated
         logAudit('updated', $room_type, $old, $room_type->toArray());
 
         return redirect()
@@ -57,7 +55,6 @@ class RoomTypeController extends Controller
 
         $room_type->delete();
 
-        // ✅ AUDIT: deleted
         logAudit('deleted', $room_type, $old, null);
 
         return redirect()

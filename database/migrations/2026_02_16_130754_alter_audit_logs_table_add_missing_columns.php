@@ -8,7 +8,6 @@ return new class extends Migration {
     public function up(): void
     {
         if (!Schema::hasTable('audit_logs')) {
-            // Если вдруг таблицы нет — пусть её создаст твоя create_migration
             return;
         }
 
@@ -59,7 +58,6 @@ return new class extends Migration {
             }
         });
 
-        // Индексы — отдельно и “тихо”, чтобы не падать если уже есть
         try {
             Schema::table('audit_logs', function (Blueprint $table) {
                 $table->index(['entity_type', 'entity_id']);
@@ -68,7 +66,6 @@ return new class extends Migration {
             });
         } catch (\Throwable $e) {}
 
-        // Foreign key — тоже отдельно, чтобы не падать
         try {
             Schema::table('audit_logs', function (Blueprint $table) {
                 $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
@@ -78,6 +75,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        // можно не откатывать
+
     }
 };

@@ -35,7 +35,6 @@ class ClientController extends Controller
     {
         $client = Client::create($request->validated());
 
-        // ✅ AUDIT: created
         logAudit('created', $client, null, $client->toArray());
 
         return redirect()
@@ -54,7 +53,6 @@ class ClientController extends Controller
 
         $client->update($request->validated());
 
-        // ✅ AUDIT: updated
         logAudit('updated', $client, $old, $client->toArray());
 
         return redirect()
@@ -68,7 +66,6 @@ class ClientController extends Controller
 
         $client->delete();
 
-        // ✅ AUDIT: deleted
         logAudit('deleted', $client, $old, null);
 
         return redirect()

@@ -41,7 +41,6 @@ class RoomController extends Controller
 
         $room = Room::create($data);
 
-        // ✅ AUDIT: created
         logAudit('created', $room, null, $room->toArray());
 
         return redirect()->route('rooms.index')
@@ -66,7 +65,6 @@ class RoomController extends Controller
 
         $room->update($data);
 
-        // ✅ AUDIT: updated
         logAudit('updated', $room, $old, $room->toArray());
 
         return redirect()->route('rooms.index')
@@ -79,7 +77,6 @@ class RoomController extends Controller
 
         $room->delete();
 
-        // ✅ AUDIT: deleted
         logAudit('deleted', $room, $old, null);
 
         return redirect()->route('rooms.index')

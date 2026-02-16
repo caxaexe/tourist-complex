@@ -46,7 +46,6 @@ class PaymentController extends Controller
             $data['paid_at'] = now();
         }
 
-        // Если пришел invoice_id — booking_id берём из счета
         if (!empty($data['invoice_id'])) {
             $invoice = \App\Models\Invoice::findOrFail($data['invoice_id']);
             $data['booking_id'] = $invoice->booking_id;
@@ -54,7 +53,6 @@ class PaymentController extends Controller
 
         $payment = Payment::create($data);
 
-        // ✅ AUDIT: created
         logAudit('created', $payment, null, $payment->toArray());
 
         // Обновим статус счета после оплаты
@@ -88,7 +86,6 @@ class PaymentController extends Controller
     {
         $invoiceId = $payment->invoice_id;
 
-        // ✅ AUDIT: deleted (берём old до удаления)
         $old = $payment->toArray();
 
         $payment->delete();

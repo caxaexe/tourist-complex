@@ -21,11 +21,10 @@ class InvoiceController extends Controller
     {
         $invoice->load(['booking.client', 'booking.room', 'items', 'payments']);
 
-        // ✅ AUDIT: viewed
         logAudit('viewed', $invoice, null, null);
 
         return view('invoices.show', compact('invoice'));
     }
 
-    // Остальное можно сделать позже (edit/update/destroy) — для диплома часто хватает index+show+create-from-booking
+    // остальное позже (edit/update/destroy)
 }

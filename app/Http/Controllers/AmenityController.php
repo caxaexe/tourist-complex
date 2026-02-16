@@ -23,7 +23,6 @@ class AmenityController extends Controller
     {
         $amenity = Amenity::create($request->validated());
 
-        // ✅ AUDIT: created
         logAudit('created', $amenity, null, $amenity->toArray());
 
         return redirect()->route('amenities.index')
@@ -41,7 +40,6 @@ class AmenityController extends Controller
 
         $amenity->update($request->validated());
 
-        // ✅ AUDIT: updated
         logAudit('updated', $amenity, $old, $amenity->toArray());
 
         return redirect()->route('amenities.index')
@@ -54,7 +52,6 @@ class AmenityController extends Controller
 
         $amenity->delete();
 
-        // ✅ AUDIT: deleted
         logAudit('deleted', $amenity, $old, null);
 
         return redirect()->route('amenities.index')

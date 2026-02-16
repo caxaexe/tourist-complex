@@ -16,10 +16,6 @@ class BookingInvoiceController extends Controller
             return back()->withErrors(['invoice' => 'Нельзя создать счёт для отменённого бронирования.']);
         }
 
-        // Если хочешь запретить 2 счета на одно бронирование, раскомментируй:
-        // if ($booking->invoices()->exists()) {
-        //     return back()->withErrors(['invoice' => 'Счёт уже существует для этого бронирования.']);
-        // }
 
         $invoice = DB::transaction(function () use ($booking) {
 

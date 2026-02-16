@@ -23,7 +23,6 @@ class ServiceController extends Controller
     {
         $service = Service::create($request->validated());
 
-        // ✅ AUDIT: created
         logAudit('created', $service, null, $service->toArray());
 
         return redirect()->route('services.index')
@@ -41,7 +40,6 @@ class ServiceController extends Controller
 
         $service->update($request->validated());
 
-        // ✅ AUDIT: updated
         logAudit('updated', $service, $old, $service->toArray());
 
         return redirect()->route('services.index')
@@ -54,7 +52,6 @@ class ServiceController extends Controller
 
         $service->delete();
 
-        // ✅ AUDIT: deleted
         logAudit('deleted', $service, $old, null);
 
         return redirect()->route('services.index')

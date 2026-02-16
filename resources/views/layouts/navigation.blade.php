@@ -51,7 +51,10 @@
                     <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
                         Оплаты
                     </x-nav-link>
-
+                    
+                    <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                        Отчёты
+                    </x-nav-link>
 
                     @if(auth()->user()->hasRole('admin'))
                         <x-nav-link :href="route('audit-logs.index')" :active="request()->routeIs('audit-logs.*')">
@@ -157,6 +160,10 @@
 
             <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
                 Оплаты
+            </x-nav-link>
+
+            <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                Отчёты
             </x-nav-link>
             
             @if(auth()->user()->hasRole('admin'))
