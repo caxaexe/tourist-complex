@@ -43,7 +43,7 @@ class ReportController extends Controller
                 'services.id',
                 'services.name',
                 DB::raw('SUM(booking_service.quantity) as qty'),
-                DB::raw('SUM(booking_service.quantity * booking_service.price) as revenue')
+                DB::raw('SUM(booking_service.quantity * services.price) as revenue')
             )
             ->groupBy('services.id', 'services.name')
             ->orderByDesc('revenue')
@@ -61,12 +61,13 @@ class ReportController extends Controller
                 'rooms.id',
                 'rooms.number',
                 DB::raw('COUNT(bookings.id) as bookings_count'),
-                DB::raw('SUM(julianday(bookings.date_to) - julianday(bookings.date_from)) as nights')
+                DB::raw('SUM(DATEDIFF(bookings.date_to, bookings.date_from)) as nights')
             )
             ->groupBy('rooms.id', 'rooms.number')
             ->orderByDesc('nights')
             ->limit(15)
-            ->get();
+            ->get();    
+
 
         return view('reports.index', compact(
             'from',
