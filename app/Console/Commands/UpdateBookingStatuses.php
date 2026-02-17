@@ -3,53 +3,29 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Booking;
 
 class UpdateBookingStatuses extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'bookings:update-statuses';
+    protected $description = 'Автоматически обновляет статусы бронирований по датам';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Auto update booking statuses (check-in/check-out)';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $today = now()->toDateString();
 
-        // check-in
-        $in = \App\Models\Booking::where('status', 'confirmed')
-            ->whereDate('date_from', $today)
-            ->get();
+        // confirmed -> checked_in (если сегодня заезд)
+        $checkedIn = Booking::where('status', 'confirmed')
+            ->whereDate('date_from', '<=', $today)
+            ->update(['status' => 'checked_in']);
 
-        foreach ($in as $b) {
-            $old = $b->toArray();
-            $b->update(['status' => 'checked_in']);
-            logAudit('updated', $b, $old, $b->toArray());
-        }
-
-        // check-out
-        $out = \App\Models\Booking::whereIn('status', ['confirmed', 'checked_in'])
+        // checked_in -> checked_out (если сегодня/прошло выселение)
+        $checkedOut = Booking::where('status', 'checked_in')
             ->whereDate('date_to', '<=', $today)
-            ->get();
+            ->update(['status' => 'checked_out']);
 
-        foreach ($out as $b) {
-            $old = $b->toArray();
-            $b->update(['status' => 'checked_out']);
-            logAudit('updated', $b, $old, $b->toArray());
-        }
+        $this->info("Checked in: {$checkedIn}, Checked out: {$checkedOut}");
 
-        $this->info('Booking statuses updated.');
+        return 0;
     }
-
 }

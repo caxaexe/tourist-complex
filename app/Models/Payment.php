@@ -8,7 +8,7 @@ class Payment extends Model
 {
     protected $fillable = [
         'booking_id',
-        'invoice_id',   // ✅ добавили
+        'invoice_id', 
         'amount',
         'method',
         'paid_at',

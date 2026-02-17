@@ -6,6 +6,8 @@ use App\Models\Payment;
 use App\Models\Booking;
 use App\Http\Requests\StorePaymentRequest;
 use Illuminate\Http\Request;
+use App\Services\InvoiceService;
+use App\Models\Invoice;
 
 class PaymentController extends Controller
 {
@@ -62,6 +64,13 @@ class PaymentController extends Controller
 
         return redirect()->route('payments.index')
             ->with('success', 'Оплата добавлена');
+
+        if (!empty($data['invoice_id'])) {
+        $invoice = Invoice::find($data['invoice_id']);
+        if ($invoice) {
+            app(InvoiceService::class)->refreshStatus($invoice);
+        }
+}
     }
 
     private function recalcInvoiceStatus(?\App\Models\Invoice $invoice): void
@@ -98,5 +107,12 @@ class PaymentController extends Controller
 
         return redirect()->route('payments.index')
             ->with('success', 'Оплата удалена');
+        
+        if ($payment->invoice_id) {
+            $invoice = Invoice::find($payment->invoice_id);
+            if ($invoice) {
+                app(InvoiceService::class)->refreshStatus($invoice);
+            }
+        }
     }
 }
