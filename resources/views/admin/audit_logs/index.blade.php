@@ -5,8 +5,8 @@
                 Журнал действий (Audit Logs)
             </h2>
 
-            <form method="GET" action="{{ route('audit-logs.index') }}" class="flex gap-2">
-                <input name="q" value="{{ $q }}"
+            <form method="GET" action="{{ route('admin.audit-logs.index') }}" class="flex gap-2">
+                <input name="q" value="{{ $q ?? request('q') }}"
                        class="border rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700"
                        placeholder="поиск: action, model, url, ip">
                 <button class="px-4 py-2 bg-blue-600 text-white rounded">Найти</button>
@@ -37,7 +37,7 @@
                                 <td>{{ $log->created_at?->format('d.m.Y H:i') }}</td>
                                 <td>{{ $log->user->name ?? '—' }}</td>
                                 <td>
-                                    <span class="px-2 py-1 rounded text-sm bg-gray-100 text-gray-800">
+                                    <span class="px-2 py-1 rounded text-sm bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
                                         {{ $log->action }}
                                     </span>
                                 </td>
