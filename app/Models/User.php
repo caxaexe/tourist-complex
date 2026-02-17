@@ -22,6 +22,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'full_name',
+        'phone',
+        'salary',
+        'position',
+        'duties',
+        'is_active',
     ];
 
     /**
@@ -48,9 +54,9 @@ class User extends Authenticatable
     }
 
     public function roles()
-{
-    return $this->belongsToMany(Role::class);
-}
+    {
+        return $this->belongsToMany(Role::class);
+    }
 
     public function hasRole(string $role): bool
     {
@@ -62,4 +68,8 @@ class User extends Authenticatable
         return $this->roles()->whereIn('name', $roles)->exists();
     }
 
+    public function bookings()
+    {
+        return $this->hasMany(\App\Models\Booking::class);
+    }
 }

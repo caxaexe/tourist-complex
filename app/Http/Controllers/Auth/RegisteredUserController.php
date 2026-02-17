@@ -41,6 +41,11 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        $roleId = \App\Models\Role::where('name', 'user')->value('id');
+        if ($roleId) {
+            $user->roles()->syncWithoutDetaching([$roleId]);
+        }
+
         event(new Registered($user));
 
         Auth::login($user);

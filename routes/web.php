@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\RoomTypeController;
@@ -7,77 +9,89 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ServiceController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\BookingInvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ReportController;
 
+// NEW
+use App\Http\Controllers\BookingRequestController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+
 Route::get('/', function () {
     return view('welcome');
 });
 
+// dashboard как у тебя
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
 
-    // Профиль
+    // ✅ Профиль
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Только admin
-    Route::get('/admin', function () {
-        return view('admin.dashboard');
-    })->middleware(['auth', 'role:admin'])->name('admin.dashboard');
+    // =========================================================
+    // ✅ ADMIN ONLY
+    // =========================================================
+    Route::prefix('admin')->middleware('role:admin')->group(function () {
 
-    // admin + employee
-    Route::get('/staff', fn () => 'Staff area')->middleware('role:admin,employee');
+        Route::get('/', function () {
+            return view('admin.dashboard');
+        })->name('admin.dashboard');
 
-    // CRUD клиентов (admin + employee)
-    Route::resource('clients', ClientController::class)->middleware('role:admin,employee');
+        // ✅ Управление персоналом (CRUD)
+        Route::resource('users', AdminUserController::class)
+            ->names('admin.users');
 
-    // CRUD типов комнат
-    Route::resource('room-types', RoomTypeController::class)
-    ->middleware('role:admin,employee');
+        // ✅ Журнал действий (только admin)
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])
+            ->name('admin.audit-logs.index');
+    });
 
-    // CRUD комнат
-    Route::resource('rooms', RoomController::class)
-    ->middleware('role:admin,employee');
+    // =========================================================
+    // ✅ EMPLOYEE + ADMIN (рабочая часть)
+    // =========================================================
+    Route::middleware('role:admin,employee')->group(function () {
 
-    // CRUD удобств
-    Route::resource('amenities', AmenityController::class)
-    ->middleware('role:admin,employee');
+        Route::get('/staff', fn () => 'Staff area')->name('staff');
 
-    // CRUD бронирований
-    Route::resource('bookings', BookingController::class)
-    ->middleware('role:admin,employee');
+        Route::resource('clients', ClientController::class);
+        Route::resource('room-types', RoomTypeController::class);
+        Route::resource('rooms', RoomController::class);
+        Route::resource('amenities', AmenityController::class);
+        Route::resource('bookings', BookingController::class);
+        Route::resource('services', ServiceController::class);
 
-    // CRUD сервисов
-    Route::resource('services', ServiceController::class)
-    ->middleware('role:admin,employee');
+        Route::resource('invoices', InvoiceController::class);
 
-    Route::resource('invoices', InvoiceController::class)
-        ->middleware('role:admin,employee');
+        Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])
+            ->name('bookings.invoices.store');
 
-    Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])
-        ->middleware('role:admin,employee')
-        ->name('bookings.invoices.store');
+        Route::resource('payments', PaymentController::class)
+            ->only(['index', 'create', 'store', 'destroy']);
 
-    Route::resource('payments', PaymentController::class)
-        ->only(['index', 'create', 'store', 'destroy'])
-        ->middleware('role:admin,employee');
+        Route::get('/reports', [ReportController::class, 'index'])
+            ->name('reports.index');
+    });
 
-    Route::get('/audit-logs', [AuditLogController::class, 'index'])
-        ->middleware(['auth', 'role:admin'])
-        ->name('audit-logs.index');
+    // =========================================================
+    // ✅ USER (обычный пользователь: заявки)
+    // =========================================================
+    Route::middleware('role:user')->group(function () {
+        Route::get('/my-bookings', [BookingRequestController::class, 'index'])
+            ->name('my.bookings.index');
 
-    Route::get('/reports', [ReportController::class, 'index'])
-        ->middleware(['auth', 'role:admin,employee'])
-        ->name('reports.index');
+        Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])
+            ->name('my.bookings.create');
+
+        Route::post('/my-bookings', [BookingRequestController::class, 'store'])
+            ->name('my.bookings.store');
+    });
 });
 
 require __DIR__.'/auth.php';

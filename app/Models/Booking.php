@@ -47,4 +47,9 @@ class Booking extends Model
     {
         return $this->hasMany(\App\Models\Payment::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
 }
