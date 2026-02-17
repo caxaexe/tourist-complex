@@ -23,6 +23,6 @@ class AuditLogController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('audit_logs.index', compact('logs', 'q'));
+        return view('admin.audit_logs.index', compact('logs', 'q'));
     }
 }
