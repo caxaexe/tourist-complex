@@ -7,10 +7,13 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
+    web: __DIR__.'/../routes/web.php',
+    commands: __DIR__.'/../routes/console.php',
+    health: '/up',
     )
+    ->withSchedule(function ($schedule) {
+        $schedule->command('bookings:update-statuses')->dailyAt('00:10');
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => RoleMiddleware::class,
@@ -19,3 +22,4 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
+
