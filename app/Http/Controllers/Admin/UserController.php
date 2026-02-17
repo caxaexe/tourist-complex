@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware(['auth', 'active', 'role:admin']);
+    }
+
     public function index(Request $request)
     {
         $q = $request->query('q');
@@ -113,15 +119,21 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // чтобы не удалить самого себя
+        // 1) нельзя удалить самого себя
         if ($user->id === auth()->id()) {
             return back()->with('success', 'Нельзя удалить самого себя');
         }
 
+        // 2) нельзя удалить админа
+        if ($user->hasRole('admin')) {
+            return back()->with('success', 'Нельзя удалить администратора');
+        }
+
         $old = $user->toArray();
-        logAudit('deleted', $user, $old, null);
 
         $user->delete();
+
+        logAudit('deleted', $user, $old, null);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Пользователь удалён');

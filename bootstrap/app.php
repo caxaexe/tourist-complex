@@ -15,8 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('bookings:update-statuses')->dailyAt('00:10');
     })
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias([
-            'role' => RoleMiddleware::class,
+    $middleware->alias([
+        'active' => \App\Http\Middleware\EnsureUserIsActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

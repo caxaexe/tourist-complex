@@ -15,7 +15,6 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ReportController;
 
-// NEW
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
@@ -23,39 +22,34 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// dashboard как у тебя
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
 
-    // ✅ Профиль
+    // Профиль
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // =========================================================
-    // ✅ ADMIN ONLY
-    // =========================================================
+    // ADMIN ONLY
     Route::prefix('admin')->middleware('role:admin')->group(function () {
 
         Route::get('/', function () {
             return view('admin.dashboard');
         })->name('admin.dashboard');
 
-        // ✅ Управление персоналом (CRUD)
+        // Управление персоналом (CRUD)
         Route::resource('users', AdminUserController::class)
             ->names('admin.users');
 
-        // ✅ Журнал действий (только admin)
+        // Журнал действий (только admin)
         Route::get('/audit-logs', [AuditLogController::class, 'index'])
             ->name('admin.audit-logs.index');
     });
 
-    // =========================================================
-    // ✅ EMPLOYEE + ADMIN (рабочая часть)
-    // =========================================================
+    // EMPLOYEE + ADMIN (рабочая часть)
     Route::middleware('role:admin,employee')->group(function () {
 
         Route::get('/staff', fn () => 'Staff area')->name('staff');
@@ -79,9 +73,7 @@ Route::middleware('auth')->group(function () {
             ->name('reports.index');
     });
 
-    // =========================================================
-    // ✅ USER (обычный пользователь: заявки)
-    // =========================================================
+    // USER (обычный пользователь: заявки)
     Route::middleware('role:user')->group(function () {
         Route::get('/my-bookings', [BookingRequestController::class, 'index'])
             ->name('my.bookings.index');
