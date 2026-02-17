@@ -72,6 +72,12 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::get('/reports', [ReportController::class, 'index'])
             ->name('reports.index');
+
+        Route::post('/bookings/{booking}/check-in', [BookingController::class, 'checkIn'])
+            ->name('bookings.checkin');
+
+        Route::post('/bookings/{booking}/check-out', [BookingController::class, 'checkOut'])
+            ->name('bookings.checkout');
     });
 
     // USER (обычный пользователь: заявки)

@@ -9,18 +9,19 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded">
+                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded text-green-900">
                     {{ session('success') }}
                 </div>
             @endif
 
             <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
                 <a href="{{ route('bookings.create') }}"
-                   class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded">
+                   class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     + Создать бронирование
                 </a>
             </div>
 
+            {{-- Фильтр по оплате --}}
             <div class="mb-4 flex flex-wrap items-center gap-2">
                 <a href="{{ route('bookings.index') }}"
                    class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
@@ -82,7 +83,7 @@
             </div>
 
             {{-- Таблица --}}
-            <div class="mt-4 bg-white dark:bg-gray-800 shadow rounded p-4">
+            <div class="mt-4 bg-white dark:bg-gray-800 shadow rounded p-4 overflow-auto">
                 <table class="w-full">
                     <thead>
                         <tr class="text-left border-b border-gray-200 dark:border-gray-700">
@@ -103,13 +104,13 @@
                         @forelse($bookings as $booking)
                             @php
                                 $map = [
-                                    'pending' => 'bg-yellow-100 text-yellow-800',
-                                    'confirmed' => 'bg-green-100 text-green-800',
-                                    'cancelled' => 'bg-gray-200 text-gray-700',
-                                    'checked_in' => 'bg-blue-100 text-blue-800',
-                                    'checked_out' => 'bg-purple-100 text-purple-800',
+                                    'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
+                                    'confirmed' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
+                                    'cancelled' => 'bg-gray-200 text-gray-700 dark:bg-gray-900/40 dark:text-gray-200',
+                                    'checked_in' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
+                                    'checked_out' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
                                 ];
-                                $cls = $map[$booking->status] ?? 'bg-gray-100 text-gray-800';
+                                $cls = $map[$booking->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200';
 
                                 $nights = $booking->date_from->diffInDays($booking->date_to);
 
@@ -118,13 +119,13 @@
 
                                 if ($paid <= 0) {
                                     $payText = 'UNPAID';
-                                    $payCls  = 'bg-red-100 text-red-800';
+                                    $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
                                 } elseif ($paid + 0.01 < $due) {
                                     $payText = 'PARTIAL';
-                                    $payCls  = 'bg-yellow-100 text-yellow-800';
+                                    $payCls  = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200';
                                 } else {
                                     $payText = 'PAID';
-                                    $payCls  = 'bg-green-100 text-green-800';
+                                    $payCls  = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
                                 }
                             @endphp
 
@@ -138,7 +139,7 @@
                                 <td class="text-gray-800 dark:text-gray-200">
                                     №{{ $booking->room->number }}
                                     @if($booking->room->roomType)
-                                        <div class="text-xs text-gray-500">
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
                                             {{ $booking->room->roomType->name }}
                                         </div>
                                     @endif
@@ -168,7 +169,7 @@
                                         {{ $payText }}
                                     </a>
 
-                                    <div class="text-xs text-gray-500 mt-1">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         {{ number_format($paid, 2, '.', ' ') }} / {{ number_format($due, 2, '.', ' ') }}
                                     </div>
                                 </td>
@@ -177,27 +178,52 @@
                                     {{ number_format($booking->total, 2, '.', ' ') }}
                                 </td>
 
-                                <td class="text-right">
-                                    <a class="text-blue-600"
-                                       href="{{ route('bookings.edit', $booking) }}">
-                                        Редактировать
-                                    </a>
+                                <td class="text-right whitespace-nowrap">
+                                    <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
+                                        <a class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700
+                                                  text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
+                                           href="{{ route('bookings.edit', $booking) }}">
+                                            Редактировать
+                                        </a>
 
-                                    @if($booking->status !== 'confirmed')
-                                        <form class="inline"
-                                              method="POST"
-                                              action="{{ route('bookings.destroy', $booking) }}"
-                                              onsubmit="return confirm('Удалить бронирование?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-red-600 ml-3">Удалить</button>
-                                        </form>
-                                    @endif
+                                        @if($booking->status === 'confirmed')
+                                            <form method="POST" action="{{ route('bookings.checkin', $booking) }}" class="inline">
+                                                @csrf
+                                                <button class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                                        onclick="return confirm('Заселить гостя (Check-in)?')">
+                                                    Check-in
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        @if($booking->status === 'checked_in')
+                                            <form method="POST" action="{{ route('bookings.checkout', $booking) }}" class="inline">
+                                                @csrf
+                                                <button class="px-3 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
+                                                        onclick="return confirm('Оформить выезд (Check-out)?')">
+                                                    Check-out
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        @if(in_array($booking->status, ['pending','cancelled'], true))
+                                            <form method="POST"
+                                                  action="{{ route('bookings.destroy', $booking) }}"
+                                                  class="inline"
+                                                  onsubmit="return confirm('Удалить бронирование?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700">
+                                                    Удалить
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="py-4 text-center text-gray-500">
+                                <td colspan="10" class="py-4 text-center text-gray-500 dark:text-gray-400">
                                     Нет бронирований
                                 </td>
                             </tr>
