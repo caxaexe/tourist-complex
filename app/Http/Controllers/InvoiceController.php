@@ -10,8 +10,8 @@ class InvoiceController extends Controller
     public function index()
     {
         $invoices = Invoice::query()
-            ->with(['booking.client'])
-            ->orderBy('id', 'desc')
+            ->with(['booking.client', 'payments'])
+            ->orderByDesc('id')
             ->paginate(10);
 
         return view('invoices.index', compact('invoices'));

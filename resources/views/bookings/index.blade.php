@@ -164,10 +164,34 @@
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    <a href="{{ route('payments.create', ['booking_id' => $booking->id]) }}"
-                                       class="inline-block px-2 py-1 rounded text-sm {{ $payCls }}">
-                                        {{ $payText }}
+                                    <td class="text-gray-800 dark:text-gray-200">
+                                @php
+                                    $invoice = $booking->invoice ?? null;
+                                @endphp
+
+                                @if($invoice)
+                                    <a href="{{ route('invoices.show', $invoice) }}"
+                                    class="inline-block px-2 py-1 rounded text-sm border border-gray-200 dark:border-gray-700
+                                            text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/40">
+                                        Счёт: {{ $invoice->number }}
                                     </a>
+
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Статус: <b>{{ $invoice->status }}</b>
+                                    </div>
+                                @else
+                                    <span class="inline-block px-2 py-1 rounded text-sm bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
+                                        Нет счёта
+                                    </span>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Оплаты добавляются только через счёт
+                                    </div>
+                                @endif
+
+                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {{ number_format($paid, 2, '.', ' ') }} / {{ number_format($due, 2, '.', ' ') }}
+                                </div>
+                            </td>
 
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         {{ number_format($paid, 2, '.', ' ') }} / {{ number_format($due, 2, '.', ' ') }}

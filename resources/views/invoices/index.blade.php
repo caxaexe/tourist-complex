@@ -9,63 +9,100 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded">
+                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded text-green-900">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+            <div class="bg-white dark:bg-gray-800 shadow rounded p-4 overflow-auto">
                 <table class="w-full">
                     <thead>
                         <tr class="text-left border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-2 text-gray-700 dark:text-gray-200">№</th>
+                            <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
+                            <th class="text-gray-700 dark:text-gray-200">Номер счёта</th>
                             <th class="text-gray-700 dark:text-gray-200">Бронь</th>
                             <th class="text-gray-700 dark:text-gray-200">Клиент</th>
                             <th class="text-gray-700 dark:text-gray-200">Дата</th>
-                            <th class="text-gray-700 dark:text-gray-200">Статус</th>
                             <th class="text-gray-700 dark:text-gray-200">Сумма</th>
-                            <th class="text-right text-gray-700 dark:text-gray-200">Открыть</th>
+                            <th class="text-gray-700 dark:text-gray-200">Оплата</th>
+                            <th class="text-right text-gray-700 dark:text-gray-200">Действия</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        @forelse($invoices as $inv)
+                        @forelse($invoices as $invoice)
+
+                            @php
+                                $paid = (float) $invoice->payments->sum('amount');
+                                $due  = (float) ($invoice->total ?? 0);
+                                $balance = max(0, $due - $paid);
+
+                                if ($due <= 0) {
+                                    $payText = 'PAID';
+                                    $payCls  = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+                                } elseif ($paid <= 0) {
+                                    $payText = 'UNPAID';
+                                    $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                                } elseif ($paid + 0.01 < $due) {
+                                    $payText = 'PARTIAL';
+                                    $payCls  = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200';
+                                } else {
+                                    $payText = 'PAID';
+                                    $payCls  = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+                                }
+                            @endphp
+
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="py-2 text-gray-800 dark:text-gray-200">
-                                    {{ $inv->number }}
+                                    {{ $invoice->id }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    #{{ $inv->booking_id }}
+                                    {{ $invoice->number }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ $inv->booking->client->full_name ?? '—' }}
+                                    #{{ $invoice->booking_id }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ optional($inv->issued_at)->format('d.m.Y') }}
+                                    {{ $invoice->booking->client->full_name ?? '—' }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ $inv->status }}
+                                    {{ optional($invoice->issued_at)->format('d.m.Y') ?? '—' }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ number_format($inv->total, 2, '.', ' ') }}
+                                    {{ number_format($due, 2, '.', ' ') }}
                                 </td>
 
-                                <td class="text-right">
-                                    <a class="text-blue-600"
-                                       href="{{ route('invoices.show', $inv) }}">
-                                        Просмотр
+                                <td>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="px-2 py-1 rounded text-sm inline-block {{ $payCls }}">
+                                            {{ $payText }}
+                                        </span>
+
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ number_format($paid,2,'.',' ') }}
+                                            /
+                                            {{ number_format($due,2,'.',' ') }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td class="text-right whitespace-nowrap">
+                                    <a href="{{ route('invoices.show', $invoice) }}"
+                                       class="px-3 py-1 bg-blue-600 text-white rounded text-sm">
+                                        Открыть счёт
                                     </a>
                                 </td>
                             </tr>
+
                         @empty
                             <tr>
-                                <td colspan="7" class="py-4 text-center text-gray-500">
-                                    Нет счетов
+                                <td colspan="8" class="py-4 text-center text-gray-500 dark:text-gray-400">
+                                    Счета отсутствуют
                                 </td>
                             </tr>
                         @endforelse

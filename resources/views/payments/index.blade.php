@@ -1,31 +1,33 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Оплаты
-        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                Оплаты
+            </h2>
+
+            {{-- ✅ Оплаты создаём только из счета --}}
+            <a href="{{ route('invoices.index') }}"
+               class="px-4 py-2 bg-blue-600 text-white rounded">
+                + Добавить оплату (через счёт)
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded">
+                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded text-green-900">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
-                <a href="{{ route('payments.create') }}"
-                   class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded">
-                    + Добавить оплату
-                </a>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+            <div class="bg-white dark:bg-gray-800 shadow rounded p-4 overflow-auto">
                 <table class="w-full">
                     <thead>
                         <tr class="text-left border-b border-gray-200 dark:border-gray-700">
                             <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
+                            <th class="text-gray-700 dark:text-gray-200">Счёт</th>
                             <th class="text-gray-700 dark:text-gray-200">Бронь</th>
                             <th class="text-gray-700 dark:text-gray-200">Клиент</th>
                             <th class="text-gray-700 dark:text-gray-200">Сумма</th>
@@ -37,17 +39,43 @@
 
                     <tbody>
                         @forelse($payments as $p)
+                            @php
+                                $invoice = $p->invoice ?? null;
+                                $booking = $invoice?->booking ?? $p->booking ?? null;
+                                $client = $booking?->client ?? null;
+                            @endphp
+
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="py-2 text-gray-800 dark:text-gray-200">
                                     {{ $p->id }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    #{{ $p->booking_id }}
+                                    @if($invoice)
+                                        <a href="{{ route('invoices.show', $invoice) }}"
+                                           class="text-blue-600 dark:text-blue-300 underline">
+                                            {{ $invoice->number }}
+                                        </a>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            статус: {{ $invoice->status }}
+                                        </div>
+                                    @else
+                                        <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">
+                                            нет invoice_id
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ $p->booking->client->full_name ?? '—' }}
+                                    @if($booking)
+                                        #{{ $booking->id }}
+                                    @else
+                                        —
+                                    @endif
+                                </td>
+
+                                <td class="text-gray-800 dark:text-gray-200">
+                                    {{ $client?->full_name ?? '—' }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
@@ -62,14 +90,14 @@
                                     {{ optional($p->paid_at)->format('d.m.Y H:i') }}
                                 </td>
 
-                                <td class="text-right">
+                                <td class="text-right whitespace-nowrap">
                                     <form class="inline"
                                           method="POST"
                                           action="{{ route('payments.destroy', $p) }}"
                                           onsubmit="return confirm('Удалить оплату?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-red-600">
+                                        <button class="text-red-600 dark:text-red-300">
                                             Удалить
                                         </button>
                                     </form>
@@ -77,7 +105,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-4 text-center text-gray-500">
+                                <td colspan="8" class="py-4 text-center text-gray-500 dark:text-gray-400">
                                     Нет оплат
                                 </td>
                             </tr>

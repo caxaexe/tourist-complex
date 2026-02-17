@@ -38,9 +38,9 @@ class Booking extends Model
             ->withTimestamps();
     }
 
-    public function invoices()
+    public function invoice()
     {
-        return $this->hasMany(\App\Models\Invoice::class);
+        return $this->hasOne(\App\Models\Invoice::class);
     }
 
     public function payments()

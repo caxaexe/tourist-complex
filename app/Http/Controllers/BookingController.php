@@ -18,6 +18,7 @@ use App\Models\InvoiceItem;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Requests\UpdateBookingRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class BookingController extends Controller
@@ -27,7 +28,7 @@ class BookingController extends Controller
         $payment = $request->query('payment'); // unpaid | partial | paid | null
 
         $query = Booking::query()
-            ->with(['client', 'room.roomType'])
+            ->with(['client', 'room.roomType', 'invoice'])
             ->withSum('payments', 'amount');
 
         if ($payment === 'unpaid') {
@@ -86,46 +87,49 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
-        // 🔒 защита: total не должен приходить из формы
+        //  total не должен приходить из формы
         unset($data['total']);
 
-        // 1) проверка пересечений
-        $hasConflict = Booking::query()
-            ->where('room_id', $data['room_id'])
-            ->where('status', '!=', 'cancelled')
-            ->where('date_from', '<', $data['date_to'])
-            ->where('date_to', '>', $data['date_from'])
-            ->exists();
+        return DB::transaction(function () use ($data) {
 
-        if ($hasConflict) {
-            return back()
-                ->withInput()
-                ->withErrors(['date_from' => 'Номер уже занят на выбранные даты.']);
-        }
+            // 1) проверка пересечений
+            $hasConflict = Booking::query()
+                ->where('room_id', $data['room_id'])
+                ->where('status', '!=', 'cancelled')
+                ->where('date_from', '<', $data['date_to'])
+                ->where('date_to', '>', $data['date_from'])
+                ->exists();
 
-        // 2) расчёт total = nights * price_per_night
-        $room = Room::findOrFail($data['room_id']);
+            if ($hasConflict) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['date_from' => 'Номер уже занят на выбранные даты.']);
+            }
 
-        $from = Carbon::parse($data['date_from']);
-        $to = Carbon::parse($data['date_to']);
+            // 2) расчёт проживания
+            $room = Room::findOrFail($data['room_id']);
 
-        $nights = max(1, $from->diffInDays($to)); // защита, чтобы не было 0
-        $stayTotal = $nights * (float)$room->price_per_night;
+            $from = Carbon::parse($data['date_from']);
+            $to   = Carbon::parse($data['date_to']);
 
-        $data['total'] = $stayTotal;
-        $data['status'] = $data['status'] ?? 'pending';
+            $nights    = max(1, $from->diffInDays($to));
+            $stayTotal = $nights * (float)$room->price_per_night;
 
-        $booking = Booking::create($data);
+            $data['total']  = $stayTotal;
+            $data['status'] = $data['status'] ?? 'pending';
 
-        logAudit('created', $booking, null, $booking->toArray());
+            $booking = Booking::create($data);
 
-        // если вдруг создают сразу confirmed — создадим счёт
-        if ($booking->status === 'confirmed') {
-            $this->ensureInvoiceForBooking($booking);
-        }
+            logAudit('created', $booking, null, $booking->toArray());
 
-        return redirect()->route('bookings.index')
-            ->with('success', 'Бронирование создано');
+            // если создают сразу confirmed — создаём счёт
+            if ($booking->status === 'confirmed') {
+                $this->ensureInvoiceForBooking($booking);
+            }
+
+            return redirect()->route('bookings.index')
+                ->with('success', 'Бронирование создано');
+        });
     }
 
     public function edit(Booking $booking)
@@ -175,76 +179,79 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
-        // 🔒 total не должен приходить из формы
+        //  total не должен приходить из формы
         unset($data['total']);
 
-        $old = $booking->toArray();
+        return DB::transaction(function () use ($request, $booking, $data) {
 
-        // 1) проверка пересечений (исключая текущую бронь)
-        $hasConflict = Booking::query()
-            ->where('room_id', $data['room_id'])
-            ->where('status', '!=', 'cancelled')
-            ->where('id', '!=', $booking->id)
-            ->where('date_from', '<', $data['date_to'])
-            ->where('date_to', '>', $data['date_from'])
-            ->exists();
+            $old = $booking->toArray();
 
-        if ($hasConflict) {
-            return back()
-                ->withInput()
-                ->withErrors(['date_from' => 'Номер уже занят на выбранные даты.']);
-        }
+            // 1) проверка пересечений (исключая текущую бронь)
+            $hasConflict = Booking::query()
+                ->where('room_id', $data['room_id'])
+                ->where('status', '!=', 'cancelled')
+                ->where('id', '!=', $booking->id)
+                ->where('date_from', '<', $data['date_to'])
+                ->where('date_to', '>', $data['date_from'])
+                ->exists();
 
-        // 2) пересчёт проживания
-        $room = Room::findOrFail($data['room_id']);
-        $from = Carbon::parse($data['date_from']);
-        $to   = Carbon::parse($data['date_to']);
+            if ($hasConflict) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['date_from' => 'Номер уже занят на выбранные даты.']);
+            }
 
-        $nights = max(1, $from->diffInDays($to));
-        $stayTotal = $nights * (float)$room->price_per_night;
+            // 2) проживание
+            $room = Room::findOrFail($data['room_id']);
+            $from = Carbon::parse($data['date_from']);
+            $to   = Carbon::parse($data['date_to']);
 
-        // 3) sync услуг
-        $sync = [];
-        foreach ($request->input('services', []) as $row) {
-            $serviceId = (int)($row['id'] ?? 0);
-            $qty       = (int)($row['quantity'] ?? 0);
+            $nights    = max(1, $from->diffInDays($to));
+            $stayTotal = $nights * (float)$room->price_per_night;
 
-            if ($serviceId <= 0 || $qty <= 0) continue;
+            // 3) sync услуг (snapshot price)
+            $sync = [];
+            foreach ($request->input('services', []) as $row) {
+                $serviceId = (int)($row['id'] ?? 0);
+                $qty       = (int)($row['quantity'] ?? 0);
 
-            $service = Service::find($serviceId);
-            if (!$service) continue;
+                if ($serviceId <= 0 || $qty <= 0) continue;
 
-            $sync[$serviceId] = [
-                'quantity' => $qty,
-                'price'    => (float)$service->price, // snapshot price
-            ];
-        }
+                $service = Service::find($serviceId);
+                if (!$service) continue;
 
-        // 4) обновляем основную бронь
-        $booking->update($data);
+                $sync[$serviceId] = [
+                    'quantity' => $qty,
+                    'price'    => (float)$service->price,
+                ];
+            }
 
-        // 5) услуги
-        $booking->services()->sync($sync);
+            // 4) обновляем бронь (без total)
+            $booking->update($data);
 
-        // 6) итог по услугам (fallback если pivot.price отсутствует)
-        $booking->load('services');
-        $servicesTotal = $booking->services->sum(function ($s) {
-            $qty = (int)($s->pivot->quantity ?? 0);
-            $price = (float)($s->pivot->price ?? $s->price ?? 0);
-            return $qty * $price;
+            // 5) услуги
+            $booking->services()->sync($sync);
+
+            // 6) итог по услугам (fallback если pivot.price отсутствует)
+            $booking->load('services');
+            $servicesTotal = $booking->services->sum(function ($s) {
+                $qty   = (int)($s->pivot->quantity ?? 0);
+                $price = (float)($s->pivot->price ?? $s->price ?? 0);
+                return $qty * $price;
+            });
+
+            $booking->update(['total' => $stayTotal + $servicesTotal]);
+
+            // 7) авто-счёт при confirmed
+            if ($booking->status === 'confirmed') {
+                $this->ensureInvoiceForBooking($booking);
+            }
+
+            logAudit('updated', $booking, $old, $booking->fresh()->toArray());
+
+            return redirect()->route('bookings.index')
+                ->with('success', 'Бронирование обновлено');
         });
-
-        $booking->update(['total' => $stayTotal + $servicesTotal]);
-
-        // 7) авто-счёт при confirmed
-        if ($booking->status === 'confirmed') {
-            $this->ensureInvoiceForBooking($booking);
-        }
-
-        logAudit('updated', $booking, $old, $booking->fresh()->toArray());
-
-        return redirect()->route('bookings.index')
-            ->with('success', 'Бронирование обновлено');
     }
 
     public function destroy(Booking $booking)
@@ -286,12 +293,13 @@ class BookingController extends Controller
         $itemsTotal = 0;
 
         // 1) проживание
-        $nights = max(1, $booking->date_from->diffInDays($booking->date_to));
+        $nights    = max(1, $booking->date_from->diffInDays($booking->date_to));
         $stayPrice = (float)($booking->room->price_per_night ?? 0);
         $stayLine  = $nights * $stayPrice;
 
         InvoiceItem::create([
             'invoice_id' => $invoice->id,
+            'type'       => 'stay',
             'title'      => 'Проживание (номер №' . $booking->room->number . ')',
             'quantity'   => $nights,
             'unit_price' => $stayPrice,
@@ -310,6 +318,7 @@ class BookingController extends Controller
 
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
+                'type'       => 'service',
                 'title'      => 'Услуга: ' . $service->name,
                 'quantity'   => $qty,
                 'unit_price' => $unit,
@@ -343,26 +352,29 @@ class BookingController extends Controller
             return back()->with('success', 'Выезд возможен только для checked_in');
         }
 
-        $old = $booking->toArray();
-        $booking->update(['status' => 'checked_out']);
-        logAudit('updated', $booking, $old, $booking->fresh()->toArray());
+        return DB::transaction(function () use ($booking) {
 
-        // закрываем счет, если paid
-        $invoice = Invoice::where('booking_id', $booking->id)
-            ->with('payments')
-            ->first();
+            $old = $booking->toArray();
+            $booking->update(['status' => 'checked_out']);
+            logAudit('updated', $booking, $old, $booking->fresh()->toArray());
 
-        if ($invoice) {
-            $paid = (float)$invoice->payments->sum('amount');
-            $due  = (float)$invoice->total;
+            // закрываем счет, если paid
+            $invoice = Invoice::where('booking_id', $booking->id)
+                ->with('payments')
+                ->first();
 
-            if ($due > 0 && $paid + 0.01 >= $due) {
-                $iOld = $invoice->toArray();
-                $invoice->update(['status' => 'closed']);
-                logAudit('updated', $invoice, $iOld, $invoice->fresh()->toArray());
+            if ($invoice) {
+                $paid = (float)$invoice->payments->sum('amount');
+                $due  = (float)$invoice->total;
+
+                if ($due > 0 && $paid + 0.01 >= $due) {
+                    $iOld = $invoice->toArray();
+                    $invoice->update(['status' => 'closed']);
+                    logAudit('updated', $invoice, $iOld, $invoice->fresh()->toArray());
+                }
             }
-        }
 
-        return back()->with('success', 'Гость выселен (checked_out)');
+            return back()->with('success', 'Гость выселен (checked_out)');
+        });
     }
 }
