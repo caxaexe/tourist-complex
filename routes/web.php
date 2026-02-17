@@ -42,6 +42,7 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         // Управление персоналом (CRUD)
         Route::resource('users', AdminUserController::class)
+            ->except(['show'])
             ->names('admin.users');
 
         // Журнал действий (только admin)
