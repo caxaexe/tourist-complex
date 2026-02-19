@@ -104,20 +104,29 @@
                         @forelse($bookings as $booking)
                             @php
                                 $map = [
-                                    'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
-                                    'confirmed' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
-                                    'cancelled' => 'bg-gray-200 text-gray-700 dark:bg-gray-900/40 dark:text-gray-200',
-                                    'checked_in' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
+                                    'pending'     => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
+                                    'confirmed'   => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
+                                    'cancelled'   => 'bg-gray-200 text-gray-700 dark:bg-gray-900/40 dark:text-gray-200',
+                                    'checked_in'  => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
                                     'checked_out' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
                                 ];
                                 $cls = $map[$booking->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200';
 
-                                $nights = $booking->date_from->diffInDays($booking->date_to);
+                                $nights = max(1, $booking->date_from->diffInDays($booking->date_to));
 
-                                $paid = (float) ($booking->payments_sum_amount ?? 0);
-                                $due  = (float) ($booking->total ?? 0);
+                                $invoice = $booking->invoice ?? null;
 
-                                if ($paid <= 0) {
+                                // Сумма к оплате: если есть счёт — берём total счета, иначе booking->total
+                                $due  = (float) ($invoice->total ?? $booking->total ?? 0);
+
+                                // Оплачено: если есть счёт — суммируем его платежи, иначе booking->payments_sum_amount
+                                $paid = (float) ($invoice ? ($invoice->payments->sum('amount') ?? 0) : ($booking->payments_sum_amount ?? 0));
+
+                                // Статус оплаты: защита от 0/0 = paid
+                                if ($due <= 0) {
+                                    $payText = 'UNPAID';
+                                    $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                                } elseif ($paid <= 0) {
                                     $payText = 'UNPAID';
                                     $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
                                 } elseif ($paid + 0.01 < $due) {
@@ -146,9 +155,7 @@
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ $booking->date_from->format('d.m.Y') }}
-                                    —
-                                    {{ $booking->date_to->format('d.m.Y') }}
+                                    {{ $booking->date_from->format('d.m.Y') }} — {{ $booking->date_to->format('d.m.Y') }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">{{ $nights }}</td>
@@ -163,50 +170,46 @@
                                     </span>
                                 </td>
 
+                                {{-- Оплата --}}
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    <td class="text-gray-800 dark:text-gray-200">
-                                @php
-                                    $invoice = $booking->invoice ?? null;
-                                @endphp
-
-                                @if($invoice)
-                                    <a href="{{ route('invoices.show', $invoice) }}"
-                                    class="inline-block px-2 py-1 rounded text-sm border border-gray-200 dark:border-gray-700
-                                            text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/40">
-                                        Счёт: {{ $invoice->number }}
-                                    </a>
-
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Статус: <b>{{ $invoice->status }}</b>
-                                    </div>
-                                @else
-                                    <span class="inline-block px-2 py-1 rounded text-sm bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
-                                        Нет счёта
+                                    <span class="inline-block px-2 py-1 rounded text-sm {{ $payCls }}">
+                                        {{ $payText }}
                                     </span>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Оплаты добавляются только через счёт
-                                    </div>
-                                @endif
 
-                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {{ number_format($paid, 2, '.', ' ') }} / {{ number_format($due, 2, '.', ' ') }}
-                                </div>
-                            </td>
+                                    @if($invoice)
+                                        <div class="mt-2">
+                                            <a href="{{ route('invoices.show', $invoice) }}"
+                                            class="inline-block px-2 py-1 rounded text-sm border border-gray-200 dark:border-gray-700
+                                                    text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/40">
+                                                Счёт: {{ $invoice->number }}
+                                            </a>
+                                        </div>
+
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Статус: <b>{{ $invoice->status }}</b>
+                                        </div>
+                                    @else
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                            Нет счёта (оплаты добавляются через счёт)
+                                        </div>
+                                    @endif
 
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         {{ number_format($paid, 2, '.', ' ') }} / {{ number_format($due, 2, '.', ' ') }}
                                     </div>
                                 </td>
 
+                                {{-- Сумма --}}
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ number_format($booking->total, 2, '.', ' ') }}
+                                    {{ number_format($due, 2, '.', ' ') }}
                                 </td>
 
+                                {{-- Действия --}}
                                 <td class="text-right whitespace-nowrap">
                                     <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
                                         <a class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700
-                                                  text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
-                                           href="{{ route('bookings.edit', $booking) }}">
+                                                text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
+                                        href="{{ route('bookings.edit', $booking) }}">
                                             Редактировать
                                         </a>
 
@@ -230,11 +233,12 @@
                                             </form>
                                         @endif
 
-                                        @if(in_array($booking->status, ['pending','cancelled'], true))
+                                        {{-- Удаление: показываем, когда нет счета (или статус pending/cancelled) --}}
+                                        @if(!$invoice && in_array($booking->status, ['pending', 'cancelled'], true))
                                             <form method="POST"
-                                                  action="{{ route('bookings.destroy', $booking) }}"
-                                                  class="inline"
-                                                  onsubmit="return confirm('Удалить бронирование?')">
+                                                action="{{ route('bookings.destroy', $booking) }}"
+                                                class="inline"
+                                                onsubmit="return confirm('Удалить бронирование #{{ $booking->id }}?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700">
@@ -252,7 +256,8 @@
                                 </td>
                             </tr>
                         @endforelse
-                    </tbody>
+                        </tbody>
+
                 </table>
 
                 <div class="mt-4">

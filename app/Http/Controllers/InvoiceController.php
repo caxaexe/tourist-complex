@@ -81,7 +81,7 @@ class InvoiceController extends Controller
             $qty = (int)($service->pivot->quantity ?? 0);
             if ($qty <= 0) continue;
 
-            $unit = (float)($service->pivot->price ?? $service->price ?? 0);
+            $unit = (float)($service->pivot->price_snapshot ?? $service->price ?? 0);
             $line = $qty * $unit;
 
             InvoiceItem::create([
@@ -97,7 +97,10 @@ class InvoiceController extends Controller
         }
 
 
-        $invoice->update(['total' => $itemsTotal]);
+        $invoice->update([
+            'total' => $invoice->items()->sum('total'),
+        ]);
+
 
         logAudit('created', $invoice, null, $invoice->toArray());
 

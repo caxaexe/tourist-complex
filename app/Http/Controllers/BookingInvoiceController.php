@@ -57,7 +57,7 @@ class BookingInvoiceController extends Controller
             // 2) Услуги (берем snapshot price из pivot booking_service)
             foreach ($booking->services as $service) {
                 $qty  = (int) $service->pivot->quantity;
-                $unit = (float) $service->pivot->price;
+                $unit = (float) $service->pivot->price_snapshot;
                 $line = $qty * $unit;
 
                 InvoiceItem::create([
@@ -72,7 +72,10 @@ class BookingInvoiceController extends Controller
                 $itemsTotal += $line;
             }
 
-            $invoice->update(['total' => $itemsTotal]);
+            $invoice->update([
+                'total' => $invoice->items()->sum('total'),
+            ]);
+
 
             return $invoice;
         });

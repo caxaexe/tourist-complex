@@ -34,10 +34,11 @@ class BookingController extends Controller
         if ($payment === 'unpaid') {
             $query->havingRaw('COALESCE(payments_sum_amount, 0) <= 0');
         } elseif ($payment === 'partial') {
-            $query->havingRaw('COALESCE(payments_sum_amount, 0) > 0 AND COALESCE(payments_sum_amount, 0) < total');
+            $query->havingRaw('total > 0 AND COALESCE(payments_sum_amount, 0) > 0 AND COALESCE(payments_sum_amount, 0) < total');
         } elseif ($payment === 'paid') {
-            $query->havingRaw('COALESCE(payments_sum_amount, 0) >= total');
+            $query->havingRaw('total > 0 AND COALESCE(payments_sum_amount, 0) >= total');
         }
+
 
         $bookings = $query->orderBy('id', 'desc')
             ->paginate(10)
@@ -299,13 +300,14 @@ class BookingController extends Controller
         $stayLine  = $nights * $stayPrice;
 
         InvoiceItem::create([
-            'invoice_id' => $invoice->id,
-            'type'       => 'stay',
-            'title'      => 'Проживание (номер №' . $booking->room->number . ')',
-            'quantity'   => $nights,
-            'unit_price' => $stayPrice,
-            'line_total' => $stayLine,
+            'invoice_id'  => $invoice->id,
+            'type'        => 'stay',
+            'description' => 'Проживание (номер №' . $booking->room->number . ')',
+            'quantity'    => $nights,
+            'unit_price'  => $stayPrice,
+            'total'       => $stayLine,
         ]);
+
 
         $itemsTotal += $stayLine;
 
@@ -318,18 +320,22 @@ class BookingController extends Controller
             $line = $qty * $unit;
 
             InvoiceItem::create([
-                'invoice_id' => $invoice->id,
-                'type'       => 'service',
-                'title'      => 'Услуга: ' . $service->name,
-                'quantity'   => $qty,
-                'unit_price' => $unit,
-                'line_total' => $line,
+                'invoice_id'  => $invoice->id,
+                'type'        => 'service',
+                'description' => 'Услуга: ' . $service->name,
+                'quantity'    => $qty,
+                'unit_price'  => $unit,
+                'total'       => $line,
             ]);
+
 
             $itemsTotal += $line;
         }
 
-        $invoice->update(['total' => $itemsTotal]);
+        $invoice->update([
+            'total' => $invoice->items()->sum('total'),
+        ]);
+
 
         logAudit('created', $invoice, null, $invoice->toArray());
     }
