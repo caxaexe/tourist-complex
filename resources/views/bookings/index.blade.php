@@ -1,3 +1,8 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -15,7 +20,7 @@
             @endif
 
             <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
-                <a href="{{ route('bookings.create') }}"
+                <a href="{{ route($prefix.'bookings.create') }}">
                    class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     + Создать бронирование
                 </a>
@@ -23,7 +28,7 @@
 
             {{-- Фильтр по оплате --}}
             <div class="mb-4 flex flex-wrap items-center gap-2">
-                <a href="{{ route('bookings.index') }}"
+                <a href="{{ route($prefix.'bookings.index') }}"
                    class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
                           {{ empty($payment) ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
                           text-gray-800 dark:text-gray-200">
@@ -209,12 +214,12 @@
                                     <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
                                         <a class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700
                                                 text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
-                                        href="{{ route('bookings.edit', $booking) }}">
+                                        href="{{ route($prefix.'bookings.edit', $booking) }}">
                                             Редактировать
                                         </a>
 
                                         @if($booking->status === 'confirmed')
-                                            <form method="POST" action="{{ route('bookings.checkin', $booking) }}" class="inline">
+                                            <form method="POST" action="{{ route($prefix.'bookings.checkin', $booking) }}" class="inline">
                                                 @csrf
                                                 <button class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
                                                         onclick="return confirm('Заселить гостя (Check-in)?')">
@@ -224,7 +229,7 @@
                                         @endif
 
                                         @if($booking->status === 'checked_in')
-                                            <form method="POST" action="{{ route('bookings.checkout', $booking) }}" class="inline">
+                                            <form method="POST" action="{{ route($prefix.'bookings.checkout', $booking) }}" class="inline">
                                                 @csrf
                                                 <button class="px-3 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
                                                         onclick="return confirm('Оформить выезд (Check-out)?')">
@@ -236,7 +241,7 @@
                                         {{-- Удаление: показываем, когда нет счета (или статус pending/cancelled) --}}
                                         @if(!$invoice && !in_array($booking->status, ['confirmed','checked_in'], true))
                                             <form method="POST"
-                                                action="{{ route('bookings.destroy', $booking) }}"
+                                                action="{{ route($prefix.'bookings.destroy', $booking) }}"
                                                 class="inline"
                                                 onsubmit="return confirm('Удалить бронирование #{{ $booking->id }}?')">
                                                 @csrf
