@@ -8,11 +8,11 @@ class InvoiceItem extends Model
 {
     protected $fillable = [
         'invoice_id',
-        'type',        // stay | service | other
-        'title',
+        'type',         // stay | service | other
+        'description',
         'quantity',
         'unit_price',
-        'line_total',
+        'total', 
     ];
 
     public function invoice()

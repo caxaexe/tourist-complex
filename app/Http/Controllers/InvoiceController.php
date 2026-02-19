@@ -66,12 +66,12 @@ class InvoiceController extends Controller
         $stayLine  = $nights * $stayPrice;
 
         InvoiceItem::create([
-            'invoice_id' => $invoice->id,
-            'type'       => 'stay',
-            'title'      => 'Проживание (номер №' . ($booking->room->number ?? '—') . ')',
-            'quantity'   => $nights,
-            'unit_price' => $stayPrice,
-            'line_total' => $stayLine,
+            'invoice_id'  => $invoice->id,
+            'type'        => 'stay',
+            'description' => 'Проживание (номер №' . ($booking->room->number ?? '—') . ')', // <-- было title
+            'quantity'    => $nights,
+            'unit_price'  => $stayPrice,
+            'total'       => $stayLine, // <-- было line_total
         ]);
 
         $itemsTotal += $stayLine;
@@ -85,16 +85,17 @@ class InvoiceController extends Controller
             $line = $qty * $unit;
 
             InvoiceItem::create([
-                'invoice_id' => $invoice->id,
-                'type'       => 'service',
-                'title'      => 'Услуга: ' . $service->name,
-                'quantity'   => $qty,
-                'unit_price' => $unit,
-                'line_total' => $line,
+                'invoice_id'  => $invoice->id,
+                'type'        => 'service',
+                'description' => 'Услуга: ' . $service->name, // <-- было title
+                'quantity'    => $qty,
+                'unit_price'  => $unit,
+                'total'       => $line, // <-- было line_total
             ]);
 
             $itemsTotal += $line;
         }
+
 
         $invoice->update(['total' => $itemsTotal]);
 
