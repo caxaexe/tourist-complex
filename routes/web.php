@@ -22,9 +22,22 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// ✅ ЕДИНАЯ точка входа: /dashboard → редирект по роли
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user()->load('roles');
+
+    if ($user->hasRole('admin')) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    if ($user->hasRole('employee')) {
+        return redirect()->route('staff.dashboard');
+    }
+
+    // обычный пользователь/клиент
+    return redirect()->route('client.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 
 Route::middleware(['auth', 'active'])->group(function () {
 
@@ -33,11 +46,15 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+
+    // =========================
     // ADMIN ONLY
+    // =========================
     Route::prefix('admin')->middleware('role:admin')->group(function () {
 
-        Route::get('/', function () {
-            return view('admin.dashboard');
+        // ✅ Admin dashboard
+        Route::get('/dashboard', function () {
+            return view('dashboards.admin');
         })->name('admin.dashboard');
 
         // Управление персоналом (CRUD)
@@ -50,10 +67,19 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->name('admin.audit-logs.index');
     });
 
-    // EMPLOYEE + ADMIN (рабочая часть)
-    Route::middleware('role:admin,employee')->group(function () {
 
-        Route::get('/staff', fn () => 'Staff area')->name('staff');
+    // =========================
+    // EMPLOYEE + ADMIN (рабочая часть)
+    // =========================
+    Route::prefix('staff')->middleware('role:admin,employee')->group(function () {
+
+        // ✅ Staff dashboard
+        Route::get('/dashboard', function () {
+            return view('dashboards.staff');
+        })->name('staff.dashboard');
+
+        // (если хочешь старый /staff оставить)
+        Route::get('/', fn () => redirect()->route('staff.dashboard'));
 
         Route::resource('clients', ClientController::class);
         Route::resource('room-types', RoomTypeController::class);
@@ -70,6 +96,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('payments', PaymentController::class)
             ->only(['index', 'create', 'store', 'destroy']);
 
+        // Отчеты — оставляю тут (и admin тоже сможет)
         Route::get('/reports', [ReportController::class, 'index'])
             ->name('reports.index');
 
@@ -80,8 +107,17 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->name('bookings.checkout');
     });
 
-    // USER (обычный пользователь: заявки)
-    Route::middleware('role:user')->group(function () {
+
+    // =========================
+    // USER / CLIENT (заявки на бронь)
+    // =========================
+    Route::prefix('client')->middleware('role:user')->group(function () {
+
+        // ✅ Client dashboard
+        Route::get('/dashboard', function () {
+            return view('dashboards.client');
+        })->name('client.dashboard');
+
         Route::get('/my-bookings', [BookingRequestController::class, 'index'])
             ->name('my.bookings.index');
 
@@ -93,4 +129,4 @@ Route::middleware(['auth', 'active'])->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
