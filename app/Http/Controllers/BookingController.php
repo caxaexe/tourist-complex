@@ -150,14 +150,14 @@ class BookingController extends Controller
 
         $services = Service::orderBy('name')->get();
 
-        // pivot может НЕ иметь price — тогда берём текущую цену услуги
         $selectedServices = $booking->services
             ->keyBy('id')
             ->map(fn($s) => [
                 'quantity' => (int)($s->pivot->quantity ?? 0),
-                'price'    => (float)($s->pivot->price ?? $s->price ?? 0),
+                'price'    => (float)($s->pivot->price_snapshot ?? $s->price ?? 0),
             ])
             ->toArray();
+
 
         $paidTotal = (float)$booking->payments->sum('amount');
         $dueTotal  = (float)$booking->total;
@@ -222,7 +222,7 @@ class BookingController extends Controller
 
                 $sync[$serviceId] = [
                     'quantity' => $qty,
-                    'price'    => (float)$service->price,
+                    'price_snapshot' => (float)$service->price,
                 ];
             }
 
@@ -235,10 +235,11 @@ class BookingController extends Controller
             // 6) итог по услугам (fallback если pivot.price отсутствует)
             $booking->load('services');
             $servicesTotal = $booking->services->sum(function ($s) {
-                $qty   = (int)($s->pivot->quantity ?? 0);
-                $price = (float)($s->pivot->price ?? $s->price ?? 0);
+                $qty = (int)($s->pivot->quantity ?? 0);
+                $price = (float)($s->pivot->price_snapshot ?? $s->price ?? 0);
                 return $qty * $price;
             });
+
 
             $booking->update(['total' => $stayTotal + $servicesTotal]);
 
@@ -313,7 +314,7 @@ class BookingController extends Controller
             $qty = (int)($service->pivot->quantity ?? 0);
             if ($qty <= 0) continue;
 
-            $unit = (float)($service->pivot->price ?? $service->price ?? 0);
+            $unit = (float)($service->pivot->price_snapshot ?? $service->price ?? 0);
             $line = $qty * $unit;
 
             InvoiceItem::create([

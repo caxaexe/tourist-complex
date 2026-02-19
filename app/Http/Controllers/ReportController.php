@@ -43,7 +43,7 @@ class ReportController extends Controller
                 'services.id',
                 'services.name',
                 DB::raw('SUM(booking_service.quantity) as qty'),
-                DB::raw('SUM(booking_service.quantity * services.price) as revenue')
+                DB::raw('SUM(booking_service.quantity * services.price_snapshot) as revenue')
             )
             ->groupBy('services.id', 'services.name')
             ->orderByDesc('revenue')
