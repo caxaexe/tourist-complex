@@ -1,8 +1,11 @@
 @php
     $u = auth()->user();
     $isAdmin = $u?->hasRole('admin');
-    $isStaff = $u?->hasAnyRole(['admin','employee']);
+    $isStaff = $u?->hasRole('employee');
     $isUser  = $u?->hasRole('user');
+
+    // Выбираем префикс для рабочих ссылок
+    $workPrefix = $isAdmin ? 'admin.' : ($isStaff ? 'staff.' : null);
 @endphp
 
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
@@ -23,30 +26,30 @@
                         Dashboard
                     </x-nav-link>
 
-                    {{-- STAFF (admin+employee) --}}
-                    @if($isStaff)
-                        <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.*')">Бронирования</x-nav-link>
-                        <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">Клиенты</x-nav-link>
-                        <x-nav-link :href="route('room-types.index')" :active="request()->routeIs('room-types.*')">Типы</x-nav-link>
-                        <x-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.*')">Номера</x-nav-link>
-                        <x-nav-link :href="route('amenities.index')" :active="request()->routeIs('amenities.*')">Удобства</x-nav-link>
-                        <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">Услуги</x-nav-link>
-                        <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">Счета</x-nav-link>
-                        <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">Оплаты</x-nav-link>
-                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">Отчёты</x-nav-link>
+                    {{-- WORK AREA (admin OR employee) --}}
+                    @if($workPrefix)
+                        <x-nav-link :href="route($workPrefix.'bookings.index')" :active="request()->routeIs($workPrefix.'bookings.*')">Бронирования</x-nav-link>
+                        <x-nav-link :href="route($workPrefix.'clients.index')" :active="request()->routeIs($workPrefix.'clients.*')">Клиенты</x-nav-link>
+                        <x-nav-link :href="route($workPrefix.'room-types.index')" :active="request()->routeIs($workPrefix.'room-types.*')">Типы</x-nav-link>
+                        <x-nav-link :href="route($workPrefix.'rooms.index')" :active="request()->routeIs($workPrefix.'rooms.*')">Номера</x-nav-link>
+                        <x-nav-link :href="route($workPrefix.'amenities.index')" :active="request()->routeIs($workPrefix.'amenities.*')">Удобства</x-nav-link>
+                        <x-nav-link :href="route($workPrefix.'services.index')" :active="request()->routeIs($workPrefix.'services.*')">Услуги</x-nav-link>
+                        <x-nav-link :href="route($workPrefix.'invoices.index')" :active="request()->routeIs($workPrefix.'invoices.*')">Счета</x-nav-link>
+                        <x-nav-link :href="route($workPrefix.'payments.index')" :active="request()->routeIs($workPrefix.'payments.*')">Оплаты</x-nav-link>
+                        <x-nav-link :href="route($workPrefix.'reports.index')" :active="request()->routeIs($workPrefix.'reports.*')">Отчёты</x-nav-link>
                     @endif
 
-                    {{-- USER --}}
+                    {{-- CLIENT --}}
                     @if($isUser)
-                        <x-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
+                        <x-nav-link :href="route('client.my.bookings.index')" :active="request()->routeIs('client.my.bookings.*')">
                             Мои заявки
                         </x-nav-link>
-                        <x-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
+                        <x-nav-link :href="route('client.my.bookings.create')" :active="request()->routeIs('client.my.bookings.create')">
                             Подать заявку
                         </x-nav-link>
                     @endif
 
-                    {{-- ADMIN --}}
+                    {{-- ADMIN EXTRA --}}
                     @if($isAdmin)
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                             Админ
@@ -113,23 +116,23 @@
                 Dashboard
             </x-responsive-nav-link>
 
-            @if($isStaff)
-                <x-responsive-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.*')">Бронирования</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">Клиенты</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('room-types.index')" :active="request()->routeIs('room-types.*')">Типы</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.*')">Номера</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('amenities.index')" :active="request()->routeIs('amenities.*')">Удобства</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('services.index')" :active="request()->routeIs('services.*')">Услуги</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">Счета</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">Оплаты</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">Отчёты</x-responsive-nav-link>
+            @if($workPrefix)
+                <x-responsive-nav-link :href="route($workPrefix.'bookings.index')" :active="request()->routeIs($workPrefix.'bookings.*')">Бронирования</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route($workPrefix.'clients.index')" :active="request()->routeIs($workPrefix.'clients.*')">Клиенты</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route($workPrefix.'room-types.index')" :active="request()->routeIs($workPrefix.'room-types.*')">Типы</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route($workPrefix.'rooms.index')" :active="request()->routeIs($workPrefix.'rooms.*')">Номера</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route($workPrefix.'amenities.index')" :active="request()->routeIs($workPrefix.'amenities.*')">Удобства</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route($workPrefix.'services.index')" :active="request()->routeIs($workPrefix.'services.*')">Услуги</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route($workPrefix.'invoices.index')" :active="request()->routeIs($workPrefix.'invoices.*')">Счета</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route($workPrefix.'payments.index')" :active="request()->routeIs($workPrefix.'payments.*')">Оплаты</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route($workPrefix.'reports.index')" :active="request()->routeIs($workPrefix.'reports.*')">Отчёты</x-responsive-nav-link>
             @endif
 
             @if($isUser)
-                <x-responsive-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
+                <x-responsive-nav-link :href="route('client.my.bookings.index')" :active="request()->routeIs('client.my.bookings.*')">
                     Мои заявки
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
+                <x-responsive-nav-link :href="route('client.my.bookings.create')" :active="request()->routeIs('client.my.bookings.create')">
                     Подать заявку
                 </x-responsive-nav-link>
             @endif
