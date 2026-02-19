@@ -40,7 +40,7 @@ class BookingInvoiceController extends Controller
             $itemsTotal = 0;
 
             // 1) Проживание
-            $nights = $booking->date_from->diffInDays($booking->date_to);
+            $nights = max(1, $booking->date_from->diffInDays($booking->date_to));
             $unit = (float)$booking->room->price_per_night;
             $line = $nights * $unit;
 
@@ -78,10 +78,12 @@ class BookingInvoiceController extends Controller
             return $invoice;
         });
 
+        logAudit('created', $invoice, null, $invoice->toArray());
+
         return redirect()->route('invoices.show', $invoice)
             ->with('success', 'Счёт создан');
 
-        logAudit('created', $invoice, null, $invoice->toArray());
+        
     }
 
     
