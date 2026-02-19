@@ -11,7 +11,6 @@ class BookingInvoiceController extends Controller
 {
     public function store(Booking $booking)
     {
-        // Нельзя создавать счет для отмененной брони (по желанию)
         if ($booking->status === 'cancelled') {
             return back()->withErrors(['invoice' => 'Нельзя создать счёт для отменённого бронирования.']);
         }
@@ -20,62 +19,60 @@ class BookingInvoiceController extends Controller
 
             $booking->load(['client', 'room', 'services']);
 
-            $issuedAt = now()->toDateString();
-            $dueAt = now()->addDays(3)->toDateString();
-
-            // Номер счета (простой вариант)
             $number = 'INV-' . now()->format('Ymd') . '-' . str_pad((string)$booking->id, 6, '0', STR_PAD_LEFT);
 
             $invoice = Invoice::create([
                 'booking_id' => $booking->id,
                 'number'     => $number,
-                'issued_at'  => $issuedAt,
-                'due_at'     => $dueAt,
-                'status'     => 'issued', // issued | paid | cancelled
+                'issued_at'  => now()->toDateString(),
+                'due_at'     => now()->addDays(3)->toDateString(),
+                'status'     => 'issued',
                 'total'      => 0,
                 'note'       => null,
             ]);
 
-            $itemsTotal = 0;
-
             // 1) Проживание
-            $nights = max(1, $booking->date_from->diffInDays($booking->date_to));
-            $unit   = (float) $booking->room->price_per_night;
-            $line   = $nights * $unit;
+            $nights    = max(1, $booking->date_from->diffInDays($booking->date_to));
+            $unitPrice = (float)($booking->room->price_per_night ?? 0);
+            $lineTotal = $nights * $unitPrice;
+
+            $txt = 'Проживание: номер ' . $booking->room->number;
 
             InvoiceItem::create([
-                'invoice_id'   => $invoice->id,
-                'type'         => 'stay',
-                'description'  => 'Проживание: номер ' . $booking->room->number, // <-- было title
-                'quantity'     => $nights,
-                'unit_price'   => $unit,
-                'total'        => $line, // <-- было line_total
+                'invoice_id'  => $invoice->id,
+                'type'        => 'stay',
+                'title'       => $txt,
+                'description' => $txt,
+                'quantity'    => $nights,
+                'unit_price'  => $unitPrice,
+                'total'       => $lineTotal,
             ]);
 
-            $itemsTotal += $line;
-
-            // 2) Услуги (берем snapshot price из pivot booking_service)
+            // 2) Услуги (pivot.price_snapshot)
             foreach ($booking->services as $service) {
-                $qty  = (int) $service->pivot->quantity;
-                $unit = (float) $service->pivot->price_snapshot;
+                $qty = (int)($service->pivot->quantity ?? 0);
+                if ($qty <= 0) continue;
+
+                $unit = (float)($service->pivot->price_snapshot ?? $service->price ?? 0);
                 $line = $qty * $unit;
+
+                $txt = $service->name;
 
                 InvoiceItem::create([
                     'invoice_id'  => $invoice->id,
                     'type'        => 'service',
-                    'description' => $service->name, // <-- было title
+                    'title'       => $txt,
+                    'description' => $txt,
                     'quantity'    => $qty,
                     'unit_price'  => $unit,
-                    'total'       => $line, // <-- было line_total
+                    'total'       => $line,
                 ]);
-
-                $itemsTotal += $line;
             }
 
+            // Итог по счету — только из items
             $invoice->update([
                 'total' => $invoice->items()->sum('total'),
             ]);
-
 
             return $invoice;
         });

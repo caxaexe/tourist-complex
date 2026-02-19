@@ -234,7 +234,7 @@
                                         @endif
 
                                         {{-- Удаление: показываем, когда нет счета (или статус pending/cancelled) --}}
-                                        @if(!$invoice && in_array($booking->status, ['pending', 'cancelled'], true))
+                                        @if(!$invoice && !in_array($booking->status, ['confirmed','checked_in'], true))
                                             <form method="POST"
                                                 action="{{ route('bookings.destroy', $booking) }}"
                                                 class="inline"
