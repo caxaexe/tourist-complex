@@ -136,7 +136,6 @@
 
                     <hr class="my-6">
 
-                    {{-- КНОПКИ --}}
                     <div class="flex flex-wrap gap-3">
                         <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                             Сохранить
@@ -147,7 +146,17 @@
                             Назад
                         </a>
 
-                        {{-- ✅ Check-in / Check-out --}}
+                        <form method="POST"
+                            action="{{ route('bookings.destroy', $booking) }}"
+                            onsubmit="return confirm('ТОЧНО удалить бронирование #{{ $booking->id }}? Это действие нельзя отменить.')">
+                            @csrf
+                            @method('DELETE')
+                            <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                Удалить бронирование
+                            </button>
+                        </form>
+
+
                         @if($booking->status === 'confirmed')
                             <form method="POST" action="{{ route('bookings.checkin', $booking) }}">
                                 @csrf
@@ -170,7 +179,6 @@
                     </div>
                 </form>
 
-                {{-- ✅ ОТДЕЛЬНАЯ ФОРМА: Создать счёт --}}
                 <hr class="my-6">
                 <form method="POST" action="{{ route('bookings.invoices.store', $booking) }}">
                     @csrf

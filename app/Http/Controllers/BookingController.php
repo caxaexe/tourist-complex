@@ -258,15 +258,23 @@ class BookingController extends Controller
 
     public function destroy(Booking $booking)
     {
-        // запрещаем удалять не только confirmed, но и “в процессе”
-        if (in_array($booking->status, ['confirmed', 'checked_in', 'checked_out'], true)) {
-            return redirect()
-                ->route('bookings.index')
-                ->with('success', 'Удаление запрещено: бронь уже в работе');
+        // 1) Если есть счет или оплаты — сначала надо удалить их или запретить удаление
+        $invoice = $booking->invoice; // если связь есть
+        if ($invoice) {
+            // если у счета есть оплаты — запрещаем (иначе потеряешь платежи/историю)
+            if ($invoice->payments()->exists()) {
+                return back()->withErrors(['delete' => 'Нельзя удалить бронь: по счету есть оплаты.']);
+            }
+
+            // удаляем позиции счета, потом сам счет
+            $invoice->items()->delete();
+            $invoice->delete();
         }
 
-        $old = $booking->toArray();
+        // 2) Удаляем связи услуг (pivot)
+        $booking->services()->detach();
 
+        $old = $booking->toArray();
         $booking->delete();
 
         logAudit('deleted', $booking, $old, null);
@@ -274,6 +282,7 @@ class BookingController extends Controller
         return redirect()->route('bookings.index')
             ->with('success', 'Бронирование удалено');
     }
+
 
     private function ensureInvoiceForBooking(Booking $booking): void
     {
