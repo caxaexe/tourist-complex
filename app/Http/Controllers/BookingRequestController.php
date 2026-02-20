@@ -9,11 +9,26 @@ use Carbon\Carbon;
 
 class BookingRequestController extends Controller
 {
+    private function currentSessionId(): string
+    {
+        // Laravel session id (работает для гостей тоже)
+        return session()->getId();
+    }
+
     public function index()
     {
-        $bookings = auth()->user()
-            ->bookings()
-            ->with('room.roomType')
+        $sid = $this->currentSessionId();
+
+        $bookings = Booking::query()
+            ->with(['room.roomType'])
+            ->when(auth()->check(), function ($q) use ($sid) {
+                $q->where(function ($qq) use ($sid) {
+                    $qq->where('user_id', auth()->id())
+                       ->orWhere('session_id', $sid);
+                });
+            }, function ($q) use ($sid) {
+                $q->where('session_id', $sid);
+            })
             ->orderByDesc('id')
             ->get();
 
@@ -44,18 +59,19 @@ class BookingRequestController extends Controller
         $from = Carbon::parse($request->date_from);
         $to   = Carbon::parse($request->date_to);
 
-        $nights = $from->diffInDays($to);
-        $total  = $nights * (float)$room->price_per_night;
+        $nights = max(1, $from->diffInDays($to));
+        $total  = $nights * (float) $room->price_per_night;
 
         Booking::create([
-            'user_id'   => auth()->id(),
-            'client_id' => 1, 
-            'room_id'   => $room->id,
-            'date_from' => $request->date_from,
-            'date_to'   => $request->date_to,
-            'status'    => 'pending',
-            'total'     => $total,
-            'note'      => $request->note,
+            'session_id' => $this->currentSessionId(),
+            'user_id'    => auth()->id(), 
+            'client_id'  => 1,         
+            'room_id'    => $room->id,
+            'date_from'  => $request->date_from,
+            'date_to'    => $request->date_to,
+            'status'     => 'pending',
+            'total'      => $total,
+            'note'       => $request->note,
         ]);
 
         return redirect()->route('my.bookings.index')

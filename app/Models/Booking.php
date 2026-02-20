@@ -14,6 +14,7 @@ class Booking extends Model
         'status',
         'total',
         'note',
+        'session_id',
     ];
 
     protected $casts = [

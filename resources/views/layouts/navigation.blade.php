@@ -1,11 +1,10 @@
 @php
     $u = auth()->user();
 
-    $isAdmin = $u?->hasRole('admin');
-    $isStaff = $u?->hasRole('employee');
-    $isUser  = $u?->hasRole('user');
+    $isAuth  = auth()->check();
+    $isAdmin = $u?->hasRole('admin') ?? false;
+    $isStaff = $u?->hasRole('employee') ?? false;
 
-    // Рабочая зона: admin.* или staff.*
     $workPrefix = $isAdmin ? 'admin.' : ($isStaff ? 'staff.' : null);
 @endphp
 
@@ -39,62 +38,70 @@
                         <x-nav-link :href="route($workPrefix.'payments.index')" :active="request()->routeIs($workPrefix.'payments.*')">Оплаты</x-nav-link>
                     @endif
 
-                    {{-- CLIENT --}}
-                    @if($isUser)
-                        <x-nav-link :href="route('client.my.bookings.index')" :active="request()->routeIs('client.my.bookings.*')">
-                            Мои заявки
-                        </x-nav-link>
-                        <x-nav-link :href="route('client.my.bookings.create')" :active="request()->routeIs('client.my.bookings.create')">
-                            Подать заявку
-                        </x-nav-link>
+                    {{-- REPORTS: только админ --}}
+                    @if($isAdmin)
+                        <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">Отчёты</x-nav-link>
                     @endif
+
+                    {{-- CLIENT AREA (доступно всем, даже гостю) --}}
+                    <x-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
+                        Мои заявки
+                    </x-nav-link>
+                    <x-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
+                        Подать заявку
+                    </x-nav-link>
 
                     {{-- ADMIN EXTRA --}}
                     @if($isAdmin)
-                        <x-nav-link :href="route('admin.reports.index')" 
-                            :active="request()->routeIs('admin.reports.*')">
-                            Отчёты
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                            Админ
                         </x-nav-link>
 
-                        <x-nav-link :href="route('admin.users.index')" 
-                            :active="request()->routeIs('admin.users.*')">
+                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                             Персонал
                         </x-nav-link>
 
-                        <x-nav-link :href="route('admin.audit-logs.index')" 
-                            :active="request()->routeIs('admin.audit-logs.index')">
+                        <x-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.*')">
                             Журнал
                         </x-nav-link>
                     @endif
+
                 </div>
             </div>
 
-            <!-- User Dropdown -->
+            <!-- Right side -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-600 bg-white hover:text-gray-900 focus:outline-none transition">
-                            <div>{{ Auth::user()->name }}</div>
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+                @if($isAuth)
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-600 bg-white hover:text-gray-900 focus:outline-none transition">
+                                <div>{{ Auth::user()->name }}</div>
+                                <div class="ms-1">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                            </button>
+                        </x-slot>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">Profile</x-dropdown-link>
+                        <x-slot name="content">
+                            <x-dropdown-link :href="route('profile.edit')">Profile</x-dropdown-link>
 
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                Log Out
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link :href="route('logout')"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    Log Out
+                                </x-dropdown-link>
+                            </form>
+                        </x-slot>
+                    </x-dropdown>
+                @else
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:underline">Login</a>
+                        <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:underline">Register</a>
+                    </div>
+                @endif
             </div>
 
             <!-- Hamburger -->
@@ -129,47 +136,46 @@
                 <x-responsive-nav-link :href="route($workPrefix.'payments.index')" :active="request()->routeIs($workPrefix.'payments.*')">Оплаты</x-responsive-nav-link>
             @endif
 
-            @if($isUser)
-                <x-responsive-nav-link :href="route('client.my.bookings.index')" :active="request()->routeIs('client.my.bookings.*')">
-                    Мои заявки
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('client.my.bookings.create')" :active="request()->routeIs('client.my.bookings.create')">
-                    Подать заявку
+            @if($isAdmin)
+                <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                    Отчёты
                 </x-responsive-nav-link>
             @endif
 
-            @if($isAdmin)
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                    Админ
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                    Персонал
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.index')">
-                    Журнал
-                </x-responsive-nav-link>
-            @endif
+            <x-responsive-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
+                Мои заявки
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
+                Подать заявку
+            </x-responsive-nav-link>
 
         </div>
 
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                @if($isAuth)
+                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                @else
+                    <div class="font-medium text-base text-gray-800">Гость</div>
+                @endif
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    Profile
-                </x-responsive-nav-link>
+                @if($isAuth)
+                    <x-responsive-nav-link :href="route('profile.edit')">Profile</x-responsive-nav-link>
 
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();">
-                        Log Out
-                    </x-responsive-nav-link>
-                </form>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-responsive-nav-link :href="route('logout')"
+                            onclick="event.preventDefault(); this.closest('form').submit();">
+                            Log Out
+                        </x-responsive-nav-link>
+                    </form>
+                @else
+                    <x-responsive-nav-link :href="route('login')">Login</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('register')">Register</x-responsive-nav-link>
+                @endif
             </div>
         </div>
     </div>
