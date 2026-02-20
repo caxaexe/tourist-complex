@@ -113,9 +113,6 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'create', 'store', 'destroy'])
             ->names('payments');
 
-        Route::get('/reports', [ReportController::class, 'index'])
-            ->name('reports.index');
-
         Route::post('/bookings/{booking}/check-in', [BookingController::class, 'checkIn'])
             ->name('bookings.checkin');
 

@@ -37,7 +37,6 @@
                         <x-nav-link :href="route($workPrefix.'services.index')" :active="request()->routeIs($workPrefix.'services.*')">Услуги</x-nav-link>
                         <x-nav-link :href="route($workPrefix.'invoices.index')" :active="request()->routeIs($workPrefix.'invoices.*')">Счета</x-nav-link>
                         <x-nav-link :href="route($workPrefix.'payments.index')" :active="request()->routeIs($workPrefix.'payments.*')">Оплаты</x-nav-link>
-                        <x-nav-link :href="route($workPrefix.'reports.index')" :active="request()->routeIs($workPrefix.'reports.*')">Отчёты</x-nav-link>
                     @endif
 
                     {{-- CLIENT --}}
@@ -52,19 +51,21 @@
 
                     {{-- ADMIN EXTRA --}}
                     @if($isAdmin)
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                            Админ
+                        <x-nav-link :href="route('admin.reports.index')" 
+                            :active="request()->routeIs('admin.reports.*')">
+                            Отчёты
                         </x-nav-link>
 
-                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                        <x-nav-link :href="route('admin.users.index')" 
+                            :active="request()->routeIs('admin.users.*')">
                             Персонал
                         </x-nav-link>
 
-                        <x-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.index')">
+                        <x-nav-link :href="route('admin.audit-logs.index')" 
+                            :active="request()->routeIs('admin.audit-logs.index')">
                             Журнал
                         </x-nav-link>
                     @endif
-
                 </div>
             </div>
 

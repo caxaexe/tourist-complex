@@ -5,7 +5,7 @@
                 Отчёты
             </h2>
 
-            <form method="GET" action="{{ route('reports.index') }}" class="flex flex-wrap gap-2 items-center">
+            <form method="GET" action="{{ route('admin.reports.index') }}" class="flex flex-wrap gap-2 items-center">
                 <input type="date" name="from"
                        value="{{ $from->toDateString() }}"
                        class="border rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
