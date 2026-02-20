@@ -127,7 +127,6 @@
                 <x-responsive-nav-link :href="route($workPrefix.'services.index')" :active="request()->routeIs($workPrefix.'services.*')">Услуги</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route($workPrefix.'invoices.index')" :active="request()->routeIs($workPrefix.'invoices.*')">Счета</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route($workPrefix.'payments.index')" :active="request()->routeIs($workPrefix.'payments.*')">Оплаты</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route($workPrefix.'reports.index')" :active="request()->routeIs($workPrefix.'reports.*')">Отчёты</x-responsive-nav-link>
             @endif
 
             @if($isUser)
