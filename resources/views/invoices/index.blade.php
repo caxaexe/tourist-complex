@@ -1,17 +1,21 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
-    <div class="flex items-center justify-between gap-3">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Счета
-        </h2>
+        <div class="flex items-center justify-between gap-3">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                Счета
+            </h2>
 
-        <a href="{{ route('invoices.create') }}"
-           class="px-4 py-2 bg-blue-600 text-white rounded">
-            + Создать счёт
-        </a>
-    </div>
-</x-slot>
-
+            <a href="{{ route($prefix.'invoices.create') }}"
+               class="px-4 py-2 bg-blue-600 text-white rounded">
+                + Создать счёт
+            </a>
+        </div>
+    </x-slot>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -39,15 +43,15 @@
 
                     <tbody>
                         @forelse($invoices as $invoice)
-
                             @php
                                 $paid = (float) $invoice->payments->sum('amount');
                                 $due  = (float) ($invoice->total ?? 0);
                                 $balance = max(0, $due - $paid);
 
+                                // ВАЖНО: 0 сумма НЕ означает PAID. Это просто пустой/битый счет -> UNPAID.
                                 if ($due <= 0) {
-                                    $payText = 'PAID';
-                                    $payCls  = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+                                    $payText = 'UNPAID';
+                                    $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
                                 } elseif ($paid <= 0) {
                                     $payText = 'UNPAID';
                                     $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
@@ -92,21 +96,21 @@
                                         </span>
 
                                         <span class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ number_format($paid,2,'.',' ') }}
-                                            /
-                                            {{ number_format($due,2,'.',' ') }}
+                                            {{ number_format($paid,2,'.',' ') }} / {{ number_format($due,2,'.',' ') }}
+                                            @if($balance > 0 && $due > 0)
+                                                • Остаток: {{ number_format($balance,2,'.',' ') }}
+                                            @endif
                                         </span>
                                     </div>
                                 </td>
 
                                 <td class="text-right whitespace-nowrap">
-                                    <a href="{{ route('invoices.show', $invoice) }}"
+                                    <a href="{{ route($prefix.'invoices.show', $invoice) }}"
                                        class="px-3 py-1 bg-blue-600 text-white rounded text-sm">
                                         Открыть счёт
                                     </a>
                                 </td>
                             </tr>
-
                         @empty
                             <tr>
                                 <td colspan="8" class="py-4 text-center text-gray-500 dark:text-gray-400">

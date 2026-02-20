@@ -20,7 +20,7 @@
             @endif
 
             <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
-                <a href="{{ route($prefix.'bookings.create') }}">
+                <a href="{{ route($prefix.'bookings.create') }}"
                    class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     + Создать бронирование
                 </a>
@@ -35,21 +35,21 @@
                     Все
                 </a>
 
-                <a href="{{ route('bookings.index', ['payment' => 'unpaid']) }}"
+                <a href="{{ route($prefix.'bookings.index', ['payment' => 'unpaid']) }}"
                    class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
                           {{ ($payment ?? '') === 'unpaid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
                           text-gray-800 dark:text-gray-200">
                     UNPAID
                 </a>
 
-                <a href="{{ route('bookings.index', ['payment' => 'partial']) }}"
+                <a href="{{ route($prefix.'bookings.index', ['payment' => 'partial']) }}"
                    class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
                           {{ ($payment ?? '') === 'partial' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
                           text-gray-800 dark:text-gray-200">
                     PARTIAL
                 </a>
 
-                <a href="{{ route('bookings.index', ['payment' => 'paid']) }}"
+                <a href="{{ route($prefix.'bookings.index', ['payment' => 'paid']) }}"
                    class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
                           {{ ($payment ?? '') === 'paid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
                           text-gray-800 dark:text-gray-200">
@@ -121,17 +121,13 @@
 
                                 $invoice = $booking->invoice ?? null;
 
-                                // Сумма к оплате: если есть счёт — берём total счета, иначе booking->total
+                                // К оплате: если есть счёт — он главный, иначе total брони
                                 $due  = (float) ($invoice->total ?? $booking->total ?? 0);
 
-                                // Оплачено: если есть счёт — суммируем его платежи, иначе booking->payments_sum_amount
-                                $paid = (float) ($invoice ? ($invoice->payments->sum('amount') ?? 0) : ($booking->payments_sum_amount ?? 0));
+                                // Оплачено: берём withSum из bookings (не зависит от eager-loading invoice->payments)
+                                $paid = (float) ($booking->payments_sum_amount ?? 0);
 
-                                // Статус оплаты: защита от 0/0 = paid
-                                if ($due <= 0) {
-                                    $payText = 'UNPAID';
-                                    $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
-                                } elseif ($paid <= 0) {
+                                if ($due <= 0 || $paid <= 0) {
                                     $payText = 'UNPAID';
                                     $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
                                 } elseif ($paid + 0.01 < $due) {
@@ -183,9 +179,9 @@
 
                                     @if($invoice)
                                         <div class="mt-2">
-                                            <a href="{{ route('invoices.show', $invoice) }}"
-                                            class="inline-block px-2 py-1 rounded text-sm border border-gray-200 dark:border-gray-700
-                                                    text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/40">
+                                            <a href="{{ route($prefix.'invoices.show', $invoice) }}"
+                                               class="inline-block px-2 py-1 rounded text-sm border border-gray-200 dark:border-gray-700
+                                                      text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/40">
                                                 Счёт: {{ $invoice->number }}
                                             </a>
                                         </div>
@@ -213,8 +209,8 @@
                                 <td class="text-right whitespace-nowrap">
                                     <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
                                         <a class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700
-                                                text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
-                                        href="{{ route($prefix.'bookings.edit', $booking) }}">
+                                                  text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
+                                           href="{{ route($prefix.'bookings.edit', $booking) }}">
                                             Редактировать
                                         </a>
 
@@ -238,12 +234,11 @@
                                             </form>
                                         @endif
 
-                                        {{-- Удаление: показываем, когда нет счета (или статус pending/cancelled) --}}
                                         @if(!$invoice && !in_array($booking->status, ['confirmed','checked_in'], true))
                                             <form method="POST"
-                                                action="{{ route($prefix.'bookings.destroy', $booking) }}"
-                                                class="inline"
-                                                onsubmit="return confirm('Удалить бронирование #{{ $booking->id }}?')">
+                                                  action="{{ route($prefix.'bookings.destroy', $booking) }}"
+                                                  class="inline"
+                                                  onsubmit="return confirm('Удалить бронирование #{{ $booking->id }}?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700">
@@ -261,7 +256,7 @@
                                 </td>
                             </tr>
                         @endforelse
-                        </tbody>
+                    </tbody>
 
                 </table>
 

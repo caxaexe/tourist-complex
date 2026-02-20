@@ -18,8 +18,10 @@ class RoomController extends Controller
         $rooms = Room::query()
             ->with('roomType')
             ->when($q, function ($query) use ($q) {
-                $query->where('number', 'like', "%{$q}%")
-                      ->orWhere('title', 'like', "%{$q}%");
+                $query->where(function ($qq) use ($q) {
+                    $qq->where('number', 'like', "%{$q}%")
+                       ->orWhere('title', 'like', "%{$q}%");
+                });
             })
             ->orderBy('id', 'desc')
             ->paginate(10)
@@ -31,20 +33,27 @@ class RoomController extends Controller
     public function create()
     {
         $roomTypes = RoomType::orderBy('name')->get();
-        return view('rooms.create', compact('roomTypes'));
+        $amenities = Amenity::orderBy('name')->get();
+
+        return view('rooms.create', compact('roomTypes', 'amenities'));
     }
 
     public function store(StoreRoomRequest $request)
     {
         $data = $request->validated();
+
         $data['is_active'] = (bool)($data['is_active'] ?? false);
+
+        $amenityIds = $request->input('amenities', []);
+        unset($data['amenities']);
 
         $room = Room::create($data);
 
+        $room->amenities()->sync(array_filter(array_map('intval', (array)$amenityIds)));
+
         logAudit('created', $room, null, $room->toArray());
 
-        return redirect()->route('rooms.index')
-            ->with('success', 'Номер добавлен');
+        return redirect()->back()->with('success', 'Номер добавлен');
     }
 
     public function edit(Room $room)
@@ -63,12 +72,16 @@ class RoomController extends Controller
 
         $old = $room->toArray();
 
+        $amenityIds = $request->input('amenities', []);
+        unset($data['amenities']);
+
         $room->update($data);
+
+        $room->amenities()->sync(array_filter(array_map('intval', (array)$amenityIds)));
 
         logAudit('updated', $room, $old, $room->toArray());
 
-        return redirect()->route('rooms.index')
-            ->with('success', 'Номер обновлён');
+        return redirect()->back()->with('success', 'Номер обновлён');
     }
 
     public function destroy(Room $room)
@@ -79,7 +92,6 @@ class RoomController extends Controller
 
         logAudit('deleted', $room, $old, null);
 
-        return redirect()->route('rooms.index')
-            ->with('success', 'Номер удалён');
+        return redirect()->back()->with('success', 'Номер удалён');
     }
 }

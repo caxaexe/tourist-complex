@@ -1,3 +1,8 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -15,7 +20,7 @@
             @endif
 
             <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
-                <a href="{{ route('room-types.create') }}"
+                <a href="{{ route($prefix.'room-types.create') }}"
                    class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded">
                     + Добавить тип
                 </a>
@@ -31,27 +36,33 @@
                             <th class="text-right text-gray-700 dark:text-gray-200">Действия</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @forelse($roomTypes as $type)
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="py-2 text-gray-800 dark:text-gray-200">{{ $type->id }}</td>
+
                                 <td class="text-gray-800 dark:text-gray-200">{{ $type->name }}</td>
+
                                 <td class="text-gray-800 dark:text-gray-200">
                                     {{ $type->description ?? '—' }}
                                 </td>
-                                <td class="text-right">
-                                    <a href="{{ route('room-types.edit', $type) }}"
-                                       class="text-blue-600">
+
+                                <td class="text-right whitespace-nowrap">
+                                    <a href="{{ route($prefix.'room-types.edit', $type) }}"
+                                       class="text-blue-600 dark:text-blue-300">
                                         Редактировать
                                     </a>
 
                                     <form method="POST"
-                                          action="{{ route('room-types.destroy', $type) }}"
+                                          action="{{ route($prefix.'room-types.destroy', $type) }}"
                                           class="inline"
                                           onsubmit="return confirm('Удалить тип?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-red-600 ml-3">Удалить</button>
+                                        <button class="text-red-600 dark:text-red-300 ml-3">
+                                            Удалить
+                                        </button>
                                     </form>
                                 </td>
                             </tr>

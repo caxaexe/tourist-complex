@@ -1,3 +1,8 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -11,12 +16,12 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <a href="{{ route('payments.create', ['invoice_id' => $invoice->id]) }}"
+                <a href="{{ route($prefix.'payments.create', ['invoice_id' => $invoice->id]) }}"
                    class="px-4 py-2 bg-blue-600 text-white rounded">
                     + Добавить оплату
                 </a>
 
-                <a href="{{ route('invoices.index') }}"
+                <a href="{{ route($prefix.'invoices.index') }}"
                    class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
                     Назад
                 </a>
@@ -93,16 +98,16 @@
                             @forelse($invoice->items as $item)
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-2 text-gray-800 dark:text-gray-200">
-                                        {{ $item->title }}
+                                        {{ $item->description ?? $item->title ?? '—' }}
                                     </td>
                                     <td class="text-right text-gray-800 dark:text-gray-200">
                                         {{ $item->quantity }}
                                     </td>
                                     <td class="text-right text-gray-800 dark:text-gray-200">
-                                        {{ number_format($item->unit_price, 2, '.', ' ') }}
+                                        {{ number_format((float)$item->unit_price, 2, '.', ' ') }}
                                     </td>
                                     <td class="text-right text-gray-800 dark:text-gray-200">
-                                        {{ number_format($item->line_total, 2, '.', ' ') }}
+                                        {{ number_format((float)($item->total ?? $item->line_total ?? 0), 2, '.', ' ') }}
                                     </td>
                                 </tr>
                             @empty
@@ -119,21 +124,21 @@
                 <div class="mt-4 text-right">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Итого по счёту</div>
                     <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                        {{ number_format($invoice->total, 2, '.', ' ') }}
+                        {{ number_format((float)$invoice->total, 2, '.', ' ') }}
                     </div>
                 </div>
 
                 <hr class="my-6 border-gray-200 dark:border-gray-700">
 
-                {{-- ✅ Оплаты по счету --}}
+                {{-- Оплаты по счету --}}
                 @php
                     $paid = (float) $invoice->payments->sum('amount');
                     $due  = (float) ($invoice->total ?? 0);
                     $balance = max(0, $due - $paid);
 
                     if ($due <= 0) {
-                        $payText = 'PAID';
-                        $payCls  = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+                        $payText = 'UNPAID';
+                        $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
                     } elseif ($paid <= 0) {
                         $payText = 'UNPAID';
                         $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
@@ -160,7 +165,7 @@
                     <div class="flex items-center gap-2">
                         <span class="px-2 py-1 rounded text-sm {{ $payCls }}">{{ $payText }}</span>
 
-                        <a href="{{ route('payments.create', ['invoice_id' => $invoice->id]) }}"
+                        <a href="{{ route($prefix.'payments.create', ['invoice_id' => $invoice->id]) }}"
                            class="px-4 py-2 bg-blue-600 text-white rounded">
                             + Добавить оплату
                         </a>
@@ -183,13 +188,13 @@
                             @forelse($invoice->payments as $p)
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <td class="py-2 text-gray-800 dark:text-gray-200">{{ $p->id }}</td>
-                                    <td class="text-gray-800 dark:text-gray-200">{{ number_format($p->amount,2,'.',' ') }}</td>
+                                    <td class="text-gray-800 dark:text-gray-200">{{ number_format((float)$p->amount,2,'.',' ') }}</td>
                                     <td class="text-gray-800 dark:text-gray-200">{{ $p->method }}</td>
                                     <td class="text-gray-800 dark:text-gray-200">{{ optional($p->paid_at)->format('d.m.Y H:i') }}</td>
                                     <td class="text-sm text-gray-500 dark:text-gray-400">{{ $p->note ?? '—' }}</td>
                                     <td class="text-right whitespace-nowrap">
                                         <form method="POST"
-                                              action="{{ route('payments.destroy', $p) }}"
+                                              action="{{ route($prefix.'payments.destroy', $p) }}"
                                               onsubmit="return confirm('Удалить оплату?')"
                                               class="inline">
                                             @csrf

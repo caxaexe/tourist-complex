@@ -1,3 +1,8 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -15,13 +20,18 @@
             @endif
 
             <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
-                <form method="GET" action="{{ route('rooms.index') }}" class="flex gap-2">
-                    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Поиск (номер/название)"
+                <form method="GET" action="{{ route($prefix.'rooms.index') }}" class="flex gap-2">
+                    <input type="text"
+                           name="q"
+                           value="{{ $q ?? '' }}"
+                           placeholder="Поиск (номер/название)"
                            class="border rounded px-3 py-2 w-80">
-                    <button class="px-4 py-2 bg-gray-800 text-white rounded">Найти</button>
+                    <button class="px-4 py-2 bg-gray-800 text-white rounded">
+                        Найти
+                    </button>
                 </form>
 
-                <a href="{{ route('rooms.create') }}"
+                <a href="{{ route($prefix.'rooms.create') }}"
                    class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded">
                     + Добавить номер
                 </a>
@@ -39,41 +49,58 @@
                             <th class="text-right text-gray-700 dark:text-gray-200">Действия</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @forelse($rooms as $room)
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="py-2 text-gray-800 dark:text-gray-200">
                                     {{ $room->number }}
                                     @if($room->title)
-                                        <div class="text-xs text-gray-500">{{ $room->title }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $room->title }}
+                                        </div>
                                     @endif
                                 </td>
+
                                 <td class="text-gray-800 dark:text-gray-200">
                                     {{ $room->roomType?->name ?? '—' }}
                                 </td>
+
                                 <td class="text-gray-800 dark:text-gray-200">
                                     {{ number_format($room->price_per_night, 2, '.', ' ') }}
                                 </td>
+
                                 <td class="text-gray-800 dark:text-gray-200">
                                     {{ $room->capacity ?? '—' }}
                                 </td>
+
                                 <td class="text-gray-800 dark:text-gray-200">
                                     {{ $room->is_active ? 'Да' : 'Нет' }}
                                 </td>
-                                <td class="text-right">
-                                    <a class="text-blue-600" href="{{ route('rooms.edit', $room) }}">Редактировать</a>
 
-                                    <form class="inline" method="POST" action="{{ route('rooms.destroy', $room) }}"
+                                <td class="text-right whitespace-nowrap">
+                                    <a class="text-blue-600 dark:text-blue-300"
+                                       href="{{ route($prefix.'rooms.edit', $room) }}">
+                                        Редактировать
+                                    </a>
+
+                                    <form class="inline"
+                                          method="POST"
+                                          action="{{ route($prefix.'rooms.destroy', $room) }}"
                                           onsubmit="return confirm('Удалить номер?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-red-600 ml-3">Удалить</button>
+                                        <button class="text-red-600 dark:text-red-300 ml-3">
+                                            Удалить
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-4 text-center text-gray-500">Нет номеров</td>
+                                <td colspan="6" class="py-4 text-center text-gray-500 dark:text-gray-400">
+                                    Нет номеров
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>

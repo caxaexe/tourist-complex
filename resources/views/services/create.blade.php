@@ -1,3 +1,8 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -7,39 +12,55 @@
 
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 shadow rounded p-6">
 
-                <form method="POST" action="{{ route('services.store') }}" class="space-y-4">
+            @if($errors->any())
+                <div class="mb-4 p-3 bg-red-100 border border-red-300 rounded text-red-900">
+                    Проверь поля формы — есть ошибки.
+                </div>
+            @endif
+
+            <div class="bg-white dark:bg-gray-800 shadow rounded p-6">
+                <form method="POST" action="{{ route($prefix.'services.store') }}" class="space-y-4">
                     @csrf
 
                     <div>
                         <label class="block mb-1 text-gray-700 dark:text-gray-200">Название *</label>
-                        <input name="name" value="{{ old('name') }}"
-                               class="border rounded w-full px-3 py-2">
-                        @error('name') <div class="text-red-600">{{ $message }}</div> @enderror
+                        <input name="name"
+                               value="{{ old('name') }}"
+                               class="border rounded w-full px-3 py-2 bg-white dark:bg-gray-900
+                                      text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
+                        @error('name')
+                            <div class="text-red-600 mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div>
                         <label class="block mb-1 text-gray-700 dark:text-gray-200">Цена *</label>
                         <input type="number" step="0.01" min="0"
-                               name="price" value="{{ old('price') }}"
-                               class="border rounded w-full px-3 py-2">
-                        @error('price') <div class="text-red-600">{{ $message }}</div> @enderror
+                               name="price"
+                               value="{{ old('price') }}"
+                               class="border rounded w-full px-3 py-2 bg-white dark:bg-gray-900
+                                      text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
+                        @error('price')
+                            <div class="text-red-600 mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="flex gap-3">
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                             Сохранить
                         </button>
-                        <a href="{{ route('services.index') }}"
-                           class="px-4 py-2 border rounded text-gray-700 dark:text-gray-200">
+
+                        <a href="{{ route($prefix.'services.index') }}"
+                           class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200
+                                  border-gray-200 dark:border-gray-700">
                             Назад
                         </a>
                     </div>
 
                 </form>
-
             </div>
+
         </div>
     </div>
 </x-app-layout>

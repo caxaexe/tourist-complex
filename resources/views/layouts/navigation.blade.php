@@ -1,10 +1,11 @@
 @php
     $u = auth()->user();
+
     $isAdmin = $u?->hasRole('admin');
     $isStaff = $u?->hasRole('employee');
     $isUser  = $u?->hasRole('user');
 
-    // Выбираем префикс для рабочих ссылок
+    // Рабочая зона: admin.* или staff.*
     $workPrefix = $isAdmin ? 'admin.' : ($isStaff ? 'staff.' : null);
 @endphp
 
@@ -59,7 +60,7 @@
                             Персонал
                         </x-nav-link>
 
-                        <x-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.*')">
+                        <x-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.index')">
                             Журнал
                         </x-nav-link>
                     @endif
@@ -144,7 +145,7 @@
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                     Персонал
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.*')">
+                <x-responsive-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.index')">
                     Журнал
                 </x-responsive-nav-link>
             @endif

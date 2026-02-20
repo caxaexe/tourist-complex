@@ -1,3 +1,8 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -8,12 +13,13 @@
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 shadow rounded p-6">
-                <form method="POST" action="{{ route('room-types.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route($prefix.'room-types.store') }}" class="space-y-4">
                     @csrf
 
                     <div>
                         <label class="block mb-1 text-gray-700 dark:text-gray-200">Название *</label>
-                        <input name="name" value="{{ old('name') }}"
+                        <input name="name"
+                               value="{{ old('name') }}"
                                class="border rounded w-full px-3 py-2">
                         @error('name') <div class="text-red-600">{{ $message }}</div> @enderror
                     </div>
@@ -30,7 +36,8 @@
                         <button class="px-4 py-2 bg-blue-600 text-white rounded">
                             Сохранить
                         </button>
-                        <a href="{{ route('room-types.index') }}"
+
+                        <a href="{{ route($prefix.'room-types.index') }}"
                            class="px-4 py-2 border rounded text-gray-700 dark:text-gray-200">
                             Назад
                         </a>

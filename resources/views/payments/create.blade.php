@@ -1,3 +1,8 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -17,7 +22,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('payments.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route($prefix.'payments.store') }}" class="space-y-4">
                     @csrf
 
                     <input type="hidden" name="invoice_id" value="{{ $invoiceId }}">
@@ -62,13 +67,13 @@
                     <div class="flex gap-3">
                         <button class="px-4 py-2 bg-blue-600 text-white rounded">Сохранить</button>
 
-                        @if(!empty($invoiceId))
-                            <a href="{{ route('invoices.show', $invoiceId) }}"
+                        @if(!empty($invoice))
+                            <a href="{{ route($prefix.'invoices.show', $invoice) }}"
                                class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
                                 Назад к счёту
                             </a>
                         @else
-                            <a href="{{ route('invoices.index') }}"
+                            <a href="{{ route($prefix.'invoices.index') }}"
                                class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
                                 Назад
                             </a>

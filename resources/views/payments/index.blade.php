@@ -1,3 +1,8 @@
+@php
+    $u = auth()->user();
+    $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -5,8 +10,8 @@
                 Оплаты
             </h2>
 
-            {{-- ✅ Оплаты создаём только из счета --}}
-            <a href="{{ route('invoices.index') }}"
+            {{--  Оплаты создаём только из счета --}}
+            <a href="{{ route($prefix.'invoices.index') }}"
                class="px-4 py-2 bg-blue-600 text-white rounded">
                 + Добавить оплату (через счёт)
             </a>
@@ -41,8 +46,8 @@
                         @forelse($payments as $p)
                             @php
                                 $invoice = $p->invoice ?? null;
-                                $booking = $invoice?->booking ?? $p->booking ?? null;
-                                $client = $booking?->client ?? null;
+                                $booking = $invoice?->booking ?? null;
+                                $client  = $booking?->client ?? null;
                             @endphp
 
                             <tr class="border-b border-gray-200 dark:border-gray-700">
@@ -52,7 +57,7 @@
 
                                 <td class="text-gray-800 dark:text-gray-200">
                                     @if($invoice)
-                                        <a href="{{ route('invoices.show', $invoice) }}"
+                                        <a href="{{ route($prefix.'invoices.show', $invoice) }}"
                                            class="text-blue-600 dark:text-blue-300 underline">
                                             {{ $invoice->number }}
                                         </a>
@@ -79,7 +84,7 @@
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ number_format($p->amount, 2, '.', ' ') }}
+                                    {{ number_format((float)$p->amount, 2, '.', ' ') }}
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
@@ -87,13 +92,13 @@
                                 </td>
 
                                 <td class="text-gray-800 dark:text-gray-200">
-                                    {{ optional($p->paid_at)->format('d.m.Y H:i') }}
+                                    {{ optional($p->paid_at)->format('d.m.Y H:i') ?? '—' }}
                                 </td>
 
                                 <td class="text-right whitespace-nowrap">
                                     <form class="inline"
                                           method="POST"
-                                          action="{{ route('payments.destroy', $p) }}"
+                                          action="{{ route($prefix.'payments.destroy', $p) }}"
                                           onsubmit="return confirm('Удалить оплату?')">
                                         @csrf
                                         @method('DELETE')

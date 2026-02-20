@@ -24,7 +24,11 @@ Route::get('/', function () {
 
 // ✅ /dashboard → редирект по роли
 Route::get('/dashboard', function () {
-    $user = auth()->user()->load('roles');
+    $user = auth()->user()?->load('roles');
+
+    if (!$user) {
+        return redirect()->route('login');
+    }
 
     if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');
@@ -46,26 +50,22 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
-    // ==========================================================
-    // ADMIN ONLY  (ВСЕ URL начинаются с /admin/ и имена admin.*)
-    // ==========================================================
+    // ADMIN ONLY  (URL /admin/... и имена admin.*)
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
 
-        // dashboard
-        Route::get('/dashboard', function () {
-            return view('dashboards.admin');
-        })->name('dashboard');
+        Route::get('/dashboard', fn () => view('dashboards.admin'))->name('dashboard');
+        Route::get('/', fn () => redirect()->route('admin.dashboard'));
 
-        // управление персоналом
+        // Управление персоналом
         Route::resource('users', AdminUserController::class)
             ->except(['show'])
             ->names('users');
 
-        // журнал действий
+        // Журнал действий
         Route::get('/audit-logs', [AuditLogController::class, 'index'])
             ->name('audit-logs.index');
 
-        // рабочие разделы (но теперь это /admin/..., а не /staff/...)
+        // Рабочие разделы (admin)
         Route::resource('clients', ClientController::class)->names('clients');
         Route::resource('room-types', RoomTypeController::class)->names('room-types');
         Route::resource('rooms', RoomController::class)->names('rooms');
@@ -92,15 +92,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     });
 
 
-    // ==========================================================
-    // STAFF ONLY (employee)  (URL /staff/... и имена staff.*)
-    // ==========================================================
+    // STAFF ONLY  (URL /staff/... и имена staff.*)
     Route::prefix('staff')->name('staff.')->middleware('role:employee')->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('dashboards.staff');
-        })->name('dashboard');
-
+        Route::get('/dashboard', fn () => view('dashboards.staff'))->name('dashboard');
         Route::get('/', fn () => redirect()->route('staff.dashboard'));
 
         Route::resource('clients', ClientController::class)->names('clients');
@@ -129,15 +124,13 @@ Route::middleware(['auth', 'active'])->group(function () {
     });
 
 
-    // ==========================================================
     // CLIENT (user)  (URL /client/... и имена client.*)
-    // ==========================================================
     Route::prefix('client')->name('client.')->middleware('role:user')->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('dashboards.client');
-        })->name('dashboard');
+        Route::get('/dashboard', fn () => view('dashboards.client'))->name('dashboard');
+        Route::get('/', fn () => redirect()->route('client.dashboard'));
 
+        // заявки
         Route::get('/my-bookings', [BookingRequestController::class, 'index'])
             ->name('my.bookings.index');
 
