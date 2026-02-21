@@ -23,6 +23,12 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    private function routePrefix(): string
+    {
+        $u = auth()->user();
+        return $u?->hasRole('admin') ? 'admin.' : 'staff.';
+    }
+
     public function index(Request $request)
     {
         $payment = $request->query('payment'); // unpaid | partial | paid | null
@@ -38,7 +44,6 @@ class BookingController extends Controller
         } elseif ($payment === 'paid') {
             $query->havingRaw('total > 0 AND COALESCE(payments_sum_amount, 0) >= total');
         }
-
 
         $bookings = $query->orderBy('id', 'desc')
             ->paginate(10)
@@ -88,7 +93,7 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
-        //  total не должен приходить из формы
+        // total не должен приходить из формы
         unset($data['total']);
 
         return DB::transaction(function () use ($data) {
@@ -127,12 +132,14 @@ class BookingController extends Controller
                 $this->ensureInvoiceForBooking($booking);
             }
 
-            return redirect()->route('bookings.index')
+            $prefix = $this->routePrefix();
+
+            return redirect()->route($prefix . 'bookings.index')
                 ->with('success', 'Бронирование создано');
         });
     }
 
-    public function edit(Booking $booking)
+    public function edit(Request $request, Booking $booking)
     {
         $booking->load([
             'client',
@@ -159,12 +166,50 @@ class BookingController extends Controller
             ])
             ->toArray();
 
+        // Оплата/баланс
         $paidTotal = (float)$booking->payments->sum('amount');
-        $dueTotal  = (float)$booking->total;
+        $dueTotal  = (float)($booking->invoice?->total ?? $booking->total ?? 0);
         $balance   = max(0, $dueTotal - $paidTotal);
+
+        // Чтобы твой edit.blade.php (который копия index) НЕ падал:
+        $payment = $request->query('payment');
+
+        // мини-статистика (как в index)
+        $today = now()->toDateString();
+
+        $activeCount = Booking::whereNotIn('status', ['cancelled', 'checked_out'])->count();
+
+        $checkInToday = Booking::whereDate('date_from', $today)
+            ->where('status', '!=', 'cancelled')
+            ->count();
+
+        $checkOutToday = Booking::whereDate('date_to', $today)
+            ->where('status', '!=', 'cancelled')
+            ->count();
+
+        $confirmedCount = Booking::where('status', 'confirmed')->count();
+        $sumTotal = Booking::sum('total');
+
+        // таблица (если edit у тебя реально показывает список)
+        $bookings = Booking::query()
+            ->with(['client', 'room.roomType', 'invoice'])
+            ->withSum('payments', 'amount')
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
+
+        $invoice = $booking->invoice;
 
         return view('bookings.edit', compact(
             'booking',
+            'invoice',
+            'bookings',
+            'payment',
+            'activeCount',
+            'checkInToday',
+            'checkOutToday',
+            'confirmedCount',
+            'sumTotal',
             'clients',
             'rooms',
             'services',
@@ -179,7 +224,7 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
-        //  total не должен приходить из формы
+        // total не должен приходить из формы
         unset($data['total']);
 
         return DB::transaction(function () use ($request, $booking, $data) {
@@ -232,14 +277,13 @@ class BookingController extends Controller
             // 5) услуги
             $booking->services()->sync($sync);
 
-            // 6) итог по услугам (fallback если pivot.price отсутствует)
+            // 6) итог по услугам
             $booking->load('services');
             $servicesTotal = $booking->services->sum(function ($s) {
                 $qty = (int)($s->pivot->quantity ?? 0);
                 $price = (float)($s->pivot->price_snapshot ?? $s->price ?? 0);
                 return $qty * $price;
             });
-
 
             $booking->update(['total' => $stayTotal + $servicesTotal]);
 
@@ -250,14 +294,18 @@ class BookingController extends Controller
 
             logAudit('updated', $booking, $old, $booking->fresh()->toArray());
 
-            return redirect()->route('bookings.index')
+            $prefix = $this->routePrefix();
+
+            return redirect()->route($prefix . 'bookings.index')
                 ->with('success', 'Бронирование обновлено');
         });
     }
 
     public function destroy(Booking $booking)
     {
-        $invoice = $booking->invoice; 
+        $booking->load('invoice');
+
+        $invoice = $booking->invoice;
         if ($invoice) {
             if ($invoice->payments()->exists()) {
                 return back()->withErrors(['delete' => 'Нельзя удалить бронь: по счету есть оплаты.']);
@@ -269,27 +317,16 @@ class BookingController extends Controller
 
         $booking->services()->detach();
 
-                $old = $booking->toArray();
+        $old = $booking->toArray();
         $booking->delete();
 
         logAudit('deleted', $booking, $old, null);
 
-        $user = auth()->user();
+        $prefix = $this->routePrefix();
 
-        if ($user?->hasRole('admin')) {
-            return redirect()->route('admin.bookings.index')
-                ->with('success', 'Бронирование удалено');
-        }
-
-        if ($user?->hasRole('employee')) {
-            return redirect()->route('staff.bookings.index')
-                ->with('success', 'Бронирование удалено');
-        }
-
-        return redirect()->to('/') 
+        return redirect()->route($prefix . 'bookings.index')
             ->with('success', 'Бронирование удалено');
     }
-
 
     private function ensureInvoiceForBooking(Booking $booking): void
     {
@@ -308,8 +345,6 @@ class BookingController extends Controller
             'note'       => 'Авто-счёт при подтверждении бронирования',
         ]);
 
-        $itemsTotal = 0;
-
         // 1) проживание
         $nights    = max(1, $booking->date_from->diffInDays($booking->date_to));
         $stayPrice = (float)($booking->room->price_per_night ?? 0);
@@ -323,9 +358,6 @@ class BookingController extends Controller
             'unit_price'  => $stayPrice,
             'total'       => $stayLine,
         ]);
-
-
-        $itemsTotal += $stayLine;
 
         // 2) услуги
         foreach ($booking->services as $service) {
@@ -343,15 +375,11 @@ class BookingController extends Controller
                 'unit_price'  => $unit,
                 'total'       => $line,
             ]);
-
-
-            $itemsTotal += $line;
         }
 
         $invoice->update([
             'total' => $invoice->items()->sum('total'),
         ]);
-
 
         logAudit('created', $invoice, null, $invoice->toArray());
     }
@@ -399,5 +427,23 @@ class BookingController extends Controller
 
             return back()->with('success', 'Гость выселен (checked_out)');
         });
+    }
+
+    public function createInvoice(Booking $booking)
+    {
+        $prefix = $this->routePrefix();
+
+        $booking->load('invoice');
+
+        if ($booking->invoice) {
+            return redirect()->route($prefix . 'invoices.show', $booking->invoice);
+        }
+
+        $this->ensureInvoiceForBooking($booking);
+
+        $booking->refresh()->load('invoice');
+
+        return redirect()->route($prefix . 'invoices.show', $booking->invoice)
+            ->with('success', 'Счёт создан');
     }
 }

@@ -112,6 +112,9 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::post('/bookings/{booking}/check-out', [BookingController::class, 'checkOut'])
             ->name('bookings.checkout');
+
+        Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])
+            ->name('bookings.invoice.create');
     });
 
     // STAFF ONLY
@@ -127,6 +130,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('bookings', BookingController::class)->names('bookings');
         Route::resource('services', ServiceController::class)->names('services');
         Route::resource('invoices', InvoiceController::class)->names('invoices');
+        
 
         Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])
             ->name('bookings.invoices.store');
@@ -140,6 +144,9 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::post('/bookings/{booking}/check-out', [BookingController::class, 'checkOut'])
             ->name('bookings.checkout');
+
+        Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])
+            ->name('bookings.invoice.create');
     });
 
 });
