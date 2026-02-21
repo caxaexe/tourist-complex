@@ -350,10 +350,13 @@ class BookingController extends Controller
         $stayPrice = (float)($booking->room->price_per_night ?? 0);
         $stayLine  = $nights * $stayPrice;
 
+        $desc = 'Проживание (номер №' . $booking->room->number . ')';
+
         InvoiceItem::create([
             'invoice_id'  => $invoice->id,
             'type'        => 'stay',
-            'description' => 'Проживание (номер №' . $booking->room->number . ')',
+            'title'       => $desc,
+            'description' => $desc,
             'quantity'    => $nights,
             'unit_price'  => $stayPrice,
             'total'       => $stayLine,
@@ -367,10 +370,13 @@ class BookingController extends Controller
             $unit = (float)($service->pivot->price_snapshot ?? $service->price ?? 0);
             $line = $qty * $unit;
 
+            $desc = 'Услуга: ' . $service->name;
+
             InvoiceItem::create([
                 'invoice_id'  => $invoice->id,
                 'type'        => 'service',
-                'description' => 'Услуга: ' . $service->name,
+                'title'       => $desc,
+                'description' => $desc,
                 'quantity'    => $qty,
                 'unit_price'  => $unit,
                 'total'       => $line,
