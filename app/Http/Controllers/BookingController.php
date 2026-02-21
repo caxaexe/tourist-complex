@@ -123,7 +123,6 @@ class BookingController extends Controller
 
             logAudit('created', $booking, null, $booking->toArray());
 
-            // если создают сразу confirmed — создаём счёт
             if ($booking->status === 'confirmed') {
                 $this->ensureInvoiceForBooking($booking);
             }
@@ -159,10 +158,11 @@ class BookingController extends Controller
             ])
             ->toArray();
 
-
         $paidTotal = (float)$booking->payments->sum('amount');
         $dueTotal  = (float)$booking->total;
         $balance   = max(0, $dueTotal - $paidTotal);
+
+        $activeCount = Booking::whereNotIn('status', ['cancelled', 'checked_out'])->count();
 
         return view('bookings.edit', compact(
             'booking',
@@ -172,7 +172,8 @@ class BookingController extends Controller
             'selectedServices',
             'paidTotal',
             'dueTotal',
-            'balance'
+            'balance',
+            'activeCount'
         ));
     }
 
