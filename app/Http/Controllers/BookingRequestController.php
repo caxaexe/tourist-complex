@@ -28,8 +28,8 @@ class BookingRequestController extends Controller
 
         $client = Client::create([
             'full_name' => 'Гость ' . Str::upper(Str::random(6)),
-            'phone' => null,
-            'email' => null,
+            'phone'     => null,
+            'email'     => null,
         ]);
 
         $request->session()->put('guest_client_id', $client->id);
@@ -73,33 +73,44 @@ class BookingRequestController extends Controller
 
         $clientId = $this->getOrCreateGuestClientId($request);
 
-        $request->validate([
+        $validated = $request->validate([
             'room_id'   => 'required|exists:rooms,id',
             'date_from' => 'required|date|after_or_equal:today',
             'date_to'   => 'required|date|after:date_from',
             'note'      => 'nullable|string|max:1000',
+
+            // обязательные контакты
+            'phone'     => 'required|string|min:5|max:30',
+            'email'     => 'required|email:rfc,dns|max:255',
         ]);
 
-        $room = Room::findOrFail($request->room_id);
+        // сохраняем контакты гостя в клиенте (важно!)
+        $client = Client::findOrFail($clientId);
+        $client->update([
+            'phone' => $validated['phone'],
+            'email' => $validated['email'],
+        ]);
 
-        $from = Carbon::parse($request->date_from);
-        $to   = Carbon::parse($request->date_to);
+        $room = Room::findOrFail($validated['room_id']);
+
+        $from = Carbon::parse($validated['date_from']);
+        $to   = Carbon::parse($validated['date_to']);
 
         $nights = $from->diffInDays($to);
         $total  = $nights * (float) $room->price_per_night;
 
         Booking::create([
-            'user_id'   => null,          // гость
-            'client_id' => $clientId,     // из сессии
+            'user_id'   => null,        // гость
+            'client_id' => $clientId,   // из сессии
             'room_id'   => $room->id,
-            'date_from' => $request->date_from,
-            'date_to'   => $request->date_to,
+            'date_from' => $validated['date_from'],
+            'date_to'   => $validated['date_to'],
             'status'    => 'pending',
             'total'     => $total,
-            'note'      => $request->note,
+            'note'      => $validated['note'] ?? null,
         ]);
 
-        return redirect()->route('my.bookings.index')
+        return redirect()->route('client.my.bookings.index')
             ->with('success', 'Заявка успешно отправлена. Ожидайте подтверждения.');
     }
 }
