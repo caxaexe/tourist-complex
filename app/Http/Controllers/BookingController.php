@@ -139,14 +139,14 @@ class BookingController extends Controller
         });
     }
 
-    public function edit(Request $request, Booking $booking)
+    public function edit(Booking $booking)
     {
         $booking->load([
             'client',
             'room.roomType',
             'services',
-            'payments',
-            'invoice',
+            'invoice.payments',
+            'payments', 
         ]);
 
         $clients = Client::orderBy('full_name')->get();
@@ -166,50 +166,21 @@ class BookingController extends Controller
             ])
             ->toArray();
 
-        // Оплата/баланс
-        $paidTotal = (float)$booking->payments->sum('amount');
-        $dueTotal  = (float)($booking->invoice?->total ?? $booking->total ?? 0);
-        $balance   = max(0, $dueTotal - $paidTotal);
-
-        // Чтобы твой edit.blade.php (который копия index) НЕ падал:
-        $payment = $request->query('payment');
-
-        // мини-статистика (как в index)
-        $today = now()->toDateString();
-
-        $activeCount = Booking::whereNotIn('status', ['cancelled', 'checked_out'])->count();
-
-        $checkInToday = Booking::whereDate('date_from', $today)
-            ->where('status', '!=', 'cancelled')
-            ->count();
-
-        $checkOutToday = Booking::whereDate('date_to', $today)
-            ->where('status', '!=', 'cancelled')
-            ->count();
-
-        $confirmedCount = Booking::where('status', 'confirmed')->count();
-        $sumTotal = Booking::sum('total');
-
-        // таблица (если edit у тебя реально показывает список)
-        $bookings = Booking::query()
-            ->with(['client', 'room.roomType', 'invoice'])
-            ->withSum('payments', 'amount')
-            ->orderByDesc('id')
-            ->paginate(10)
-            ->withQueryString();
-
         $invoice = $booking->invoice;
+
+        $dueTotal = (float)($invoice?->total ?? $booking->total ?? 0);
+
+        $paidTotal = (float)(
+            $invoice
+                ? $invoice->payments->sum('amount')
+                : $booking->payments->sum('amount')
+        );
+
+        $balance = max(0, $dueTotal - $paidTotal);
 
         return view('bookings.edit', compact(
             'booking',
             'invoice',
-            'bookings',
-            'payment',
-            'activeCount',
-            'checkInToday',
-            'checkOutToday',
-            'confirmedCount',
-            'sumTotal',
             'clients',
             'rooms',
             'services',

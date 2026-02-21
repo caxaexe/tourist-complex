@@ -9,6 +9,14 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    private function routePrefix(): string
+{
+    $u = auth()->user();
+    if ($u?->hasRole('admin')) return 'admin.';
+    if ($u?->hasRole('employee')) return 'staff.';
+    return '';
+}
+
     public function index()
     {
         $payments = Payment::query()
@@ -19,16 +27,14 @@ class PaymentController extends Controller
         return view('payments.index', compact('payments'));
     }
 
-    /**
-     *  Только через invoice_id
-     * /payments/create?invoice_id=123
-     */
     public function create(Request $request)
     {
+        $prefix = $this->routePrefix();
+
         $invoiceId = $request->query('invoice_id');
 
         if (!$invoiceId) {
-            return redirect()->route('invoices.index')
+            return redirect()->route($prefix.'invoices.index')
                 ->with('success', 'Оплату можно добавить только из счёта. Откройте счёт и нажмите “Добавить оплату”.');
         }
 
@@ -41,14 +47,10 @@ class PaymentController extends Controller
         ]);
     }
 
-    /**
-     *  Создание оплаты строго с invoice_id
-     * Автоматика:
-     * - пересчитать статус счета (unpaid/partial/paid)
-     * - если paid → booking confirmed (если pending)
-     */
     public function store(StorePaymentRequest $request)
     {
+        $prefix = $this->routePrefix();
+
         $data = $request->validated();
 
         if (empty($data['paid_at'])) {
@@ -57,13 +59,11 @@ class PaymentController extends Controller
 
         $invoice = Invoice::with(['booking'])->findOrFail($data['invoice_id']);
 
-        // 🔒 booking_id НЕ берем из формы — жестко от счета
         $data['booking_id'] = $invoice->booking_id;
 
         $payment = Payment::create($data);
         logAudit('created', $payment, null, $payment->toArray());
 
-        // Пересчет статуса счета
         $oldInvoice = $invoice->toArray();
         $status = $this->recalcInvoiceStatus($invoice);
 
@@ -71,7 +71,6 @@ class PaymentController extends Controller
             logAudit('updated', $invoice->fresh(), $oldInvoice, $invoice->fresh()->toArray());
         }
 
-        // Если счет полностью оплачен → бронь confirmed (если была pending)
         if ($status === 'paid') {
             $booking = $invoice->booking()->first();
             if ($booking && $booking->status === 'pending') {
@@ -81,15 +80,18 @@ class PaymentController extends Controller
             }
         }
 
-        //  логично возвращать на сам счет
+        $prefix = $this->routePrefix();
+
         return redirect()
-            ->route('invoices.show', $invoice)
+            ->route($prefix.'invoices.show', $invoice)
             ->with('success', 'Оплата добавлена');
+
     }
 
     public function destroy(Payment $payment)
     {
-        // payment должен быть привязан к счету (invoice-only логика)
+        $prefix = $this->routePrefix();
+
         $invoice = null;
         if (!empty($payment->invoice_id)) {
             $invoice = Invoice::with('booking')->find($payment->invoice_id);
@@ -108,26 +110,25 @@ class PaymentController extends Controller
             }
 
             return redirect()
-                ->route('invoices.show', $invoice)
+                ->route($prefix.'invoices.show', $invoice)
                 ->with('success', 'Оплата удалена');
         }
 
-        return redirect()->route('payments.index')
+        $prefix = $this->routePrefix();
+
+        return redirect()
+            ->route($prefix.'invoices.show', $invoice)
             ->with('success', 'Оплата удалена');
     }
 
-    /**
-     * unpaid | partial | paid
-     * closed тут НЕ трогаем — его ставим при check_out
-     */
     private function recalcInvoiceStatus(Invoice $invoice): string
     {
         if ($invoice->status === 'closed') {
             return 'closed';
         }
 
-        $paid = (float)$invoice->payments()->sum('amount');
-        $due  = (float)$invoice->total;
+        $paid = (float) $invoice->payments()->sum('amount');
+        $due  = (float) $invoice->total;
 
         if ($due <= 0) {
             $status = 'paid';
@@ -143,4 +144,6 @@ class PaymentController extends Controller
 
         return $status;
     }
+
+
 }

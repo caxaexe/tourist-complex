@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
+    private function routePrefix(): string
+    {
+        $u = auth()->user();
+
+        if ($u?->hasRole('admin')) return 'admin.';
+        if ($u?->hasRole('employee')) return 'staff.';
+
+        return '';
+    }
+
     public function index()
     {
         $invoices = Invoice::query()
@@ -20,7 +30,6 @@ class InvoiceController extends Controller
         return view('invoices.index', compact('invoices'));
     }
 
-    // Страница создания счета (выбираем бронь)
     public function create()
     {
         $bookings = Booking::query()
@@ -34,17 +43,19 @@ class InvoiceController extends Controller
         return view('invoices.create', compact('bookings'));
     }
 
-    // Создание счета по выбранной брони
     public function store(Request $request)
     {
+        $prefix = $this->routePrefix();
+
         $data = $request->validate([
             'booking_id' => 'required|exists:bookings,id',
         ]);
 
-        $booking = Booking::with(['room', 'client', 'services'])->findOrFail($data['booking_id']);
+        $booking = Booking::with(['room', 'client', 'services', 'invoice'])->findOrFail($data['booking_id']);
 
         if ($booking->invoice) {
-            return redirect()->route('invoices.show', $booking->invoice)
+            return redirect()
+                ->route($prefix.'invoices.show', $booking->invoice)
                 ->with('success', 'Счёт уже существует, открываю его');
         }
 
@@ -68,13 +79,13 @@ class InvoiceController extends Controller
             $txt = 'Проживание (номер №' . ($booking->room->number ?? '—') . ')';
 
             InvoiceItem::create([
-                'invoice_id'   => $invoice->id,
-                'type'         => 'stay',
-                'title'        => $txt,
-                'description'  => $txt,
-                'quantity'     => $nights,
-                'unit_price'   => $unitPrice,
-                'total'        => $lineTotal,
+                'invoice_id'  => $invoice->id,
+                'type'        => 'stay',
+                'title'       => $txt,
+                'description' => $txt,
+                'quantity'    => $nights,
+                'unit_price'  => $unitPrice,
+                'total'       => $lineTotal,
             ]);
 
             // 2) Услуги
@@ -98,7 +109,7 @@ class InvoiceController extends Controller
                 ]);
             }
 
-            // Итог по счету — только из items
+            // итог
             $invoice->update([
                 'total' => $invoice->items()->sum('total'),
             ]);
@@ -108,7 +119,8 @@ class InvoiceController extends Controller
 
         logAudit('created', $invoice, null, $invoice->toArray());
 
-        return redirect()->route('invoices.show', $invoice)
+        return redirect()
+            ->route($prefix.'invoices.show', $invoice)
             ->with('success', 'Счёт создан');
     }
 
