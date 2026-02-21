@@ -1,12 +1,12 @@
 @php
     $u = auth()->user();
+    $isAuth = auth()->check();
 
     $isAdmin = $u?->hasRole('admin') ?? false;
     $isStaff = $u?->hasRole('employee') ?? false;
 
     $isClientSide = !$isAdmin && !$isStaff;
 
-    // рабочий префикс для персонала
     $workPrefix = $isAdmin ? 'admin.' : ($isStaff ? 'staff.' : null);
 @endphp
 
