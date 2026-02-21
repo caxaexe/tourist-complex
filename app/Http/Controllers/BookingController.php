@@ -164,16 +164,21 @@ class BookingController extends Controller
 
         $activeCount = Booking::whereNotIn('status', ['cancelled', 'checked_out'])->count();
 
+        $bookings = Booking::query()
+            ->with(['client', 'room.roomType', 'invoice'])
+            ->orderByDesc('id')
+            ->paginate(10);
+
         return view('bookings.edit', compact(
             'booking',
+            'bookings',
             'clients',
             'rooms',
             'services',
             'selectedServices',
             'paidTotal',
             'dueTotal',
-            'balance',
-            'activeCount'
+            'balance'
         ));
     }
 
