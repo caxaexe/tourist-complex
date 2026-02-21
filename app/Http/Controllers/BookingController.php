@@ -132,7 +132,7 @@ class BookingController extends Controller
         });
     }
 
-    public function edit(Booking $booking)
+    public function edit(Request $request, Booking $booking)
     {
         $booking->load([
             'client',
@@ -164,14 +164,28 @@ class BookingController extends Controller
 
         $activeCount = Booking::whereNotIn('status', ['cancelled', 'checked_out'])->count();
 
-        $bookings = Booking::query()
+        $payment = $request->query('payment'); // если у тебя в edit есть фильтр
+
+        $query = Booking::query()
             ->with(['client', 'room.roomType', 'invoice'])
-            ->orderByDesc('id')
-            ->paginate(10);
+            ->withSum('payments', 'amount');
+
+        if ($payment === 'unpaid') {
+            $query->havingRaw('COALESCE(payments_sum_amount, 0) <= 0');
+        } elseif ($payment === 'partial') {
+            $query->havingRaw('total > 0 AND COALESCE(payments_sum_amount, 0) > 0 AND COALESCE(payments_sum_amount, 0) < total');
+        } elseif ($payment === 'paid') {
+            $query->havingRaw('total > 0 AND COALESCE(payments_sum_amount, 0) >= total');
+        }
+
+        $bookings = $query->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
 
         return view('bookings.edit', compact(
             'booking',
             'bookings',
+            'payment',
             'clients',
             'rooms',
             'services',
