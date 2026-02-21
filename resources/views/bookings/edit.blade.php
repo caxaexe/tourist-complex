@@ -5,13 +5,31 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Бронирования
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                Редактирование бронирования #{{ $booking->id }}
+            </h2>
+
+            <a href="{{ route($prefix.'bookings.index') }}"
+               class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
+                      text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/30">
+                ← Назад
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+
+            @if($errors->any())
+                <div class="mb-4 p-3 bg-red-100 border border-red-300 rounded text-red-900">
+                    <ul class="list-disc pl-5">
+                        @foreach($errors->all() as $e)
+                            <li>{{ $e }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             @if(session('success'))
                 <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded text-green-900">
@@ -19,252 +37,120 @@
                 </div>
             @endif
 
-            <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
-                <a href="{{ route($prefix.'bookings.create') }}"
-                   class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    + Создать бронирование
-                </a>
-            </div>
+            <div class="bg-white dark:bg-gray-800 shadow rounded p-6">
 
-            {{-- Фильтр по оплате --}}
-            <div class="mb-4 flex flex-wrap items-center gap-2">
-                <a href="{{ route($prefix.'bookings.index') }}"
-                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
-                          {{ empty($payment) ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
-                          text-gray-800 dark:text-gray-200">
-                    Все
-                </a>
-
-                <a href="{{ route($prefix.'bookings.index', ['payment' => 'unpaid']) }}"
-                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
-                          {{ ($payment ?? '') === 'unpaid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
-                          text-gray-800 dark:text-gray-200">
-                    UNPAID
-                </a>
-
-                <a href="{{ route($prefix.'bookings.index', ['payment' => 'partial']) }}"
-                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
-                          {{ ($payment ?? '') === 'partial' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
-                          text-gray-800 dark:text-gray-200">
-                    PARTIAL
-                </a>
-
-                <a href="{{ route($prefix.'bookings.index', ['payment' => 'paid']) }}"
-                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
-                          {{ ($payment ?? '') === 'paid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
-                          text-gray-800 dark:text-gray-200">
-                    PAID
-                </a>
-            </div>
-
-            {{-- Мини-статистика --}}
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Активные</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $activeCount }}</div>
+                <div class="mb-4 text-sm text-gray-600 dark:text-gray-300">
+                    Оплачено: <b>{{ number_format($paidTotal, 2, '.', ' ') }}</b> /
+                    К оплате: <b>{{ number_format($dueTotal, 2, '.', ' ') }}</b> —
+                    Баланс: <b>{{ number_format($balance, 2, '.', ' ') }}</b>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Заезд сегодня</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $checkInToday }}</div>
-                </div>
+                <form method="POST" action="{{ route($prefix.'bookings.update', $booking) }}">
+                    @csrf
+                    @method('PUT')
 
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Выезд сегодня</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $checkOutToday }}</div>
-                </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Подтверждено</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $confirmedCount }}</div>
-                </div>
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-700 dark:text-gray-200">Клиент</label>
+                            <select name="client_id" class="border rounded w-full p-2">
+                                @foreach($clients as $client)
+                                    <option value="{{ $client->id }}" @selected(old('client_id', $booking->client_id) == $client->id)>
+                                        {{ $client->full_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Сумма всего</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                        {{ number_format($sumTotal, 2, '.', ' ') }}
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-700 dark:text-gray-200">Номер</label>
+                            <select name="room_id" class="border rounded w-full p-2">
+                                @foreach($rooms as $room)
+                                    <option value="{{ $room->id }}" @selected(old('room_id', $booking->room_id) == $room->id)>
+                                        №{{ $room->number }} — {{ $room->roomType->name ?? '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-700 dark:text-gray-200">Дата заезда</label>
+                            <input type="date" name="date_from"
+                                   value="{{ old('date_from', optional($booking->date_from)->format('Y-m-d')) }}"
+                                   class="border rounded w-full p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-700 dark:text-gray-200">Дата выезда</label>
+                            <input type="date" name="date_to"
+                                   value="{{ old('date_to', optional($booking->date_to)->format('Y-m-d')) }}"
+                                   class="border rounded w-full p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-700 dark:text-gray-200">Статус</label>
+                            <select name="status" class="border rounded w-full p-2">
+                                @foreach(['pending','confirmed','cancelled','checked_in','checked_out'] as $st)
+                                    <option value="{{ $st }}" @selected(old('status', $booking->status) === $st)>
+                                        {{ $st }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1 text-gray-700 dark:text-gray-200">Комментарий</label>
+                            <input type="text" name="note"
+                                   value="{{ old('note', $booking->note) }}"
+                                   class="border rounded w-full p-2">
+                        </div>
+
                     </div>
-                </div>
-            </div>
 
-            {{-- Таблица --}}
-            <div class="mt-4 bg-white dark:bg-gray-800 shadow rounded p-4 overflow-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="text-left border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
-                            <th class="text-gray-700 dark:text-gray-200">Клиент</th>
-                            <th class="text-gray-700 dark:text-gray-200">Номер</th>
-                            <th class="text-gray-700 dark:text-gray-200">Даты</th>
-                            <th class="text-gray-700 dark:text-gray-200">Ночей</th>
-                            <th class="text-gray-700 dark:text-gray-200">Цена/ночь</th>
-                            <th class="text-gray-700 dark:text-gray-200">Статус</th>
-                            <th class="text-gray-700 dark:text-gray-200">Оплата</th>
-                            <th class="text-gray-700 dark:text-gray-200">Сумма</th>
-                            <th class="text-right text-gray-700 dark:text-gray-200">Действия</th>
-                        </tr>
-                    </thead>
+                    {{-- Услуги --}}
+                    <div class="mt-6">
+                        <div class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                            Услуги
+                        </div>
 
-                    <tbody>
-                        @forelse($bookings as $booking)
-                            @php
-                                $map = [
-                                    'pending'     => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
-                                    'confirmed'   => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
-                                    'cancelled'   => 'bg-gray-200 text-gray-700 dark:bg-gray-900/40 dark:text-gray-200',
-                                    'checked_in'  => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
-                                    'checked_out' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
-                                ];
-                                $cls = $map[$booking->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200';
+                        <div class="space-y-2">
+                            @foreach($services as $s)
+                                @php $row = $selectedServices[$s->id] ?? ['quantity' => 0, 'price' => (float)$s->price]; @endphp
 
-                                $nights = max(1, $booking->date_from->diffInDays($booking->date_to));
+                                <div class="flex items-center gap-2">
+                                    <input type="hidden" name="services[{{ $loop->index }}][id]" value="{{ $s->id }}">
 
-                                $invoice = $booking->invoice ?? null;
-
-                                // К оплате: если есть счёт — он главный, иначе total брони
-                                $due  = (float) ($invoice->total ?? $booking->total ?? 0);
-
-                                // Оплачено: берём withSum из bookings (не зависит от eager-loading invoice->payments)
-                                $paid = (float) ($booking->payments_sum_amount ?? 0);
-
-                                if ($due <= 0 || $paid <= 0) {
-                                    $payText = 'UNPAID';
-                                    $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
-                                } elseif ($paid + 0.01 < $due) {
-                                    $payText = 'PARTIAL';
-                                    $payCls  = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200';
-                                } else {
-                                    $payText = 'PAID';
-                                    $payCls  = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
-                                }
-                            @endphp
-
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="py-2 text-gray-800 dark:text-gray-200">{{ $booking->id }}</td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    {{ $booking->client->full_name }}
-                                </td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    №{{ $booking->room->number }}
-                                    @if($booking->room->roomType)
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $booking->room->roomType->name }}
-                                        </div>
-                                    @endif
-                                </td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    {{ $booking->date_from->format('d.m.Y') }} — {{ $booking->date_to->format('d.m.Y') }}
-                                </td>
-
-                                <td class="text-gray-800 dark:text-gray-200">{{ $nights }}</td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    {{ number_format($booking->room->price_per_night, 2, '.', ' ') }}
-                                </td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    <span class="px-2 py-1 rounded text-sm {{ $cls }}">
-                                        {{ $booking->status }}
-                                    </span>
-                                </td>
-
-                                {{-- Оплата --}}
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    <span class="inline-block px-2 py-1 rounded text-sm {{ $payCls }}">
-                                        {{ $payText }}
-                                    </span>
-
-                                    @if($invoice)
-                                        <div class="mt-2">
-                                            <a href="{{ route($prefix.'invoices.show', $invoice) }}"
-                                               class="inline-block px-2 py-1 rounded text-sm border border-gray-200 dark:border-gray-700
-                                                      text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/40">
-                                                Счёт: {{ $invoice->number }}
-                                            </a>
-                                        </div>
-
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            Статус: <b>{{ $invoice->status }}</b>
-                                        </div>
-                                    @else
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                            Нет счёта (оплаты добавляются через счёт)
-                                        </div>
-                                    @endif
-
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        {{ number_format($paid, 2, '.', ' ') }} / {{ number_format($due, 2, '.', ' ') }}
+                                    <div class="flex-1 text-gray-800 dark:text-gray-200">
+                                        {{ $s->name }}
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                            ({{ number_format($s->price, 2, '.', ' ') }})
+                                        </span>
                                     </div>
-                                </td>
 
-                                {{-- Сумма --}}
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    {{ number_format($due, 2, '.', ' ') }}
-                                </td>
+                                    <input type="number" min="0"
+                                           name="services[{{ $loop->index }}][quantity]"
+                                           value="{{ old("services.$loop->index.quantity", $row['quantity']) }}"
+                                           class="border rounded w-24 p-2"
+                                           placeholder="0">
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
 
-                                {{-- Действия --}}
-                                <td class="text-right whitespace-nowrap">
-                                    <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
-                                        <a class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700
-                                                  text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
-                                           href="{{ route($prefix.'bookings.edit', $booking) }}">
-                                            Редактировать
-                                        </a>
+                    <div class="mt-6 flex gap-2">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Сохранить
+                        </button>
 
-                                        @if($booking->status === 'confirmed')
-                                            <form method="POST" action="{{ route($prefix.'bookings.checkin', $booking) }}" class="inline">
-                                                @csrf
-                                                <button class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-                                                        onclick="return confirm('Заселить гостя (Check-in)?')">
-                                                    Check-in
-                                                </button>
-                                            </form>
-                                        @endif
+                        <a href="{{ route($prefix.'bookings.index') }}"
+                           class="px-4 py-2 rounded border border-gray-200 dark:border-gray-700
+                                  text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/30">
+                            Отмена
+                        </a>
+                    </div>
 
-                                        @if($booking->status === 'checked_in')
-                                            <form method="POST" action="{{ route($prefix.'bookings.checkout', $booking) }}" class="inline">
-                                                @csrf
-                                                <button class="px-3 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
-                                                        onclick="return confirm('Оформить выезд (Check-out)?')">
-                                                    Check-out
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                        @if(!$invoice && !in_array($booking->status, ['confirmed','checked_in'], true))
-                                            <form method="POST"
-                                                  action="{{ route($prefix.'bookings.destroy', $booking) }}"
-                                                  class="inline"
-                                                  onsubmit="return confirm('Удалить бронирование #{{ $booking->id }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700">
-                                                    Удалить
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="10" class="py-4 text-center text-gray-500 dark:text-gray-400">
-                                    Нет бронирований
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-
-                </table>
-
-                <div class="mt-4">
-                    {{ $bookings->links() }}
-                </div>
+                </form>
             </div>
-
         </div>
     </div>
 </x-app-layout>

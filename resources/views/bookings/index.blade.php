@@ -1,6 +1,10 @@
 @php
     $u = auth()->user();
     $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+
+    $editRoute = auth()->user()?->hasRole('admin')
+      ? 'admin.bookings.edit'
+      : 'staff.bookings.edit';
 @endphp
 
 <x-app-layout>
