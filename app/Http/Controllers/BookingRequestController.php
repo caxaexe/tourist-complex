@@ -110,7 +110,7 @@ class BookingRequestController extends Controller
             'note'      => $validated['note'] ?? null,
         ]);
 
-        return redirect()->route('client.my.bookings.index')
+        return redirect()->route('my.bookings.index')
             ->with('success', 'Заявка успешно отправлена. Ожидайте подтверждения.');
     }
 }
