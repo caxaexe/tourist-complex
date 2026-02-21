@@ -328,7 +328,7 @@ class BookingController extends Controller
             ->with('success', 'Бронирование удалено');
     }
 
-    private function ensureInvoiceForBooking(Booking $booking): void
+    public function ensureInvoiceForBooking(Booking $booking): void
     {
         $exists = Invoice::where('booking_id', $booking->id)->exists();
         if ($exists) return;

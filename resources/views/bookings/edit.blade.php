@@ -184,10 +184,10 @@
                 </form>
 
                 <hr class="my-6">
-                <form method="POST" action="{{ route($prefix.'bookings.invoices.store', $booking) }}">
+                <form method="POST" action="{{ route($prefix.'bookings.invoice.create', $booking) }}">
                     @csrf
                     <button class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-black">
-                        Создать счёт (Invoice)
+                        Создать счёт
                     </button>
                 </form>
 
