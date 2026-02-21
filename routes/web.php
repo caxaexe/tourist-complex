@@ -22,24 +22,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//  КЛИЕНТ БЕЗ РЕГИСТРАЦИИ (по сессии)
-Route::get('/my-bookings', [BookingRequestController::class, 'index'])
-    ->name('my.bookings.index');
-
-Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])
-    ->name('my.bookings.create');
-
-Route::post('/my-bookings', [BookingRequestController::class, 'store'])
-    ->name('my.bookings.store');
-
-
-//  /dashboard → редирект по роли (а если гость — в клиентскую зону)
+//  /dashboard → редирект по роли (если не залогинен — на welcome)
 Route::get('/dashboard', function () {
-    if (!auth()->check()) {
-        return redirect()->route('my.bookings.index');
+    $user = auth()->user();
+
+    if (!$user) {
+        return redirect('/');
     }
 
-    $user = auth()->user()->load('roles');
+    $user->load('roles');
 
     if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');
@@ -49,10 +40,36 @@ Route::get('/dashboard', function () {
         return redirect()->route('staff.dashboard');
     }
 
-    return redirect()->route('my.bookings.index');
-})->middleware(['verified'])->name('dashboard');
+    // если вдруг есть роль user
+    return redirect()->route('client.dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 
+// CLIENT/GUEST AREA (БЕЗ логина)
+// - гостю можно
+// - user можно (если вдруг залогинен как user)
+// - admin/employee нельзя
+Route::prefix('client')->name('client.')->group(function () {
+
+    Route::get('/dashboard', function () {
+        return view('dashboards.client');
+    })->name('dashboard');
+
+    Route::get('/my-bookings', [BookingRequestController::class, 'index'])
+        ->name('my.bookings.index');
+
+    Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])
+        ->name('my.bookings.create');
+
+    Route::post('/my-bookings', [BookingRequestController::class, 'store'])
+        ->name('my.bookings.store');
+});
+
+Route::redirect('/my-bookings', '/client/my-bookings');
+Route::redirect('/my-bookings/create', '/client/my-bookings/create');
+
+
+// AUTH AREA (staff/admin + профиль)
 Route::middleware(['auth', 'active'])->group(function () {
 
     // Профиль
@@ -61,7 +78,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
-    // ADMIN ONLY  (/admin/... и имена admin.*)
+    // ADMIN ONLY
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
 
         Route::get('/dashboard', function () {
@@ -75,6 +92,11 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/audit-logs', [AuditLogController::class, 'index'])
             ->name('audit-logs.index');
 
+        //  reports только админ
+        Route::get('/reports', [ReportController::class, 'index'])
+            ->name('reports.index');
+
+        // рабочие CRUD
         Route::resource('clients', ClientController::class)->names('clients');
         Route::resource('room-types', RoomTypeController::class)->names('room-types');
         Route::resource('rooms', RoomController::class)->names('rooms');
@@ -90,10 +112,6 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'create', 'store', 'destroy'])
             ->names('payments');
 
-        //  REPORTS ТОЛЬКО АДМИН
-        Route::get('/reports', [ReportController::class, 'index'])
-            ->name('reports.index');
-
         Route::post('/bookings/{booking}/check-in', [BookingController::class, 'checkIn'])
             ->name('bookings.checkin');
 
@@ -102,7 +120,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     });
 
 
-    // STAFF ONLY (/staff/... и имена staff.*)
+    // STAFF ONLY (employee)
     Route::prefix('staff')->name('staff.')->middleware('role:employee')->group(function () {
 
         Route::get('/dashboard', function () {
@@ -126,13 +144,13 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'create', 'store', 'destroy'])
             ->names('payments');
 
-
         Route::post('/bookings/{booking}/check-in', [BookingController::class, 'checkIn'])
             ->name('bookings.checkin');
 
         Route::post('/bookings/{booking}/check-out', [BookingController::class, 'checkOut'])
             ->name('bookings.checkout');
     });
+
 });
 
 require __DIR__ . '/auth.php';

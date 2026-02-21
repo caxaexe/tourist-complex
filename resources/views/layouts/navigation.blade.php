@@ -1,10 +1,12 @@
 @php
     $u = auth()->user();
 
-    $isAuth  = auth()->check();
     $isAdmin = $u?->hasRole('admin') ?? false;
     $isStaff = $u?->hasRole('employee') ?? false;
 
+    $isClientSide = !$isAdmin && !$isStaff;
+
+    // рабочий префикс для персонала
     $workPrefix = $isAdmin ? 'admin.' : ($isStaff ? 'staff.' : null);
 @endphp
 
@@ -38,18 +40,15 @@
                         <x-nav-link :href="route($workPrefix.'payments.index')" :active="request()->routeIs($workPrefix.'payments.*')">Оплаты</x-nav-link>
                     @endif
 
-                    {{-- REPORTS: только админ --}}
-                    @if($isAdmin)
-                        <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">Отчёты</x-nav-link>
-                    @endif
-
                     {{-- CLIENT AREA (доступно всем, даже гостю) --}}
-                    <x-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
-                        Мои заявки
-                    </x-nav-link>
-                    <x-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
-                        Подать заявку
-                    </x-nav-link>
+                    @if($isClientSide)
+                        <x-nav-link :href="route('client.my.bookings.index')" :active="request()->routeIs('client.my.bookings.*')">
+                            Мои заявки
+                        </x-nav-link>
+                        <x-nav-link :href="route('client.my.bookings.create')" :active="request()->routeIs('client.my.bookings.create')">
+                            Подать заявку
+                        </x-nav-link>
+                    @endif
 
                     {{-- ADMIN EXTRA --}}
                     @if($isAdmin)
@@ -63,6 +62,10 @@
 
                         <x-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.*')">
                             Журнал
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                            Отчёты
                         </x-nav-link>
                     @endif
 
@@ -137,17 +140,31 @@
             @endif
 
             @if($isAdmin)
-                <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                    Админ
+                </x-nav-link>
+
+                <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                    Персонал
+                </x-nav-link>
+
+                <x-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.*')">
+                    Журнал
+                </x-nav-link>
+
+                <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
                     Отчёты
-                </x-responsive-nav-link>
+                </x-nav-link>
             @endif
 
-            <x-responsive-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
-                Мои заявки
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
-                Подать заявку
-            </x-responsive-nav-link>
+            @if($isClientSide)
+                <x-nav-link :href="route('client.my.bookings.index')" :active="request()->routeIs('client.my.bookings.*')">
+                    Мои заявки
+                </x-nav-link>
+                <x-nav-link :href="route('client.my.bookings.create')" :active="request()->routeIs('client.my.bookings.create')">
+                    Подать заявку
+                </x-nav-link>
+            @endif
 
         </div>
 
