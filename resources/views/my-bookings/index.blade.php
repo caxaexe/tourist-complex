@@ -7,7 +7,7 @@
 
     <div class="py-6 max-w-6xl mx-auto">
 
-        <a href="{{ route('client.my.bookings.create') }}"
+        <a href="{{ route('my.bookings.create') }}"
            class="px-4 py-2 bg-blue-600 text-white rounded">
             Подать заявку
         </a>

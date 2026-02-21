@@ -8,7 +8,7 @@
     <div class="py-6 max-w-3xl mx-auto">
         <div class="bg-white shadow rounded p-6">
 
-            <form method="POST" action="{{ route('client.my.bookings.store') }}">
+            <form method="POST" action="{{ route('my.bookings.store') }}">
                 @csrf
 
                 <div class="mb-4">
