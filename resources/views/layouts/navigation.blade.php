@@ -41,11 +41,16 @@
                     @endif
 
                     {{-- CLIENT AREA (доступно всем, даже гостю) --}}
-                    @if($isClientSide)
-                        <x-nav-link :href="route('client.my.bookings.index')" :active="request()->routeIs('client.my.bookings.*')">
+                    @php
+                        $isStaffOrAdmin = auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('employee'));
+                    @endphp
+
+                    @if(!$isStaffOrAdmin)
+                        <x-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
                             Мои заявки
                         </x-nav-link>
-                        <x-nav-link :href="route('client.my.bookings.create')" :active="request()->routeIs('client.my.bookings.create')">
+
+                        <x-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
                             Подать заявку
                         </x-nav-link>
                     @endif
@@ -157,11 +162,16 @@
                 </x-nav-link>
             @endif
 
-            @if($isClientSide)
-                <x-nav-link :href="route('client.my.bookings.index')" :active="request()->routeIs('client.my.bookings.*')">
+            @php
+                $isStaffOrAdmin = auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('employee'));
+            @endphp
+
+            @if(!$isStaffOrAdmin)
+                <x-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
                     Мои заявки
                 </x-nav-link>
-                <x-nav-link :href="route('client.my.bookings.create')" :active="request()->routeIs('client.my.bookings.create')">
+
+                <x-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
                     Подать заявку
                 </x-nav-link>
             @endif
