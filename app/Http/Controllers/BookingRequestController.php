@@ -6,47 +6,40 @@ use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class BookingRequestController extends Controller
 {
-    private function forbidStaff()
+    private function forbidStaffAdmin(): void
     {
-        $u = auth()->user();
-
-        if ($u && $u->hasAnyRole(['admin', 'employee'])) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Клиентская зона недоступна для персонала.');
+        if (auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('employee'))) {
+            abort(403, 'Админ/сотрудник не может подавать клиентские заявки.');
         }
-
-        return null;
     }
 
     private function getOrCreateGuestClientId(Request $request): int
     {
-        $clientId = (int) $request->session()->get('client_id', 0);
+        $clientId = (int) $request->session()->get('guest_client_id', 0);
+
         if ($clientId > 0 && Client::whereKey($clientId)->exists()) {
             return $clientId;
         }
 
         $client = Client::create([
-            'full_name' => 'Guest #' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6)),
+            'full_name' => 'Гость ' . Str::upper(Str::random(6)),
             'phone' => null,
             'email' => null,
-            'passport_series' => null,
-            'passport_number' => null,
-            'birth_date' => null,
-            'address' => null,
         ]);
 
-        $request->session()->put('client_id', $client->id);
+        $request->session()->put('guest_client_id', $client->id);
 
-        return (int) $client->id;
+        return $client->id;
     }
 
     public function index(Request $request)
     {
-        if ($r = $this->forbidStaff()) return $r;
+        $this->forbidStaffAdmin();
 
         $clientId = $this->getOrCreateGuestClientId($request);
 
@@ -61,9 +54,9 @@ class BookingRequestController extends Controller
 
     public function create(Request $request)
     {
-        if ($r = $this->forbidStaff()) return $r;
+        $this->forbidStaffAdmin();
 
-        // просто гарантируем что клиент есть
+        // гарантируем что клиент в сессии уже есть
         $this->getOrCreateGuestClientId($request);
 
         $rooms = Room::where('is_active', true)
@@ -76,7 +69,9 @@ class BookingRequestController extends Controller
 
     public function store(Request $request)
     {
-        if ($r = $this->forbidStaff()) return $r;
+        $this->forbidStaffAdmin();
+
+        $clientId = $this->getOrCreateGuestClientId($request);
 
         $request->validate([
             'room_id'   => 'required|exists:rooms,id',
@@ -85,19 +80,17 @@ class BookingRequestController extends Controller
             'note'      => 'nullable|string|max:1000',
         ]);
 
-        $clientId = $this->getOrCreateGuestClientId($request);
-
         $room = Room::findOrFail($request->room_id);
 
         $from = Carbon::parse($request->date_from);
         $to   = Carbon::parse($request->date_to);
 
-        $nights = max(1, $from->diffInDays($to));
+        $nights = $from->diffInDays($to);
         $total  = $nights * (float) $room->price_per_night;
 
         Booking::create([
-            'user_id'   => auth()->id(), // null для гостя — нормально
-            'client_id' => $clientId,
+            'user_id'   => null,          // гость
+            'client_id' => $clientId,     // из сессии
             'room_id'   => $room->id,
             'date_from' => $request->date_from,
             'date_to'   => $request->date_to,
@@ -106,7 +99,7 @@ class BookingRequestController extends Controller
             'note'      => $request->note,
         ]);
 
-        return redirect()->route('client.my.bookings.index')
+        return redirect()->route('my.bookings.index')
             ->with('success', 'Заявка успешно отправлена. Ожидайте подтверждения.');
     }
 }

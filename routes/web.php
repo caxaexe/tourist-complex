@@ -19,15 +19,16 @@ use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 Route::get('/', function () {
+    // можно потом заменить на клиентский dashboard или страницу бронирования
     return view('welcome');
 });
 
-//  /dashboard → редирект по роли (если не залогинен — на welcome)
+// /dashboard → редирект по роли (если не залогинен — на /my-bookings или /)
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
     if (!$user) {
-        return redirect('/');
+        return redirect()->route('my.bookings.index');
     }
 
     $user->load('roles');
@@ -40,36 +41,33 @@ Route::get('/dashboard', function () {
         return redirect()->route('staff.dashboard');
     }
 
-    // если вдруг есть роль user
-    return redirect()->route('client.dashboard');
+    // роль user (если используется)
+    return redirect()->route('my.bookings.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
-// CLIENT/GUEST AREA (БЕЗ логина)
-// - гостю можно
-// - user можно (если вдруг залогинен как user)
-// - admin/employee нельзя
-Route::prefix('client')->name('client.')->group(function () {
+// ==========================================================
+// CLIENT/GUEST AREA (БЕЗ логина) — имена my.bookings.*
+// ==========================================================
+Route::get('/client/dashboard', fn () => view('dashboards.client'))->name('client.dashboard');
 
-    Route::get('/dashboard', function () {
-        return view('dashboards.client');
-    })->name('dashboard');
+Route::get('/my-bookings', [BookingRequestController::class, 'index'])
+    ->name('my.bookings.index');
 
-    Route::get('/my-bookings', [BookingRequestController::class, 'index'])
-        ->name('my.bookings.index');
+Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])
+    ->name('my.bookings.create');
 
-    Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])
-        ->name('my.bookings.create');
+Route::post('/my-bookings', [BookingRequestController::class, 'store'])
+    ->name('my.bookings.store');
 
-    Route::post('/my-bookings', [BookingRequestController::class, 'store'])
-        ->name('my.bookings.store');
-});
-
-Route::redirect('/my-bookings', '/client/my-bookings');
-Route::redirect('/my-bookings/create', '/client/my-bookings/create');
+// (опционально) старые client/my-bookings → редирект
+Route::redirect('/client/my-bookings', '/my-bookings');
+Route::redirect('/client/my-bookings/create', '/my-bookings/create');
 
 
+// ==========================================================
 // AUTH AREA (staff/admin + профиль)
+// ==========================================================
 Route::middleware(['auth', 'active'])->group(function () {
 
     // Профиль
@@ -77,13 +75,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-
     // ADMIN ONLY
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('dashboards.admin');
-        })->name('dashboard');
+        Route::get('/dashboard', fn () => view('dashboards.admin'))->name('dashboard');
 
         Route::resource('users', AdminUserController::class)
             ->except(['show'])
@@ -92,7 +87,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/audit-logs', [AuditLogController::class, 'index'])
             ->name('audit-logs.index');
 
-        //  reports только админ
+        // reports только админ
         Route::get('/reports', [ReportController::class, 'index'])
             ->name('reports.index');
 
@@ -119,14 +114,10 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->name('bookings.checkout');
     });
 
-
-    // STAFF ONLY (employee)
+    // STAFF ONLY
     Route::prefix('staff')->name('staff.')->middleware('role:employee')->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('dashboards.staff');
-        })->name('dashboard');
-
+        Route::get('/dashboard', fn () => view('dashboards.staff'))->name('dashboard');
         Route::get('/', fn () => redirect()->route('staff.dashboard'));
 
         Route::resource('clients', ClientController::class)->names('clients');
