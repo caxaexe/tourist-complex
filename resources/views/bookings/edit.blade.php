@@ -1,6 +1,14 @@
 @php
     $u = auth()->user();
     $prefix = $u?->hasRole('admin') ? 'admin.' : 'staff.';
+
+    // если контроллер передал $invoice — используем, иначе берём из $booking
+    $invoice = $invoice ?? ($booking->invoice ?? null);
+
+    // можно ли удалять (безопасный UI):
+    // - если есть счёт -> лучше не показывать (т.к. там могут быть оплаты/история)
+    // - если нет счёта -> можно (у тебя в index так и было)
+    $canDelete = !$invoice;
 @endphp
 
 <x-app-layout>
@@ -13,7 +21,7 @@
             <a href="{{ route($prefix.'bookings.index') }}"
                class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
                       text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                Назад
+                ← Назад
             </a>
         </div>
     </x-slot>
@@ -44,6 +52,23 @@
                     К оплате: <b>{{ number_format($dueTotal, 2, '.', ' ') }}</b> —
                     Баланс: <b>{{ number_format($balance, 2, '.', ' ') }}</b>
                 </div>
+
+                @if($invoice)
+                    <div class="mb-4 text-sm text-gray-600 dark:text-gray-300">
+                        Счёт:
+                        <a class="underline"
+                           href="{{ route($prefix.'invoices.show', $invoice) }}">
+                            {{ $invoice->number }}
+                        </a>
+                        <span class="ml-2">
+                            (статус: <b>{{ $invoice->status }}</b>)
+                        </span>
+                    </div>
+                @else
+                    <div class="mb-4 text-sm text-gray-600 dark:text-gray-300">
+                        Счёта нет — оплаты добавляются через счёт.
+                    </div>
+                @endif
 
                 <form method="POST" action="{{ route($prefix.'bookings.update', $booking) }}">
                     @csrf
@@ -137,12 +162,41 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 flex gap-2">
+                    {{-- Кнопки --}}
+                    <div class="mt-6 flex flex-col sm:flex-row gap-2 sm:items-center">
                         <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                             Сохранить
                         </button>
 
-                    
+                        {{-- Счёт --}}
+                        @if($invoice)
+                            <a href="{{ route($prefix.'invoices.show', $invoice) }}"
+                               class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                                Открыть счёт
+                            </a>
+                        @else
+                            <form method="POST" action="{{ route($prefix.'bookings.invoice.create', $booking) }}" class="inline">
+                                @csrf
+                                <button class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                                        onclick="return confirm('Создать счёт для бронирования #{{ $booking->id }}?')">
+                                    Создать счёт
+                                </button>
+                            </form>
+                        @endif
+
+                        {{-- Удаление --}}
+                        @if($canDelete)
+                            <form method="POST"
+                                  action="{{ route($prefix.'bookings.destroy', $booking) }}"
+                                  class="inline"
+                                  onsubmit="return confirm('Удалить бронирование #{{ $booking->id }}?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                    Удалить
+                                </button>
+                            </form>
+                        @endif
 
                         <a href="{{ route($prefix.'bookings.index') }}"
                            class="px-4 py-2 rounded border border-gray-200 dark:border-gray-700
