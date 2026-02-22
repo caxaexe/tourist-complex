@@ -9,4 +9,12 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
+
+
+    protected function routePrefix(): string
+    {
+        $u = auth()->user();
+        return $u?->hasRole('admin') ? 'admin.' : 'staff.';
+    }
+
 }
