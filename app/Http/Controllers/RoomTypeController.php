@@ -27,7 +27,7 @@ class RoomTypeController extends Controller
         logAudit('created', $roomType, null, $roomType->toArray());
 
         return redirect()
-            ->route('room-types.index')
+            ->route($this->routePrefix().'room-types.index')
             ->with('success', 'Тип номера создан');
     }
 
@@ -45,7 +45,7 @@ class RoomTypeController extends Controller
         logAudit('updated', $room_type, $old, $room_type->toArray());
 
         return redirect()
-            ->route('room-types.index')
+            ->route($this->routePrefix().'room-types.index')
             ->with('success', 'Тип номера обновлён');
     }
 
@@ -58,7 +58,7 @@ class RoomTypeController extends Controller
         logAudit('deleted', $room_type, $old, null);
 
         return redirect()
-            ->route('room-types.index')
+            ->route($this->routePrefix().'room-types.index')
             ->with('success', 'Тип номера удалён');
     }
 }
