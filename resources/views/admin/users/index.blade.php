@@ -1,19 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h2 class="font-semibold text-xl text-gray-800">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">
                 Персонал
             </h2>
 
             <div class="flex gap-2">
                 <form method="GET" class="flex gap-2">
                     <input name="q" value="{{ $q }}" placeholder="Поиск..."
-                           class="border rounded px-3 py-2">
+                           class="border border-gray-300 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <button class="px-3 py-2 border rounded">Найти</button>
                 </form>
 
                 <a href="{{ route('admin.users.create') }}"
-                   class="px-4 py-2 bg-blue-600 text-white rounded">
+                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                     + Добавить
                 </a>
             </div>
@@ -23,12 +23,12 @@
     <div class="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8">
 
         @if(session('success'))
-            <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded text-gray-800">
+            <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded text-gray-800 dark:text-gray-200">
                 {{ session('success') }}
             </div>
         @endif
 
-        <div class="bg-white shadow rounded p-4 overflow-auto">
+        <div class="bg-white dark:bg-gray-800 shadow rounded p-4 overflow-auto text-gray-800 dark:text-gray-200">
             <table class="w-full">
                 <thead>
                     <tr class="text-left border-b">
@@ -44,11 +44,11 @@
                 </thead>
                 <tbody>
                 @forelse($users as $u)
-                    <tr class="border-b">
+                    <tr class="border-b border-gray-200 dark:border-gray-700">
                         <td class="py-2">{{ $u->id }}</td>
                         <td>
                             {{ $u->full_name ?? $u->name }}
-                            <div class="text-xs text-gray-500">{{ $u->name }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ $u->name }}</div>
                         </td>
                         <td>{{ $u->email }}</td>
                         <td class="text-sm">
@@ -60,7 +60,7 @@
                             @if($u->is_active)
                                 <span class="px-2 py-1 rounded bg-green-100 text-green-800 text-sm">да</span>
                             @else
-                                <span class="px-2 py-1 rounded bg-gray-200 text-gray-800 text-sm">нет</span>
+                                <span class="px-2 py-1 rounded bg-gray-200 text-gray-800 dark:text-gray-200 text-sm">нет</span>
                             @endif
                         </td>
                         <td class="text-right">
@@ -77,7 +77,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="py-4 text-center text-gray-500">Нет пользователей</td></tr>
+                    <tr><td colspan="8" class="py-4 text-center text-gray-500 dark:text-gray-400">Нет пользователей</td></tr>
                 @endforelse
                 </tbody>
             </table>

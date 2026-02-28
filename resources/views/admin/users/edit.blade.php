@@ -5,9 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="max-w-3xl mx-auto">
+    <div class="py-6 max-w-3xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white shadow rounded p-6">
 
             <form method="POST" action="{{ route('admin.users.update', $user) }}" class="space-y-4">
@@ -16,53 +14,53 @@
 
                 <div>
                     <label class="block mb-1">Логин (name)*</label>
-                    <input name="name" value="{{ old('name', $user->name) }}" class="border rounded w-full px-3 py-2">
+                    <input name="name" value="{{ old('name', $user->name) }}" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     @error('name') <div class="text-red-600">{{ $message }}</div> @enderror
                 </div>
 
                 <div>
                     <label class="block mb-1">ФИО</label>
-                    <input name="full_name" value="{{ old('full_name', $user->full_name) }}" class="border rounded w-full px-3 py-2">
+                    <input name="full_name" value="{{ old('full_name', $user->full_name) }}" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <div>
                     <label class="block mb-1">Email*</label>
-                    <input name="email" value="{{ old('email', $user->email) }}" class="border rounded w-full px-3 py-2">
+                    <input name="email" value="{{ old('email', $user->email) }}" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     @error('email') <div class="text-red-600">{{ $message }}</div> @enderror
                 </div>
 
                 <div>
                     <label class="block mb-1">Телефон</label>
-                    <input name="phone" value="{{ old('phone', $user->phone) }}" class="border rounded w-full px-3 py-2">
+                    <input name="phone" value="{{ old('phone', $user->phone) }}" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block mb-1">Новый пароль (если нужно)</label>
-                        <input type="password" name="password" class="border rounded w-full px-3 py-2">
+                        <input type="password" name="password" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         @error('password') <div class="text-red-600">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="block mb-1">Повтор пароля</label>
-                        <input type="password" name="password_confirmation" class="border rounded w-full px-3 py-2">
+                        <input type="password" name="password_confirmation" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block mb-1">Должность</label>
-                        <input name="position" value="{{ old('position', $user->position) }}" class="border rounded w-full px-3 py-2">
+                        <input name="position" value="{{ old('position', $user->position) }}" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block mb-1">Зарплата</label>
                         <input type="number" step="0.01" name="salary" value="{{ old('salary', $user->salary) }}"
-                               class="border rounded w-full px-3 py-2">
+                               class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 
                 <div>
                     <label class="block mb-1">Обязанности</label>
-                    <textarea name="duties" rows="3" class="border rounded w-full px-3 py-2">{{ old('duties', $user->duties) }}</textarea>
+                    <textarea name="duties" rows="3" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('duties', $user->duties) }}</textarea>
                 </div>
 
                 <div>
@@ -86,13 +84,11 @@
                 </div>
 
                 <div class="flex gap-3">
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded">Сохранить</button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">Сохранить</button>
                     <a href="{{ route('admin.users.index') }}" class="px-4 py-2 border rounded">Назад</a>
                 </div>
             </form>
 
-        </div>
-            </div>
         </div>
     </div>
 </x-app-layout>
