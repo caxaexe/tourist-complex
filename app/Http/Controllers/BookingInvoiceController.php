@@ -31,7 +31,7 @@ class BookingInvoiceController extends Controller
 
        $prefix = auth()->user()?->hasRole('admin') ? 'admin.' : 'staff.';
 
-        return redirect()->route($prefix.'invoices.show', $invoice)
+        return redirect()->route($prefix.'invoices.show', $booking->invoice)
             ->with('success', 'Счёт создан');
         }
 }

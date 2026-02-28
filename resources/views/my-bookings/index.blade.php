@@ -1,50 +1,95 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">
-            Мои заявки
-        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                Мои заявки
+            </h2>
+
+            <a href="{{ route('my.bookings.create') }}"
+               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700
+                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                Подать заявку
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-6 max-w-7xl mx-auto">
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
-        <a href="{{ route('my.bookings.create') }}"
-           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-            Подать заявку
-        </a>
+            @if(session('success'))
+                <div class="p-3 rounded bg-green-100 border border-green-300 text-green-900">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-        @if(session('success'))
-            <div class="mt-4 p-3 rounded bg-green-100 text-green-800">
-                {{ session('success') }}
+            <div class="bg-white dark:bg-gray-800 shadow rounded p-5 overflow-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left border-b border-gray-200 dark:border-gray-700">
+                            <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
+                            <th class="py-2 text-gray-700 dark:text-gray-200">Номер</th>
+                            <th class="py-2 text-gray-700 dark:text-gray-200">Даты</th>
+                            <th class="py-2 text-gray-700 dark:text-gray-200">Статус</th>
+                            <th class="py-2 text-gray-700 dark:text-gray-200">Сумма</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($bookings as $b)
+                            @php
+                                $statusMap = [
+                                    'pending'     => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
+                                    'confirmed'   => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
+                                    'cancelled'   => 'bg-gray-200 text-gray-700 dark:bg-gray-900/40 dark:text-gray-200',
+                                    'checked_in'  => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
+                                    'checked_out' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
+                                ];
+
+                                $statusClass = $statusMap[$b->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200';
+                            @endphp
+
+                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                <td class="py-3 text-gray-800 dark:text-gray-200">
+                                    #{{ $b->id }}
+                                </td>
+
+                                <td class="py-3 text-gray-800 dark:text-gray-200">
+                                    №{{ $b->room->number ?? '—' }}
+                                    @if($b->room?->roomType)
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $b->room->roomType->name }}
+                                        </div>
+                                    @endif
+                                </td>
+
+                                <td class="py-3 text-gray-800 dark:text-gray-200">
+                                    {{ optional($b->date_from)->format('d.m.Y') }}
+                                    —
+                                    {{ optional($b->date_to)->format('d.m.Y') }}
+                                </td>
+
+                                <td class="py-3">
+                                    <span class="px-2 py-1 rounded text-sm {{ $statusClass }}">
+                                        {{ strtoupper($b->status) }}
+                                    </span>
+                                </td>
+
+                                <td class="py-3 text-gray-800 dark:text-gray-200">
+                                    {{ number_format((float)$b->total, 2, '.', ' ') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-6 text-center text-gray-500 dark:text-gray-400">
+                                    У вас пока нет заявок.<br>
+                                    Нажмите «Подать заявку», чтобы создать первую.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        @endif
 
-        <div class="mt-4 bg-white dark:bg-gray-800 shadow rounded p-4 text-gray-800 dark:text-gray-200">
-            <table class="w-full">
-                <thead>
-                    <tr>
-                        <th class="text-left py-2">ID</th>
-                        <th class="text-left py-2">Номер</th>
-                        <th class="text-left py-2">Даты</th>
-                        <th class="text-left py-2">Статус</th>
-                        <th class="text-left py-2">Сумма</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($bookings as $b)
-                        <tr class="border-t border-gray-200 dark:border-gray-700">
-                            <td class="py-2">{{ $b->id }}</td>
-                            <td class="py-2">№{{ $b->room->number }}</td>
-                            <td class="py-2">{{ $b->date_from }} — {{ $b->date_to }}</td>
-                            <td class="py-2">{{ $b->status }}</td>
-                            <td class="py-2">{{ number_format($b->total,2,'.',' ') }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="py-4">Заявок нет</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
         </div>
     </div>
 </x-app-layout>

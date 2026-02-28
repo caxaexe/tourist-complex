@@ -1,6 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+use App\Models\Booking;
+use App\Models\Client;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
@@ -18,46 +23,90 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+/**
+ * Главная страница (публичная):
+ * - Гость: видит инфо + свои заявки (по guest_client_id в сессии) + кнопку входа + кнопку "Подать заявку"
+ * - Staff/Admin: редирект на /dashboard (их рабочая зона)
+ */
+Route::get('/', function (Request $request) {
 
-// ==========================================================
-// DASHBOARD GATE (доступен и гостю, без auth middleware)
-// гость -> /my-bookings
-// admin -> /admin/dashboard
-// staff/employee -> /staff/dashboard
-// любые другие роли -> 403
-// ==========================================================
+    if (auth()->check()) {
+        $u = auth()->user();
+
+        // staff/admin не должны видеть публичную главную
+        if ($u->hasRole('admin') || (method_exists($u, 'isStaff') ? $u->isStaff() : $u->hasAnyRole(['staff', 'employee']))) {
+            return redirect()->route('dashboard');
+        }
+    }
+
+    // ---- Гость (не авторизован): создаём/достаём client_id из сессии
+    $clientId = (int) $request->session()->get('guest_client_id', 0);
+
+    if ($clientId <= 0 || !Client::whereKey($clientId)->exists()) {
+        $client = Client::create([
+            'full_name' => 'Гость ' . Str::upper(Str::random(6)),
+            'phone'     => null,
+            'email'     => null,
+        ]);
+
+        $clientId = $client->id;
+        $request->session()->put('guest_client_id', $clientId);
+    }
+
+    $bookings = Booking::query()
+        ->where('client_id', $clientId)
+        ->with('room.roomType')
+        ->orderByDesc('id')
+        ->get();
+
+    // ТУТ ты сделаешь resources/views/home.blade.php
+    // (или можешь временно вернуть view('my-bookings.index', ...) если хочешь без новой страницы)
+    return view('home', compact('bookings'));
+})->name('home');
+
+
+/**
+ * Backward compatibility:
+ * старые ссылки на "клиентский кабинет" больше не нужны — ведём в /my-bookings
+ */
+Route::redirect('/client/dashboard', '/my-bookings');
+Route::redirect('/client', '/my-bookings');
+Route::redirect('/client/my-bookings', '/my-bookings');
+Route::redirect('/client/my-bookings/create', '/my-bookings/create');
+
+
+/**
+ * /dashboard:
+ * - гость -> главная /
+ * - admin -> /admin/dashboard
+ * - staff/employee -> /staff/dashboard
+ * - прочие авторизованные -> /
+ */
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
-    // Гость
     if (!$user) {
-        return redirect()->route('my.bookings.index');
+        return redirect()->route('home');
     }
 
     $user->loadMissing('roles');
 
-    // Админ
     if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');
     }
 
-    // Сотрудник (staff или employee)
-    if (method_exists($user, 'isStaff') && $user->isStaff()) {
+    // staff / employee
+    if (method_exists($user, 'isStaff') ? $user->isStaff() : $user->hasAnyRole(['staff','employee'])) {
         return redirect()->route('staff.dashboard');
     }
 
-    // Любая другая роль/состояние — явно запрещаем, чтобы не было "тихих" редиректов в гостевую часть
-    abort(403, 'Недостаточно прав.');
+    // любые другие авторизованные роли -> публичная главная
+    return redirect()->route('home');
 })->name('dashboard');
 
 
-// ==========================================================
-// CLIENT (ГОСТЕВОЙ по сессии)
+// ===== CLIENT (ГОСТЕВОЙ по сессии) =====
 // Мои заявки: доступны гостю, не требуют логина
-// ==========================================================
 Route::get('/my-bookings', [BookingRequestController::class, 'index'])
     ->name('my.bookings.index');
 
@@ -66,10 +115,6 @@ Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])
 
 Route::post('/my-bookings', [BookingRequestController::class, 'store'])
     ->name('my.bookings.store');
-
-// старые пути -> редирект
-Route::redirect('/client/my-bookings', '/my-bookings');
-Route::redirect('/client/my-bookings/create', '/my-bookings/create');
 
 
 // ==========================================================
@@ -82,9 +127,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // ======================================================
     // ADMIN ONLY
-    // ======================================================
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
 
         Route::get('/', fn () => redirect()->route('admin.dashboard'));
@@ -125,9 +168,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->name('bookings.invoice.create');
     });
 
-    // ======================================================
-    // STAFF ONLY (РОЛИ staff И employee)
-    // ======================================================
+    // STAFF ONLY
     Route::prefix('staff')->name('staff.')->middleware('role:staff,employee')->group(function () {
 
         Route::get('/', fn () => redirect()->route('staff.dashboard'));
