@@ -13,7 +13,7 @@ class BookingRequestController extends Controller
 {
     private function forbidStaffAdmin(): void
     {
-        if (auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('employee'))) {
+        if (auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isStaff())) {
             abort(403, 'Админ/сотрудник не может подавать клиентские заявки.');
         }
     }

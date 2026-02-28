@@ -22,34 +22,42 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// ВАЖНО: /dashboard доступен гостю тоже (без auth middleware)
+// ==========================================================
+// DASHBOARD GATE (доступен и гостю, без auth middleware)
 // гость -> /my-bookings
 // admin -> /admin/dashboard
-// staff -> /staff/dashboard
+// staff/employee -> /staff/dashboard
+// любые другие роли -> 403
+// ==========================================================
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
+    // Гость
     if (!$user) {
         return redirect()->route('my.bookings.index');
     }
 
     $user->loadMissing('roles');
 
+    // Админ
     if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');
     }
 
-    if ($user->hasRole('staff')) {
+    // Сотрудник (staff или employee)
+    if (method_exists($user, 'isStaff') && $user->isStaff()) {
         return redirect()->route('staff.dashboard');
     }
 
-    // другие роли/непонятно -> клиентская часть (гостевая)
-    return redirect()->route('my.bookings.index');
+    // Любая другая роль/состояние — явно запрещаем, чтобы не было "тихих" редиректов в гостевую часть
+    abort(403, 'Недостаточно прав.');
 })->name('dashboard');
 
 
-// ===== CLIENT (ГОСТЕВОЙ по сессии) =====
+// ==========================================================
+// CLIENT (ГОСТЕВОЙ по сессии)
 // Мои заявки: доступны гостю, не требуют логина
+// ==========================================================
 Route::get('/my-bookings', [BookingRequestController::class, 'index'])
     ->name('my.bookings.index');
 
@@ -74,7 +82,9 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // ======================================================
     // ADMIN ONLY
+    // ======================================================
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
 
         Route::get('/', fn () => redirect()->route('admin.dashboard'));
@@ -115,8 +125,10 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->name('bookings.invoice.create');
     });
 
-    // STAFF ONLY (РОЛЬ staff)  
-    Route::prefix('staff')->name('staff.')->middleware('role:staff')->group(function () {
+    // ======================================================
+    // STAFF ONLY (РОЛИ staff И employee)
+    // ======================================================
+    Route::prefix('staff')->name('staff.')->middleware('role:staff,employee')->group(function () {
 
         Route::get('/', fn () => redirect()->route('staff.dashboard'));
         Route::get('/dashboard', fn () => view('dashboards.staff'))->name('dashboard');

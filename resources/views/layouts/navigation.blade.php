@@ -4,7 +4,7 @@
 
     // ВАЖНО: у тебя роль staff (НЕ employee)
     $isAdmin = $isAuth ? $u->hasRole('admin') : false;
-    $isStaff = $isAuth ? $u->hasRole('staff') : false;
+    $isStaff = $isAuth ? $u->isStaff() : false;
     $isStaffOrAdmin = $isAuth && ($isAdmin || $isStaff);
 
     $workPrefix = $isAdmin ? 'admin.' : ($isStaff ? 'staff.' : null);
