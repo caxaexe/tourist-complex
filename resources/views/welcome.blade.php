@@ -29,16 +29,14 @@
                             $u = auth()->user();
                             $u?->loadMissing('roles');
 
-                            // дефолт: маршрут-редирект по роли
                             $target = route('dashboard');
 
                             if ($u?->hasRole('admin')) {
                                 $target = route('admin.dashboard');
-                            } elseif ($u?->hasRole('staff')) {
+                            } elseif ($u?->hasRole('employee')) {
                                 $target = route('staff.dashboard');
                             } else {
-                                // клиент (или любой другой пользователь)
-                                $target = route('client.dashboard');
+                                $target = route('my.bookings.index');
                             }
                         @endphp
 
