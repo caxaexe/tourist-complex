@@ -86,7 +86,7 @@
                     <div class="text-sm text-gray-500 dark:text-gray-400">Дополнительно</div>
                     <div class="mt-1 text-lg font-semibold text-gray-800 dark:text-gray-200">Услуги</div>
                     <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                        Доп.услуги и цены (сауна, завтрак и т.д.)
+                        Доп.услуги и цены
                     </div>
                 </a>
 

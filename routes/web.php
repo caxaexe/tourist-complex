@@ -23,15 +23,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// /dashboard → редирект по роли
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
     if (!$user) {
-        return redirect('/');
+        return redirect()->route('my.bookings.index');
     }
 
-    $user->loadMissing('roles');
+    $user->load('roles');
 
     if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');
@@ -41,7 +40,6 @@ Route::get('/dashboard', function () {
         return redirect()->route('staff.dashboard');
     }
 
-    // клиент (и всё остальное по умолчанию)
     return redirect()->route('client.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 

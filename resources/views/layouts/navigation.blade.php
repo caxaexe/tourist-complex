@@ -3,7 +3,7 @@
     $isAuth = auth()->check();
 
     $isAdmin = $u?->hasRole('admin') ?? false;
-    $isStaff = $u?->hasRole('employee') ?? false;
+    $isStaff = $u?->hasRole('staff') ?? false;
 
     $isStaffOrAdmin = $isAuth && ($isAdmin || $isStaff);
 
@@ -45,9 +45,14 @@
                 <!-- Desktop -->
                 <div class="hidden sm:flex sm:items-center sm:ms-10 sm:space-x-2">
 
-                    <x-nav-link :href="route('dashboard')" :active="$dashboardActive">
-                        Dashboard
-                    </x-nav-link>
+                    @php
+                    $dashUrl = route('my.bookings.index');
+                    if ($isAdmin || $isStaff) $dashUrl = route('dashboard');
+                @endphp
+
+                <x-nav-link :href="$dashUrl" :active="request()->routeIs('dashboard') || request()->routeIs('my.bookings.*')">
+                    Dashboard
+                </x-nav-link>
 
                     {{-- WORK AREA (admin OR employee) --}}
                     @if($workPrefix)
