@@ -4,12 +4,6 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 Отель — заявки на бронирование
             </h2>
-
-            <a href="{{ route('login') }}"
-               class="inline-flex items-center px-4 py-2 rounded border border-gray-200 dark:border-gray-700
-                      text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">
-                Вход для персонала
-            </a>
         </div>
     </x-slot>
 

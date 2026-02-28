@@ -1,75 +1,160 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">
-            Подать заявку на бронирование
-        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                Подать заявку на бронирование
+            </h2>
+
+            <a href="{{ route('my.bookings.index') }}"
+               class="inline-flex items-center px-4 py-2 border rounded
+                      text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700
+                      hover:bg-gray-50 dark:hover:bg-gray-700/40">
+                ← Мои заявки
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-6 max-w-3xl mx-auto">
-        <div class="bg-white shadow rounded p-6">
+    <div class="py-6">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
-            <form method="POST" action="{{ route('my.bookings.store') }}">
-                @csrf
+            <div class="bg-white dark:bg-gray-800 shadow rounded p-6">
 
-                <div class="mb-4">
-                    <label>Телефон *</label>
-                    <input type="text" name="phone"
-                        value="{{ old('phone') }}"
-                        class="border rounded w-full p-2"
-                        required>
-                    @error('phone') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-                </div>
+                <form method="POST" action="{{ route('my.bookings.store') }}" class="space-y-5">
+                    @csrf
 
-                <div class="mb-4">
-                    <label>Email *</label>
-                    <input type="email" name="email"
-                        value="{{ old('email') }}"
-                        class="border rounded w-full p-2"
-                        required>
-                    @error('email') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-                </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                <div class="mb-4">
-                    <label>Номер *</label>
-                    <select name="room_id" class="border rounded w-full p-2" required>
-                        @foreach($rooms as $room)
-                            <option value="{{ $room->id }}" @selected(old('room_id') == $room->id)>
-                                №{{ $room->number }} — {{ $room->roomType->name ?? '' }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('room_id') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-                </div>
+                        {{-- Телефон --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                                Телефон <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="phone"
+                                   value="{{ old('phone') }}"
+                                   required
+                                   class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
+                                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                          focus:border-blue-500 focus:ring-blue-500">
+                            @error('phone')
+                                <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                <div class="mb-4">
-                    <label>Дата заезда *</label>
-                    <input type="date" name="date_from"
-                        value="{{ old('date_from') }}"
-                        class="border rounded w-full p-2"
-                        required>
-                    @error('date_from') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-                </div>
+                        {{-- Email --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                                Email <span class="text-red-500">*</span>
+                            </label>
+                            <input type="email" name="email"
+                                   value="{{ old('email') }}"
+                                   required
+                                   class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
+                                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                          focus:border-blue-500 focus:ring-blue-500">
+                            @error('email')
+                                <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                <div class="mb-4">
-                    <label>Дата выезда *</label>
-                    <input type="date" name="date_to"
-                        value="{{ old('date_to') }}"
-                        class="border rounded w-full p-2"
-                        required>
-                    @error('date_to') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-                </div>
+                    </div>
 
-                <div class="mb-4">
-                    <label>Комментарий</label>
-                    <textarea name="note" class="border rounded w-full p-2">{{ old('note') }}</textarea>
-                    @error('note') <div class="text-red-600 text-sm mt-1">{{ $message }}</div> @enderror
-                </div>
+                    {{-- Номер --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Номер <span class="text-red-500">*</span>
+                        </label>
+                        <select name="room_id" required
+                                class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
+                                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                       focus:border-blue-500 focus:ring-blue-500">
+                            @foreach($rooms as $room)
+                                <option value="{{ $room->id }}" @selected(old('room_id') == $room->id)>
+                                    №{{ $room->number }}
+                                    @if($room->roomType)
+                                        — {{ $room->roomType->name }}
+                                    @endif
+                                    @if(isset($room->price_per_night))
+                                        ({{ number_format((float)$room->price_per_night, 2, '.', ' ') }}/ночь)
+                                    @endif
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('room_id')
+                            <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-                <button class="px-4 py-2 bg-green-600 text-white rounded">
-                    Отправить заявку
-                </button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-            </form>
+                        {{-- Дата заезда --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                                Дата заезда <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" name="date_from"
+                                   value="{{ old('date_from') }}"
+                                   required
+                                   class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
+                                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                          focus:border-blue-500 focus:ring-blue-500">
+                            @error('date_from')
+                                <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Дата выезда --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                                Дата выезда <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" name="date_to"
+                                   value="{{ old('date_to') }}"
+                                   required
+                                   class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
+                                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                          focus:border-blue-500 focus:ring-blue-500">
+                            @error('date_to')
+                                <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                    </div>
+
+                    {{-- Комментарий --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Комментарий
+                        </label>
+                        <textarea name="note" rows="4"
+                                  class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
+                                         bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                         focus:border-blue-500 focus:ring-blue-500"
+                                  placeholder="Например: поздний заезд, пожелания по номеру...">{{ old('note') }}</textarea>
+                        @error('note')
+                            <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end pt-2">
+                        <a href="{{ route('my.bookings.index') }}"
+                           class="inline-flex justify-center px-4 py-2 rounded border
+                                  border-gray-200 dark:border-gray-700
+                                  text-gray-700 dark:text-gray-200
+                                  hover:bg-gray-50 dark:hover:bg-gray-700/40">
+                            Отмена
+                        </a>
+
+                        <button type="submit"
+                                class="inline-flex justify-center px-5 py-2 rounded bg-blue-600 text-white
+                                       hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
+                                       focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                            Отправить заявку
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
         </div>
     </div>
 </x-app-layout>
