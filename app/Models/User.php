@@ -84,7 +84,7 @@ class User extends Authenticatable
 
    public function isStaff(): bool
     {
-        return $this->hasRole('employee');
+        return $this->hasRole('staff');
     }
 
     public function isClient(): bool
