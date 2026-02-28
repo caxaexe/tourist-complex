@@ -33,7 +33,7 @@
 
                             if ($u?->hasRole('admin')) {
                                 $target = route('admin.dashboard');
-                            } elseif ($u?->hasRole('employee')) {
+                            } elseif ($u?->hasRole('staff')) {
                                 $target = route('staff.dashboard');
                             } else {
                                 $target = route('my.bookings.index');

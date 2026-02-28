@@ -25,7 +25,7 @@ Route::get('/', function () {
 // ВАЖНО: /dashboard доступен гостю тоже (без auth middleware)
 // гость -> /my-bookings
 // admin -> /admin/dashboard
-// employee -> /staff/dashboard
+// staff -> /staff/dashboard
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
@@ -39,7 +39,7 @@ Route::get('/dashboard', function () {
         return redirect()->route('admin.dashboard');
     }
 
-    if ($user->hasRole('employee')) {
+    if ($user->hasRole('staff')) {
         return redirect()->route('staff.dashboard');
     }
 
@@ -115,8 +115,8 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->name('bookings.invoice.create');
     });
 
-    // STAFF ONLY (РОЛЬ employee)
-    Route::prefix('staff')->name('staff.')->middleware('role:employee')->group(function () {
+    // STAFF ONLY (РОЛЬ staff)  
+    Route::prefix('staff')->name('staff.')->middleware('role:staff')->group(function () {
 
         Route::get('/', fn () => redirect()->route('staff.dashboard'));
         Route::get('/dashboard', fn () => view('dashboards.staff'))->name('dashboard');
