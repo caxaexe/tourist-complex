@@ -25,7 +25,7 @@ class ServiceController extends Controller
 
         logAudit('created', $service, null, $service->toArray());
 
-        return redirect()->route('services.index')
+        return redirect()->route($this->routePrefix().'services.index')
             ->with('success', 'Услуга добавлена');
     }
 
@@ -42,7 +42,7 @@ class ServiceController extends Controller
 
         logAudit('updated', $service, $old, $service->toArray());
 
-        return redirect()->route('services.index')
+        return redirect()->route($this->routePrefix().'services.index')
             ->with('success', 'Услуга обновлена');
     }
 
@@ -54,7 +54,7 @@ class ServiceController extends Controller
 
         logAudit('deleted', $service, $old, null);
 
-        return redirect()->route('services.index')
+        return redirect()->route($this->routePrefix().'services.index')
             ->with('success', 'Услуга удалена');
     }
 }

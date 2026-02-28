@@ -25,7 +25,7 @@ class AmenityController extends Controller
 
         logAudit('created', $amenity, null, $amenity->toArray());
 
-        return redirect()->route('amenities.index')
+        return redirect()->route($this->routePrefix().'amenities.index')
             ->with('success', 'Удобство добавлено');
     }
 
@@ -42,7 +42,7 @@ class AmenityController extends Controller
 
         logAudit('updated', $amenity, $old, $amenity->toArray());
 
-        return redirect()->route('amenities.index')
+        return redirect()->route($this->routePrefix().'amenities.index')
             ->with('success', 'Удобство обновлено');
     }
 
@@ -54,7 +54,7 @@ class AmenityController extends Controller
 
         logAudit('deleted', $amenity, $old, null);
 
-        return redirect()->route('amenities.index')
+        return redirect()->route($this->routePrefix().'amenities.index')
             ->with('success', 'Удобство удалено');
     }
 }

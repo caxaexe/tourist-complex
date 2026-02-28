@@ -38,7 +38,7 @@ class ClientController extends Controller
         logAudit('created', $client, null, $client->toArray());
 
         return redirect()
-            ->route('clients.index')
+            ->route($this->routePrefix().'clients.index')
             ->with('success', 'Клиент добавлен');
     }
 
@@ -56,7 +56,7 @@ class ClientController extends Controller
         logAudit('updated', $client, $old, $client->toArray());
 
         return redirect()
-            ->route('clients.index')
+            ->route($this->routePrefix().'clients.index')
             ->with('success', 'Данные клиента обновлены');
     }
 
@@ -69,7 +69,7 @@ class ClientController extends Controller
         logAudit('deleted', $client, $old, null);
 
         return redirect()
-            ->route('clients.index')
+            ->route($this->routePrefix().'clients.index')
             ->with('success', 'Клиент удалён');
     }
 }

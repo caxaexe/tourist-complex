@@ -10,7 +10,6 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-
     protected function routePrefix(): string
     {
         $u = auth()->user();
