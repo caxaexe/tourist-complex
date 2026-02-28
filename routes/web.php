@@ -19,38 +19,38 @@ use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 Route::get('/', function () {
-    // можно потом заменить на клиентский dashboard или страницу бронирования
+    // публичная страница
     return view('welcome');
 });
 
-// /dashboard → редирект по роли (если не залогинен — на /my-bookings или /)
+// /dashboard → редирект по роли
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
     if (!$user) {
-        return redirect()->route('my.bookings.index');
+        return redirect('/');
     }
 
-    $user->load('roles');
+    $user->loadMissing('roles');
 
     if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');
     }
 
-    if ($user->hasRole('employee')) {
+    if ($user->hasRole('staff')) {
         return redirect()->route('staff.dashboard');
     }
 
-    // роль user (если используется)
-    return redirect()->route('my.bookings.index');
+    // клиент (и всё остальное по умолчанию)
+    return redirect()->route('client.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Клиентский кабинет
+Route::get('/client/dashboard', fn () => view('dashboards.client'))
+    ->middleware(['auth', 'verified'])
+    ->name('client.dashboard');
 
-// ==========================================================
-// CLIENT/GUEST AREA (БЕЗ логина) — имена my.bookings.*
-// ==========================================================
-Route::get('/client/dashboard', fn () => view('dashboards.client'))->name('client.dashboard');
-
+// Мои брони (клиент)
 Route::get('/my-bookings', [BookingRequestController::class, 'index'])
     ->name('my.bookings.index');
 
@@ -63,7 +63,6 @@ Route::post('/my-bookings', [BookingRequestController::class, 'store'])
 // (опционально) старые client/my-bookings → редирект
 Route::redirect('/client/my-bookings', '/my-bookings');
 Route::redirect('/client/my-bookings/create', '/my-bookings/create');
-
 
 // ==========================================================
 // AUTH AREA (staff/admin + профиль)
@@ -78,6 +77,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     // ADMIN ONLY
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
 
+        Route::get('/', fn () => redirect()->route('admin.dashboard'));
         Route::get('/dashboard', fn () => view('dashboards.admin'))->name('dashboard');
 
         Route::resource('users', AdminUserController::class)
@@ -118,10 +118,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     });
 
     // STAFF ONLY
-    Route::prefix('staff')->name('staff.')->middleware('role:employee')->group(function () {
+    Route::prefix('staff')->name('staff.')->middleware('role:staff')->group(function () {
 
-        Route::get('/dashboard', fn () => view('dashboards.staff'))->name('dashboard');
         Route::get('/', fn () => redirect()->route('staff.dashboard'));
+        Route::get('/dashboard', fn () => view('dashboards.staff'))->name('dashboard');
 
         Route::resource('clients', ClientController::class)->names('clients');
         Route::resource('room-types', RoomTypeController::class)->names('room-types');
@@ -130,7 +130,6 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('bookings', BookingController::class)->names('bookings');
         Route::resource('services', ServiceController::class)->names('services');
         Route::resource('invoices', InvoiceController::class)->names('invoices');
-        
 
         Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])
             ->name('bookings.invoices.store');
