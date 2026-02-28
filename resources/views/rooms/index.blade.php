@@ -5,7 +5,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
             Номера
         </h2>
     </x-slot>
@@ -25,56 +25,56 @@
                            name="q"
                            value="{{ $q ?? '' }}"
                            placeholder="Поиск (номер/название)"
-                           class="border rounded px-3 py-2 w-80">
-                    <button class="px-4 py-2 bg-gray-800 text-white rounded">
+                           class="border border-gray-300 dark:border-gray-700 rounded px-3 py-2 w-80 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <button class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                         Найти
                     </button>
                 </form>
 
                 <a href="{{ route($prefix.'rooms.create') }}"
-                   class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded">
+                   class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                     + Добавить номер
                 </a>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+            <div class="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow rounded p-4 text-gray-800 dark:text-gray-200">
                 <table class="w-full">
                     <thead>
-                        <tr class="text-left border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-2 text-gray-700 dark:text-gray-200">№</th>
-                            <th class="text-gray-700 dark:text-gray-200">Тип</th>
-                            <th class="text-gray-700 dark:text-gray-200">Цена/ночь</th>
-                            <th class="text-gray-700 dark:text-gray-200">Вместимость</th>
-                            <th class="text-gray-700 dark:text-gray-200">Активен</th>
-                            <th class="text-right text-gray-700 dark:text-gray-200">Действия</th>
+                        <tr class="text-left border-b border-gray-200 dark:border-gray-700 dark:border-gray-700">
+                            <th class="py-2 text-gray-700 dark:text-gray-200 dark:text-gray-200">№</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Тип</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Цена/ночь</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Вместимость</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Активен</th>
+                            <th class="text-right text-gray-700 dark:text-gray-200 dark:text-gray-200">Действия</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @forelse($rooms as $room)
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="py-2 text-gray-800 dark:text-gray-200">
+                            <tr class="border-b border-gray-200 dark:border-gray-700 dark:border-gray-700">
+                                <td class="py-2 text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ $room->number }}
                                     @if($room->title)
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-400">
                                             {{ $room->title }}
                                         </div>
                                     @endif
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ $room->roomType?->name ?? '—' }}
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ number_format($room->price_per_night, 2, '.', ' ') }}
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ $room->capacity ?? '—' }}
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ $room->is_active ? 'Да' : 'Нет' }}
                                 </td>
 
@@ -98,7 +98,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-4 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="6" class="py-4 text-center text-gray-500 dark:text-gray-400 dark:text-gray-400">
                                     Нет номеров
                                 </td>
                             </tr>

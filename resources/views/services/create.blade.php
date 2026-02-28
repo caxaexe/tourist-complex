@@ -5,7 +5,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
             Добавить услугу
         </h2>
     </x-slot>
@@ -24,36 +24,36 @@
                     @csrf
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200">Название *</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Название *</label>
                         <input name="name"
                                value="{{ old('name') }}"
                                class="border rounded w-full px-3 py-2 bg-white dark:bg-gray-900
-                                      text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
+                                      text-gray-800 dark:text-gray-200 dark:text-gray-200 border-gray-200 dark:border-gray-700 dark:border-gray-700">
                         @error('name')
                             <div class="text-red-600 mt-1">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200">Цена *</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Цена *</label>
                         <input type="number" step="0.01" min="0"
                                name="price"
                                value="{{ old('price') }}"
                                class="border rounded w-full px-3 py-2 bg-white dark:bg-gray-900
-                                      text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
+                                      text-gray-800 dark:text-gray-200 dark:text-gray-200 border-gray-200 dark:border-gray-700 dark:border-gray-700">
                         @error('price')
                             <div class="text-red-600 mt-1">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="flex gap-3">
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                             Сохранить
                         </button>
 
                         <a href="{{ route($prefix.'services.index') }}"
-                           class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200
-                                  border-gray-200 dark:border-gray-700">
+                           class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200 dark:text-gray-200
+                                  border-gray-200 dark:border-gray-700 dark:border-gray-700">
                             Назад
                         </a>
                     </div>

@@ -5,7 +5,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
             Создать бронирование
         </h2>
     </x-slot>
@@ -20,7 +20,7 @@
                     {{-- Клиент --}}
                     <div>
                         <label class="block mb-1">Клиент *</label>
-                        <select name="client_id" class="border rounded w-full px-3 py-2">
+                        <select name="client_id" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">— выбрать —</option>
                             @foreach($clients as $client)
                                 <option value="{{ $client->id }}"
@@ -35,7 +35,7 @@
                     {{-- Номер --}}
                     <div>
                         <label class="block mb-1">Номер *</label>
-                        <select name="room_id" class="border rounded w-full px-3 py-2">
+                        <select name="room_id" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">— выбрать —</option>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}"
@@ -55,7 +55,7 @@
                             <input type="date"
                                    name="date_from"
                                    value="{{ old('date_from') }}"
-                                   class="border rounded w-full px-3 py-2">
+                                   class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             @error('date_from') <div class="text-red-600">{{ $message }}</div> @enderror
                         </div>
 
@@ -64,7 +64,7 @@
                             <input type="date"
                                    name="date_to"
                                    value="{{ old('date_to') }}"
-                                   class="border rounded w-full px-3 py-2">
+                                   class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             @error('date_to') <div class="text-red-600">{{ $message }}</div> @enderror
                         </div>
                     </div>
@@ -72,7 +72,7 @@
                     {{-- Статус --}}
                     <div>
                         <label class="block mb-1">Статус</label>
-                        <select name="status" class="border rounded w-full px-3 py-2">
+                        <select name="status" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="pending">pending</option>
                             <option value="confirmed">confirmed</option>
                             <option value="cancelled">cancelled</option>
@@ -85,13 +85,13 @@
                     <div>
                         <label class="block mb-1">Примечание</label>
                         <textarea name="note"
-                                  class="border rounded w-full px-3 py-2"
+                                  class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                   rows="3">{{ old('note') }}</textarea>
                         @error('note') <div class="text-red-600">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="flex gap-3">
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                             Сохранить
                         </button>
                         <a href="{{ route($prefix.'bookings.index') }}"

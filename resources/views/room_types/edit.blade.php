@@ -5,7 +5,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
             Редактировать тип номера #{{ $room_type->id }}
         </h2>
     </x-slot>
@@ -18,28 +18,28 @@
                     @method('PUT')
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200">Название *</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Название *</label>
                         <input name="name"
                                value="{{ old('name', $room_type->name) }}"
-                               class="border rounded w-full px-3 py-2">
+                               class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         @error('name') <div class="text-red-600">{{ $message }}</div> @enderror
                     </div>
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200">Описание</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Описание</label>
                         <textarea name="description"
-                                  class="border rounded w-full px-3 py-2"
+                                  class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                   rows="4">{{ old('description', $room_type->description) }}</textarea>
                         @error('description') <div class="text-red-600">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="flex gap-3">
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                             Сохранить
                         </button>
 
                         <a href="{{ route($prefix.'room-types.index') }}"
-                           class="px-4 py-2 border rounded text-gray-700 dark:text-gray-200">
+                           class="px-4 py-2 border rounded text-gray-700 dark:text-gray-200 dark:text-gray-200">
                             Назад
                         </a>
                     </div>

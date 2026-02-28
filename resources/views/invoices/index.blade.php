@@ -6,12 +6,12 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
                 Счета
             </h2>
 
             <a href="{{ route($prefix.'invoices.create') }}"
-               class="px-4 py-2 bg-blue-600 text-white rounded">
+               class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                 + Создать счёт
             </a>
         </div>
@@ -21,23 +21,23 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded text-green-900">
+                <div class="mb-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-800 text-green-900 dark:text-green-200">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded p-4 overflow-auto">
+            <div class="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow rounded p-4 overflow-auto text-gray-800 dark:text-gray-200">
                 <table class="w-full">
                     <thead>
-                        <tr class="text-left border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
-                            <th class="text-gray-700 dark:text-gray-200">Номер счёта</th>
-                            <th class="text-gray-700 dark:text-gray-200">Бронь</th>
-                            <th class="text-gray-700 dark:text-gray-200">Клиент</th>
-                            <th class="text-gray-700 dark:text-gray-200">Дата</th>
-                            <th class="text-gray-700 dark:text-gray-200">Сумма</th>
-                            <th class="text-gray-700 dark:text-gray-200">Оплата</th>
-                            <th class="text-right text-gray-700 dark:text-gray-200">Действия</th>
+                        <tr class="text-left border-b border-gray-200 dark:border-gray-700 dark:border-gray-700">
+                            <th class="py-2 text-gray-700 dark:text-gray-200 dark:text-gray-200">ID</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Номер счёта</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Бронь</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Клиент</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Дата</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Сумма</th>
+                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Оплата</th>
+                            <th class="text-right text-gray-700 dark:text-gray-200 dark:text-gray-200">Действия</th>
                         </tr>
                     </thead>
 
@@ -64,28 +64,28 @@
                                 }
                             @endphp
 
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="py-2 text-gray-800 dark:text-gray-200">
+                            <tr class="border-b border-gray-200 dark:border-gray-700 dark:border-gray-700">
+                                <td class="py-2 text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ $invoice->id }}
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ $invoice->number }}
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     #{{ $invoice->booking_id }}
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ $invoice->booking->client->full_name ?? '—' }}
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ optional($invoice->issued_at)->format('d.m.Y') ?? '—' }}
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
                                     {{ number_format($due, 2, '.', ' ') }}
                                 </td>
 
@@ -95,7 +95,7 @@
                                             {{ $payText }}
                                         </span>
 
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                        <span class="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-400">
                                             {{ number_format($paid,2,'.',' ') }} / {{ number_format($due,2,'.',' ') }}
                                             @if($balance > 0 && $due > 0)
                                                 • Остаток: {{ number_format($balance,2,'.',' ') }}
@@ -106,14 +106,14 @@
 
                                 <td class="text-right whitespace-nowrap">
                                     <a href="{{ route($prefix.'invoices.show', $invoice) }}"
-                                       class="px-3 py-1 bg-blue-600 text-white rounded text-sm">
+                                       class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                                         Открыть счёт
                                     </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="py-4 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="8" class="py-4 text-center text-gray-500 dark:text-gray-400 dark:text-gray-400">
                                     Счета отсутствуют
                                 </td>
                             </tr>
