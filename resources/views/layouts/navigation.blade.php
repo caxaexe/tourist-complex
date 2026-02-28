@@ -2,19 +2,27 @@
     $u = auth()->user();
     $isAuth = auth()->check();
 
+    // ВАЖНО: у тебя в web.php используется role:employee, а не staff
     $isAdmin = $u?->hasRole('admin') ?? false;
-    $isStaff = $u?->hasRole('staff') ?? false;
+    $isStaff = $u?->hasRole('employee') ?? false;
 
     $isStaffOrAdmin = $isAuth && ($isAdmin || $isStaff);
 
     // admin.* / staff.* или null (клиент)
     $workPrefix = $isAdmin ? 'admin.' : ($isStaff ? 'staff.' : null);
 
-    // Активность "Dashboard" для любых дашбордов
-    $dashboardActive = request()->routeIs('dashboard')
-        || request()->routeIs('admin.dashboard')
-        || request()->routeIs('staff.dashboard')
-        || request()->routeIs('client.dashboard');
+    // Куда ведёт "Dashboard"
+    if ($isStaffOrAdmin) {
+        $dashUrl = route($workPrefix.'bookings.index');
+    } else {
+        $dashUrl = route('my.bookings.index');
+    }
+
+    // Подсветка Dashboard
+    $dashActive = request()->routeIs('dashboard')
+        || request()->routeIs('admin.*')
+        || request()->routeIs('staff.*')
+        || request()->routeIs('my.bookings.*');
 @endphp
 
 <nav
@@ -34,10 +42,9 @@
             <!-- Left -->
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-200" />
-                        <span class="text-gray-200 text-sm font-semibold hidden sm:inline">
-                            {{ config('app.name', 'Laravel') }}
+                    <a href="{{ $dashUrl }}" class="inline-flex items-center gap-2">
+                        <span class="text-gray-100 font-semibold">
+                            {{ config('app.name', 'Hotel') }}
                         </span>
                     </a>
                 </div>
@@ -45,14 +52,9 @@
                 <!-- Desktop -->
                 <div class="hidden sm:flex sm:items-center sm:ms-10 sm:space-x-2">
 
-                    @php
-                    $dashUrl = route('my.bookings.index');
-                    if ($isAdmin || $isStaff) $dashUrl = route('dashboard');
-                @endphp
-
-                <x-nav-link :href="$dashUrl" :active="request()->routeIs('dashboard') || request()->routeIs('my.bookings.*')">
-                    Dashboard
-                </x-nav-link>
+                    <x-nav-link :href="$dashUrl" :active="$dashActive">
+                        Dashboard
+                    </x-nav-link>
 
                     {{-- WORK AREA (admin OR employee) --}}
                     @if($workPrefix)
@@ -257,7 +259,7 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                                 onclick="event.preventDefault(); this.closest('form').submit();">
                                     Выйти
                                 </x-dropdown-link>
                             </form>
@@ -291,7 +293,7 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t border-gray-800">
         <div class="pt-2 pb-3 space-y-1 px-2">
 
-            <x-responsive-nav-link :href="route('dashboard')" :active="$dashboardActive">
+            <x-responsive-nav-link :href="$dashUrl" :active="$dashActive">
                 Dashboard
             </x-responsive-nav-link>
 
@@ -407,7 +409,7 @@
                     </svg>
                 </button>
                 <div x-show="myOpen" class="pl-3 space-y-1">
-                    <x-responsive-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.index') || request()->routeIs('my.bookings.*')">
+                    <x-responsive-nav-link :href="route('my.bookings.index')" :active="request()->routeIs('my.bookings.*')">
                         Список заявок
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('my.bookings.create')" :active="request()->routeIs('my.bookings.create')">
