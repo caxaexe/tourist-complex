@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Hotel') }}</title>
+    <title>Castle Noctem</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -14,12 +14,11 @@
 </head>
 
 <body class="font-sans antialiased bg-gray-950 text-gray-100">
-    {{-- NAV --}}
     <header class="sticky top-0 z-50 border-b border-gray-800/80 bg-gray-950/80 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <a href="{{ url('/') }}" class="flex items-center gap-2">
                 <span class="text-white font-semibold tracking-wide">
-                    {{ config('app.name', 'Hotel') }}
+                    Castle Noctem
                 </span>
             </a>
 
@@ -46,7 +45,6 @@
                 @endif
             </nav>
 
-            {{-- Mobile actions --}}
             <div class="flex sm:hidden items-center gap-2">
                 <a href="{{ route('my.bookings.create') }}"
                    class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-sm">
@@ -62,14 +60,11 @@
         </div>
     </header>
 
-    {{-- 1) HERO --}}
     <section class="relative">
-        {{-- background image --}}
         <div class="absolute inset-0">
             <img src="{{ asset('images/hotel.jpg') }}"
                  alt="Hotel"
                  class="w-full h-full object-cover" />
-            {{-- overlay for readability --}}
             <div class="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
         </div>
 
@@ -82,11 +77,12 @@
                     </div>
 
                     <h1 class="mt-5 text-4xl sm:text-5xl font-semibold tracking-tight text-white">
-                        {{ config('app.name', 'Название отеля') }}
+                        Castle Noctem
                     </h1>
 
                     <p class="mt-4 text-lg text-gray-200">
-                        Уютные номера, спокойная атмосфера и всё необходимое для комфортного отдыха.
+                        Мистический замок в сердце гор Трансильвании. Старинная архитектура, туман над вершинами, тишина хвойных лесов и
+                        комфорт современного курорта. Здесь легенды оживают, а отдых становится по-настоящему незабываемым.
                     </p>
 
                     <div class="mt-8 flex flex-col sm:flex-row gap-3">
@@ -128,27 +124,31 @@
                         Об отеле
                     </h2>
                     <p class="mt-4 text-gray-300 leading-relaxed">
-                        Здесь напиши кратко, что представляет собой отель: расположение, формат (семейный/бизнес),
-                        условия, преимущества. Можно 3–5 предложений.
+                        Castle Noctem - это исторический замок, расположенный высоко в горах Трансильвании, в окружении хвойных лесов и снежных склонов. 
+
+                        Архитектура вдохновлена средневековыми крепостями региона,
+                        с массивными каменными стенами, башнями и витражными окнами.
+                        Несмотря на мистическую атмосферу, внутри вас ждёт комфорт
+                        премиального горного курорта.
                     </p>
 
                     <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
                             <div class="text-sm text-gray-400">Комфорт</div>
                             <div class="mt-1 text-gray-200">
-                                Чистые номера, удобные кровати, всё нужное под рукой.
+                                Каминные залы, Панорамные виды на горы, Средневековый интерьер с современным комфортом.
                             </div>
                         </div>
                         <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
                             <div class="text-sm text-gray-400">Удобства</div>
                             <div class="mt-1 text-gray-200">
-                                Wi-Fi, парковка, кондиционер (подставь свои пункты).
+                                SPA-зона и сауна, Тёплые номера с видом на горы, Ресторан с трансильванской кухней.
                             </div>
                         </div>
                         <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
                             <div class="text-sm text-gray-400">Расположение</div>
                             <div class="mt-1 text-gray-200">
-                                Тихий район / центр города (подставь как у тебя).
+                                Расположенный в горах Трансильвании, на высоте 1400 метров, замок окружён хвойными лесами и горнолыжными трассами.
                             </div>
                         </div>
                         <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
@@ -183,7 +183,7 @@
                             Перейти к заявке
                         </a>
                         <div class="mt-3 text-xs text-gray-400">
-                            * Заявка не требует регистрации (как “прохожий”).
+                            * Заявка не требует регистрации.
                         </div>
                     </div>
                 </div>
@@ -191,7 +191,6 @@
         </div>
     </section>
 
-    {{-- 3) CONTACTS --}}
     <section id="contacts" class="py-16 sm:py-20 border-t border-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -200,7 +199,7 @@
                         Контакты
                     </h2>
                     <p class="mt-3 text-gray-300">
-                        Свяжитесь с нами любым удобным способом.
+                        Свяжитесь с нами и забронируйте пребывание в замке, где легенды становятся частью реальности.
                     </p>
                 </div>
 
@@ -213,14 +212,14 @@
 
                     <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
                         <div class="text-sm text-gray-400">Email</div>
-                        <div class="mt-1 text-gray-200 font-medium">hotel@example.com</div>
+                        <div class="mt-1 text-gray-200 font-medium">drakula@example.com</div>
                         <div class="mt-2 text-sm text-gray-400">Ответ в течение дня</div>
                     </div>
 
                     <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
                         <div class="text-sm text-gray-400">Адрес</div>
-                        <div class="mt-1 text-gray-200 font-medium">Кишинёв, …</div>
-                        <div class="mt-2 text-sm text-gray-400">Подставь точный адрес</div>
+                        <div class="mt-1 text-gray-200 font-medium">Romania</div>
+                        <div class="mt-2 text-sm text-gray-400">Carpathian Mountains, Transylvania</div>
                     </div>
                 </div>
             </div>
@@ -239,7 +238,7 @@
     <footer class="border-t border-gray-900 py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
             <div class="text-sm text-gray-400">
-                © {{ date('Y') }} {{ config('app.name', 'Hotel') }}. Все права защищены.
+                © {{ date('Y') }} Castle Noctem. Between mountains and myths.
             </div>
 
             <div class="flex items-center gap-3">
