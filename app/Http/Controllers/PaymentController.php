@@ -9,13 +9,6 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    private function routePrefix(): string
-{
-    $u = auth()->user();
-    if ($u?->hasRole('admin')) return 'admin.';
-    if ($u?->hasRole('employee')) return 'staff.';
-    return '';
-}
 
     public function index()
     {

@@ -7,11 +7,6 @@ use App\Models\Invoice;
 
 class BookingInvoiceController extends Controller
 {
-    private function routePrefix(): string
-    {
-        $u = auth()->user();
-        return $u?->hasRole('admin') ? 'admin.' : 'staff.';
-    }
 
     public function store(Booking $booking)
     {
