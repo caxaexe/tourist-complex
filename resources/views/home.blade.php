@@ -116,77 +116,96 @@
     </section>
 
     {{-- 2) ABOUT --}}
-    <section id="about" class="py-16 sm:py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <div>
-                    <h2 class="text-2xl sm:text-3xl font-semibold text-white">
-                        Об отеле
-                    </h2>
-                    <p class="mt-4 text-gray-300 leading-relaxed">
-                        Castle Noctem - это исторический замок, расположенный высоко в горах Трансильвании, в окружении хвойных лесов и снежных склонов. 
+<section id="about" class="py-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 
-                        Архитектура вдохновлена средневековыми крепостями региона,
-                        с массивными каменными стенами, башнями и витражными окнами.
-                        Несмотря на мистическую атмосферу, внутри вас ждёт комфорт
-                        премиального горного курорта.
-                    </p>
+        <h2 class="text-3xl sm:text-4xl font-semibold text-white">
+            Об отеле
+        </h2>
 
-                    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
-                            <div class="text-sm text-gray-400">Комфорт</div>
-                            <div class="mt-1 text-gray-200">
-                                Каминные залы, Панорамные виды на горы, Средневековый интерьер с современным комфортом.
-                            </div>
-                        </div>
-                        <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
-                            <div class="text-sm text-gray-400">Удобства</div>
-                            <div class="mt-1 text-gray-200">
-                                SPA-зона и сауна, Тёплые номера с видом на горы, Ресторан с трансильванской кухней.
-                            </div>
-                        </div>
-                        <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
-                            <div class="text-sm text-gray-400">Расположение</div>
-                            <div class="mt-1 text-gray-200">
-                                Расположенный в горах Трансильвании, на высоте 1400 метров, замок окружён хвойными лесами и горнолыжными трассами.
-                            </div>
-                        </div>
-                        <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
-                            <div class="text-sm text-gray-400">Сервис</div>
-                            <div class="mt-1 text-gray-200">
-                                Быстро отвечаем и помогаем по любым вопросам.
-                            </div>
-                        </div>
+        <p class="mt-6 text-gray-300 leading-relaxed max-w-3xl mx-auto">
+            Castle Noctem — это исторический замок, расположенный высоко в горах Трансильвании,
+            в окружении хвойных лесов и снежных склонов.
+
+            Архитектура вдохновлена средневековыми крепостями региона —
+            массивные каменные стены, башни и витражные окна.
+            Несмотря на мистическую атмосферу, внутри вас ждёт комфорт
+            премиального горного курорта.
+        </p>
+
+        <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+            <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
+                <div class="text-sm text-gray-400 uppercase tracking-wider">Комфорт</div>
+                <div class="mt-2 text-gray-200">
+                    Каминные залы, панорамные виды на горы,
+                    средневековый интерьер с современным комфортом.
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
+                <div class="text-sm text-gray-400 uppercase tracking-wider">Удобства</div>
+                <div class="mt-2 text-gray-200">
+                    SPA-зона и сауна, тёплые номера с видом на горы,
+                    ресторан с трансильванской кухней.
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
+                <div class="text-sm text-gray-400 uppercase tracking-wider">Расположение</div>
+                <div class="mt-2 text-gray-200">
+                    Замок расположен на высоте 1400 метров,
+                    окружён хвойными лесами и горнолыжными трассами.
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
+                <div class="text-sm text-gray-400 uppercase tracking-wider">Сервис</div>
+                <div class="mt-2 text-gray-200">
+                    Персональный подход и поддержка 24/7.
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+    {{-- 3) BOOKING BLOCK --}}
+    <section class="py-20 border-t border-gray-900">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="rounded-2xl border border-gray-800 bg-gray-900 p-8 text-center">
+
+                <h3 class="text-2xl font-semibold text-white">
+                    Как подать заявку
+                </h3>
+
+                <ol class="mt-6 space-y-4 text-gray-300 text-left max-w-md mx-auto">
+                    <li class="flex gap-3">
+                        <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-gray-200 text-sm">1</span>
+                        Выберите номер и даты.
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-gray-200 text-sm">2</span>
+                        Укажите телефон и email.
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-gray-200 text-sm">3</span>
+                        Отправьте заявку — мы подтвердим её.
+                    </li>
+                </ol>
+
+                <div class="mt-8">
+                    <a href="{{ route('my.bookings.create') }}"
+                    class="inline-flex justify-center items-center px-6 py-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+                        Перейти к заявке
+                    </a>
+                    <div class="mt-3 text-xs text-gray-400">
+                        * Заявка не требует регистрации.
                     </div>
                 </div>
 
-                <div class="rounded-2xl border border-gray-800 bg-gray-900 p-6">
-                    <h3 class="text-lg font-semibold text-white">Как подать заявку</h3>
-                    <ol class="mt-4 space-y-3 text-gray-300">
-                        <li class="flex gap-3">
-                            <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-gray-200 text-sm">1</span>
-                            Выберите номер и даты.
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-gray-200 text-sm">2</span>
-                            Укажите телефон и email для связи.
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-gray-200 text-sm">3</span>
-                            Отправьте заявку — мы подтвердим её после проверки.
-                        </li>
-                    </ol>
-
-                    <div class="mt-6">
-                        <a href="{{ route('my.bookings.create') }}"
-                           class="inline-flex w-full justify-center items-center px-5 py-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
-                            Перейти к заявке
-                        </a>
-                        <div class="mt-3 text-xs text-gray-400">
-                            * Заявка не требует регистрации.
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -218,8 +237,8 @@
 
                     <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
                         <div class="text-sm text-gray-400">Адрес</div>
-                        <div class="mt-1 text-gray-200 font-medium">Romania</div>
-                        <div class="mt-2 text-sm text-gray-400">Carpathian Mountains, Transylvania</div>
+                        <div class="mt-1 text-gray-200 font-medium">Carpathian Mountains</div>
+                        <div class="mt-2 text-sm text-gray-400">Romania, Transylvania</div>
                     </div>
                 </div>
             </div>

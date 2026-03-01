@@ -2,7 +2,6 @@
     $u = auth()->user();
     $isAuth = auth()->check();
 
-    // ВАЖНО: у тебя роль staff (НЕ employee)
     $isAdmin = $isAuth ? $u->hasRole('admin') : false;
     $isStaff = $isAuth ? $u->isStaff() : false;
     $isStaffOrAdmin = $isAuth && ($isAdmin || $isStaff);
@@ -32,7 +31,7 @@
             <div class="flex items-center gap-6">
                 <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2">
                     <span class="text-gray-200 font-semibold">
-                        {{ config('app.name', 'App') }}
+                        Castle Noctem
                     </span>
                 </a>
 
@@ -42,7 +41,7 @@
                     <a href="{{ $dashboardUrl }}"
                        class="px-3 py-2 rounded-md text-sm font-medium transition
                        {{ (request()->routeIs('dashboard') || request()->routeIs('my.bookings.*')) ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                        Dashboard
+                        Главная
                     </a>
 
                     @if($workPrefix)
@@ -232,7 +231,7 @@
             <a href="{{ $dashboardUrl }}"
                class="block px-3 py-2 rounded-md text-sm font-medium transition
                {{ (request()->routeIs('dashboard') || request()->routeIs('my.bookings.*')) ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                Dashboard
+                Главная
             </a>
 
             @if($workPrefix)
