@@ -9,12 +9,6 @@ use App\Http\Requests\UpdateRoomTypeRequest;
 class RoomTypeController extends Controller
 {
 
-    private function routePrefix(): string
-    {
-        $u = auth()->user();
-        return $u?->hasRole('admin') ? 'admin.' : 'staff.';
-    }
-    
     public function index()
     {
         $roomTypes = RoomType::orderBy('id', 'desc')->paginate(10);

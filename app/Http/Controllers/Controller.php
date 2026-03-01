@@ -10,10 +10,9 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    private function routePrefix(): string
+    protected function routePrefix(): string
     {
         $u = auth()->user();
         return $u?->hasRole('admin') ? 'admin.' : 'staff.';
     }
-
 }
