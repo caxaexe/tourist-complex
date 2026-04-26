@@ -201,9 +201,7 @@
                     class="inline-flex justify-center items-center px-6 py-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
                         Перейти к заявке
                     </a>
-                    <div class="mt-3 text-xs text-gray-400">
-                        * Заявка не требует регистрации.
-                    </div>
+                
                 </div>
 
             </div>
@@ -231,7 +229,7 @@
 
                     <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
                         <div class="text-sm text-gray-400">Email</div>
-                        <div class="mt-1 text-gray-200 font-medium">drakula@example.com</div>
+                        <div class="mt-1 text-gray-200 font-medium">caxa5578@example.com</div>
                         <div class="mt-2 text-sm text-gray-400">Ответ в течение дня</div>
                     </div>
 
