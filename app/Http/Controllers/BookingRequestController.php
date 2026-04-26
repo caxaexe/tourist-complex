@@ -74,6 +74,8 @@ class BookingRequestController extends Controller
         $clientId = $this->getOrCreateGuestClientId($request);
 
         $validated = $request->validate([
+            // Добавили обязательное ФИО
+            'full_name' => 'required|string|min:3|max:255',
             'room_id'   => 'required|exists:rooms,id',
             'date_from' => 'required|date|after_or_equal:today',
             'date_to'   => 'required|date|after:date_from',
@@ -82,24 +84,28 @@ class BookingRequestController extends Controller
             // обязательные контакты
             'phone'     => 'required|string|min:5|max:30',
             'email'     => 'required|email:rfc,dns|max:255',
+        ], [
+            'full_name.required' => 'Пожалуйста, укажите ваше ФИО.',
+            'full_name.min'      => 'ФИО должно содержать минимум 3 символа.',
         ]);
 
-        // сохраняем контакты гостя в клиенте (важно!)
-        $client = Client::findOrFail($clientId);
+        // сохраняем контакты и ФИО гостя в клиенте (важно!)
+        $client = \App\Models\Client::findOrFail($clientId);
         $client->update([
-            'phone' => $validated['phone'],
-            'email' => $validated['email'],
+            'full_name' => $validated['full_name'],
+            'phone'     => $validated['phone'],
+            'email'     => $validated['email'],
         ]);
 
-        $room = Room::findOrFail($validated['room_id']);
+        $room = \App\Models\Room::findOrFail($validated['room_id']);
 
-        $from = Carbon::parse($validated['date_from']);
-        $to   = Carbon::parse($validated['date_to']);
+        $from = \Carbon\Carbon::parse($validated['date_from']);
+        $to   = \Carbon\Carbon::parse($validated['date_to']);
 
         $nights = $from->diffInDays($to);
         $total  = $nights * (float) $room->price_per_night;
 
-        Booking::create([
+        \App\Models\Booking::create([
             'user_id'   => null,        // гость
             'client_id' => $clientId,   // из сессии
             'room_id'   => $room->id,

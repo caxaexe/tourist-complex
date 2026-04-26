@@ -19,6 +19,7 @@ use App\Http\Controllers\BookingInvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ReportController;
+use Illuminate\Support\Facades\Mail;
 
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -164,6 +165,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     });
 
+    
+
 });
+
 
 require __DIR__ . '/auth.php';

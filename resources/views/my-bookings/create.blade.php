@@ -22,6 +22,23 @@
                 <form method="POST" action="{{ route('my.bookings.store') }}" class="space-y-5">
                     @csrf
 
+                    {{-- ФИО (Новое поле) --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                            ФИО <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="full_name"
+                               value="{{ old('full_name') }}"
+                               required
+                               placeholder="Например: Иванов Иван Иванович"
+                               class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
+                                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                      focus:border-blue-500 focus:ring-blue-500">
+                        @error('full_name')
+                            <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                         {{-- Телефон --}}
