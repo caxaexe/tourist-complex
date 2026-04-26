@@ -29,7 +29,7 @@ class BookingController extends Controller
 
     public function index(Request $request)
     {
-        $payment = $request->query('payment'); // unpaid | partial | paid | null
+        $payment = $request->query('payment');
 
         $query = Booking::query()
             ->with(['client', 'room.roomType', 'invoice'])
@@ -47,7 +47,6 @@ class BookingController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // Мини-статистика
         $today = now()->toDateString();
 
         $activeCount = Booking::whereNotIn('status', ['cancelled', 'checked_out'])->count();
@@ -91,12 +90,10 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
-        // total не должен приходить из формы
         unset($data['total']);
 
         return DB::transaction(function () use ($data) {
 
-            // 1) проверка пересечений
             $hasConflict = Booking::query()
                 ->where('room_id', $data['room_id'])
                 ->where('status', '!=', 'cancelled')
@@ -110,7 +107,6 @@ class BookingController extends Controller
                     ->withErrors(['date_from' => 'Номер уже занят на выбранные даты.']);
             }
 
-            // 2) расчёт проживания
             $room = Room::findOrFail($data['room_id']);
 
             $from = Carbon::parse($data['date_from']);
@@ -193,14 +189,12 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
-        // total не должен приходить из формы
         unset($data['total']);
 
         return DB::transaction(function () use ($request, $booking, $data) {
 
             $old = $booking->toArray();
 
-            // 1) проверка пересечений (исключая текущую бронь)
             $hasConflict = Booking::query()
                 ->where('room_id', $data['room_id'])
                 ->where('status', '!=', 'cancelled')
@@ -215,7 +209,6 @@ class BookingController extends Controller
                     ->withErrors(['date_from' => 'Номер уже занят на выбранные даты.']);
             }
 
-            // 2) проживание
             $room = Room::findOrFail($data['room_id']);
             $from = Carbon::parse($data['date_from']);
             $to   = Carbon::parse($data['date_to']);
@@ -223,7 +216,6 @@ class BookingController extends Controller
             $nights    = max(1, $from->diffInDays($to));
             $stayTotal = $nights * (float)$room->price_per_night;
 
-            // 3) sync услуг (snapshot price)
             $sync = [];
             foreach ($request->input('services', []) as $row) {
                 $serviceId = (int)($row['id'] ?? 0);
@@ -240,13 +232,10 @@ class BookingController extends Controller
                 ];
             }
 
-            // 4) обновляем бронь (без total)
             $booking->update($data);
 
-            // 5) услуги
             $booking->services()->sync($sync);
 
-            // 6) итог по услугам
             $booking->load('services');
             $servicesTotal = $booking->services->sum(function ($s) {
                 $qty = (int)($s->pivot->quantity ?? 0);
@@ -256,7 +245,6 @@ class BookingController extends Controller
 
             $booking->update(['total' => $stayTotal + $servicesTotal]);
 
-            // 7) авто-счёт при confirmed
             if ($booking->status === 'confirmed') {
                 $this->ensureInvoiceForBooking($booking);
             }
@@ -314,7 +302,6 @@ class BookingController extends Controller
             'note'       => 'Авто-счёт при подтверждении бронирования',
         ]);
 
-        // 1) проживание
         $nights    = max(1, $booking->date_from->diffInDays($booking->date_to));
         $stayPrice = (float)($booking->room->price_per_night ?? 0);
         $stayLine  = $nights * $stayPrice;
@@ -331,7 +318,6 @@ class BookingController extends Controller
             'total'       => $stayLine,
         ]);
 
-        // 2) услуги
         foreach ($booking->services as $service) {
             $qty = (int)($service->pivot->quantity ?? 0);
             if ($qty <= 0) continue;
@@ -384,7 +370,6 @@ class BookingController extends Controller
             $booking->update(['status' => 'checked_out']);
             logAudit('updated', $booking, $old, $booking->fresh()->toArray());
 
-            // закрываем счет, если paid
             $invoice = Invoice::where('booking_id', $booking->id)
                 ->with('payments')
                 ->first();
@@ -424,15 +409,13 @@ class BookingController extends Controller
 
     public function confirm(Booking $booking)
     {
-        // Проверяем, не в статусе ли оно уже
         if ($booking->status !== 'pending') {
             return back()->with('error', 'Подтвердить можно только заявки в ожидании.');
         }
 
-        // Проверка на пересечение дат, чтобы не подтвердить занятый номер
         $hasConflict = Booking::query()
             ->where('room_id', $booking->room_id)
-            ->where('status', 'confirmed') // Ищем именно среди подтвержденных
+            ->where('status', 'confirmed') 
             ->where('id', '!=', $booking->id)
             ->where('date_from', '<', $booking->date_to)
             ->where('date_to', '>', $booking->date_from)
@@ -446,12 +429,10 @@ class BookingController extends Controller
             $old = $booking->toArray();
             $booking->update(['status' => 'confirmed']);
             
-            // Автоматически создаем счет, как это было у вас в store()
             $this->ensureInvoiceForBooking($booking);
 
             logAudit('updated', $booking, $old, $booking->fresh()->toArray());
 
-            // Отправляем письмо, если есть email
             if ($booking->client->email) {
                 Mail::to($booking->client->email)->send(new BookingConfirmed($booking));
             }
@@ -472,7 +453,6 @@ class BookingController extends Controller
             
             logAudit('updated', $booking, $old, $booking->fresh()->toArray());
 
-            // Отправляем письмо с причиной
             if ($booking->client->email) {
                 Mail::to($booking->client->email)->send(new BookingCancelled($booking, $request->reason));
             }
