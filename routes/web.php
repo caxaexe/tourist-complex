@@ -166,6 +166,13 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])
             ->name('bookings.invoice.create');
+            
+        // ДОБАВЛЕНО ДЛЯ АДМИНА
+        Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])
+            ->name('bookings.confirm');
+
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])
+            ->name('bookings.cancel');
     });
 
     // STAFF ONLY
@@ -198,6 +205,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])
             ->name('bookings.invoice.create');
         
+        // ДОБАВЛЕНО ДЛЯ ПЕРСОНАЛА
         Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])
             ->name('bookings.confirm');
 
