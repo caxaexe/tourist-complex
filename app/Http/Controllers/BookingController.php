@@ -17,6 +17,9 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Requests\UpdateBookingRequest;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingConfirmed;
+use App\Mail\BookingCancelled;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -417,5 +420,64 @@ class BookingController extends Controller
 
         return redirect()->route($prefix . 'invoices.show', $booking->invoice)
             ->with('success', 'Счёт создан');
+    }
+
+    public function confirm(Booking $booking)
+    {
+        // Проверяем, не в статусе ли оно уже
+        if ($booking->status !== 'pending') {
+            return back()->with('error', 'Подтвердить можно только заявки в ожидании.');
+        }
+
+        // Проверка на пересечение дат, чтобы не подтвердить занятый номер
+        $hasConflict = Booking::query()
+            ->where('room_id', $booking->room_id)
+            ->where('status', 'confirmed') // Ищем именно среди подтвержденных
+            ->where('id', '!=', $booking->id)
+            ->where('date_from', '<', $booking->date_to)
+            ->where('date_to', '>', $booking->date_from)
+            ->exists();
+
+        if ($hasConflict) {
+            return back()->withErrors(['conflict' => 'Невозможно подтвердить: номер уже занят на эти даты.']);
+        }
+
+        return DB::transaction(function () use ($booking) {
+            $old = $booking->toArray();
+            $booking->update(['status' => 'confirmed']);
+            
+            // Автоматически создаем счет, как это было у вас в store()
+            $this->ensureInvoiceForBooking($booking);
+
+            logAudit('updated', $booking, $old, $booking->fresh()->toArray());
+
+            // Отправляем письмо, если есть email
+            if ($booking->client->email) {
+                Mail::to($booking->client->email)->send(new BookingConfirmed($booking));
+            }
+
+            return back()->with('success', 'Бронирование подтверждено, письмо отправлено.');
+        });
+    }
+
+    public function cancel(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:255'
+        ]);
+
+        return DB::transaction(function () use ($request, $booking) {
+            $old = $booking->toArray();
+            $booking->update(['status' => 'cancelled']);
+            
+            logAudit('updated', $booking, $old, $booking->fresh()->toArray());
+
+            // Отправляем письмо с причиной
+            if ($booking->client->email) {
+                Mail::to($booking->client->email)->send(new BookingCancelled($booking, $request->reason));
+            }
+
+            return back()->with('success', 'Бронирование отменено, клиент уведомлен.');
+        });
     }
 }

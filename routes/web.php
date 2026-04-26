@@ -197,6 +197,12 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])
             ->name('bookings.invoice.create');
+        
+        Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])
+            ->name('bookings.confirm');
+
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])
+            ->name('bookings.cancel');
     });
 
 });

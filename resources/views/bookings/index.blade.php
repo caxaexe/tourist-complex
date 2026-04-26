@@ -23,6 +23,22 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-900 dark:text-red-200">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-900 dark:text-red-200">
+                    <ul class="list-disc pl-5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
                 <a href="{{ route($prefix.'bookings.create') }}"
                    class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
@@ -212,6 +228,28 @@
                                 {{-- Действия --}}
                                 <td class="text-right whitespace-nowrap">
                                     <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
+                                        
+                                        @if($booking->status === 'pending')
+                                            {{-- Кнопка Подтвердить --}}
+                                            <form method="POST" action="{{ route($prefix.'bookings.confirm', $booking) }}" class="inline">
+                                                @csrf
+                                                <button class="px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                                                        onclick="return confirm('Подтвердить бронирование #{{ $booking->id }}?')">
+                                                    Подтвердить
+                                                </button>
+                                            </form>
+
+                                            {{-- Кнопка Отменить --}}
+                                            <form method="POST" action="{{ route($prefix.'bookings.cancel', $booking) }}" class="inline" id="cancel-form-{{$booking->id}}">
+                                                @csrf
+                                                <input type="hidden" name="reason" id="cancel-reason-{{$booking->id}}">
+                                                <button type="button" class="px-3 py-1 rounded bg-gray-500 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                                                        onclick="cancelBooking({{ $booking->id }})">
+                                                    Отменить
+                                                </button>
+                                            </form>
+                                        @endif
+
                                         <a class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700 dark:border-gray-700
                                                   text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
                                            href="{{ route($prefix.'bookings.edit', $booking) }}">
@@ -271,4 +309,19 @@
 
         </div>
     </div>
+
+    <script>
+        function cancelBooking(id) {
+            let reason = prompt('Пожалуйста, укажите причину отмены бронирования (она будет отправлена клиенту):');
+            
+            if (reason !== null) {
+                if (reason.trim() !== '') {
+                    document.getElementById('cancel-reason-' + id).value = reason;
+                    document.getElementById('cancel-form-' + id).submit();
+                } else {
+                    alert('Для отмены необходимо обязательно указать причину.');
+                }
+            }
+        }
+    </script>
 </x-app-layout>
