@@ -25,8 +25,6 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 /**
  * Главная страница (публичная):
- * - Гость: видит инфо + свои заявки (по guest_client_id в сессии) + кнопку входа + кнопку "Подать заявку"
- * - Staff/Admin: редирект на /dashboard (их рабочая зона)
  */
 Route::get('/', function (Request $request) {
 
@@ -59,15 +57,12 @@ Route::get('/', function (Request $request) {
         ->orderByDesc('id')
         ->get();
 
-    // ТУТ ты сделаешь resources/views/home.blade.php
-    // (или можешь временно вернуть view('my-bookings.index', ...) если хочешь без новой страницы)
     return view('home', compact('bookings'));
 })->name('home');
 
 
 /**
  * Backward compatibility:
- * старые ссылки на "клиентский кабинет" больше не нужны — ведём в /my-bookings
  */
 Route::redirect('/client/dashboard', '/my-bookings');
 Route::redirect('/client', '/my-bookings');
@@ -77,10 +72,6 @@ Route::redirect('/client/my-bookings/create', '/my-bookings/create');
 
 /**
  * /dashboard:
- * - гость -> главная /
- * - admin -> /admin/dashboard
- * - staff/employee -> /staff/dashboard
- * - прочие авторизованные -> /
  */
 Route::get('/dashboard', function () {
     $user = auth()->user();
@@ -95,26 +86,18 @@ Route::get('/dashboard', function () {
         return redirect()->route('admin.dashboard');
     }
 
-    // staff / employee
     if (method_exists($user, 'isStaff') ? $user->isStaff() : $user->hasAnyRole(['staff','employee'])) {
         return redirect()->route('staff.dashboard');
     }
 
-    // любые другие авторизованные роли -> публичная главная
     return redirect()->route('home');
 })->name('dashboard');
 
 
 // ===== CLIENT (ГОСТЕВОЙ по сессии) =====
-// Мои заявки: доступны гостю, не требуют логина
-Route::get('/my-bookings', [BookingRequestController::class, 'index'])
-    ->name('my.bookings.index');
-
-Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])
-    ->name('my.bookings.create');
-
-Route::post('/my-bookings', [BookingRequestController::class, 'store'])
-    ->name('my.bookings.store');
+Route::get('/my-bookings', [BookingRequestController::class, 'index'])->name('my.bookings.index');
+Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])->name('my.bookings.create');
+Route::post('/my-bookings', [BookingRequestController::class, 'store'])->name('my.bookings.store');
 
 
 // ==========================================================
@@ -133,15 +116,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/', fn () => redirect()->route('admin.dashboard'));
         Route::get('/dashboard', fn () => view('dashboards.admin'))->name('dashboard');
 
-        Route::resource('users', AdminUserController::class)
-            ->except(['show'])
-            ->names('users');
-
-        Route::get('/audit-logs', [AuditLogController::class, 'index'])
-            ->name('audit-logs.index');
-
-        Route::get('/reports', [ReportController::class, 'index'])
-            ->name('reports.index');
+        Route::resource('users', AdminUserController::class)->except(['show'])->names('users');
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
         Route::resource('clients', ClientController::class)->names('clients');
         Route::resource('room-types', RoomTypeController::class)->names('room-types');
@@ -151,28 +128,15 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('services', ServiceController::class)->names('services');
         Route::resource('invoices', InvoiceController::class)->names('invoices');
 
-        Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])
-            ->name('bookings.invoices.store');
+        Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])->name('bookings.invoices.store');
+        Route::resource('payments', PaymentController::class)->only(['index', 'create', 'store', 'destroy'])->names('payments');
 
-        Route::resource('payments', PaymentController::class)
-            ->only(['index', 'create', 'store', 'destroy'])
-            ->names('payments');
-
-        Route::post('/bookings/{booking}/check-in', [BookingController::class, 'checkIn'])
-            ->name('bookings.checkin');
-
-        Route::post('/bookings/{booking}/check-out', [BookingController::class, 'checkOut'])
-            ->name('bookings.checkout');
-
-        Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])
-            ->name('bookings.invoice.create');
+        Route::post('/bookings/{booking}/check-in', [BookingController::class, 'checkIn'])->name('bookings.checkin');
+        Route::post('/bookings/{booking}/check-out', [BookingController::class, 'checkOut'])->name('bookings.checkout');
+        Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])->name('bookings.invoice.create');
             
-        // ДОБАВЛЕНО ДЛЯ АДМИНА
-        Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])
-            ->name('bookings.confirm');
-
-        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])
-            ->name('bookings.cancel');
+        Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->name('bookings.confirm');
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     });
 
     // STAFF ONLY
@@ -189,28 +153,15 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('services', ServiceController::class)->names('services');
         Route::resource('invoices', InvoiceController::class)->names('invoices');
 
-        Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])
-            ->name('bookings.invoices.store');
+        Route::post('/bookings/{booking}/invoices', [BookingInvoiceController::class, 'store'])->name('bookings.invoices.store');
+        Route::resource('payments', PaymentController::class)->only(['index', 'create', 'store', 'destroy'])->names('payments');
 
-        Route::resource('payments', PaymentController::class)
-            ->only(['index', 'create', 'store', 'destroy'])
-            ->names('payments');
-
-        Route::post('/bookings/{booking}/check-in', [BookingController::class, 'checkIn'])
-            ->name('bookings.checkin');
-
-        Route::post('/bookings/{booking}/check-out', [BookingController::class, 'checkOut'])
-            ->name('bookings.checkout');
-
-        Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])
-            ->name('bookings.invoice.create');
+        Route::post('/bookings/{booking}/check-in', [BookingController::class, 'checkIn'])->name('bookings.checkin');
+        Route::post('/bookings/{booking}/check-out', [BookingController::class, 'checkOut'])->name('bookings.checkout');
+        Route::post('/bookings/{booking}/invoice', [BookingController::class, 'createInvoice'])->name('bookings.invoice.create');
         
-        // ДОБАВЛЕНО ДЛЯ ПЕРСОНАЛА
-        Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])
-            ->name('bookings.confirm');
-
-        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])
-            ->name('bookings.cancel');
+        Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->name('bookings.confirm');
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     });
 
 });
