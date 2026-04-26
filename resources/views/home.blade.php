@@ -263,7 +263,6 @@
             <div class="flex items-center gap-3">
                 <a href="#about" class="text-sm text-gray-300 hover:text-white hover:underline">Об отеле</a>
                 <a href="#contacts" class="text-sm text-gray-300 hover:text-white hover:underline">Контакты</a>
-                <a href="{{ route('my.bookings.index') }}" class="text-sm text-gray-300 hover:text-white hover:underline">Мои заявки</a>
             </div>
         </div>
     </footer>
