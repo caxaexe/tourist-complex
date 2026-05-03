@@ -5,12 +5,7 @@
                 Подать заявку на бронирование
             </h2>
 
-            <a href="{{ route('my.bookings.index') }}"
-               class="inline-flex items-center px-4 py-2 border rounded
-                      text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700
-                      hover:bg-gray-50 dark:hover:bg-gray-700/40">
-                ← Мои заявки
-            </a>
+
         </div>
     </x-slot>
 
@@ -22,7 +17,6 @@
                 <form method="POST" action="{{ route('my.bookings.store') }}" class="space-y-5">
                     @csrf
 
-                    {{-- ФИО (Новое поле) --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                             ФИО <span class="text-red-500">*</span>
@@ -30,7 +24,6 @@
                         <input type="text" name="full_name"
                                value="{{ old('full_name') }}"
                                required
-                               placeholder="Например: Иванов Иван Иванович"
                                class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
                                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
                                       focus:border-blue-500 focus:ring-blue-500">
@@ -41,7 +34,6 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                        {{-- Телефон --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Телефон <span class="text-red-500">*</span>
@@ -57,7 +49,6 @@
                             @enderror
                         </div>
 
-                        {{-- Email --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Email <span class="text-red-500">*</span>
@@ -75,7 +66,6 @@
 
                     </div>
 
-                    {{-- Номер --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                             Номер <span class="text-red-500">*</span>
@@ -103,7 +93,6 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                        {{-- Дата заезда --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Дата заезда <span class="text-red-500">*</span>
@@ -119,7 +108,6 @@
                             @enderror
                         </div>
 
-                        {{-- Дата выезда --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Дата выезда <span class="text-red-500">*</span>
@@ -137,7 +125,6 @@
 
                     </div>
 
-                    {{-- Комментарий --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                             Комментарий
