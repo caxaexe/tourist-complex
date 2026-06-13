@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-200 leading-tight">
-            {{ __('Номера и Удобства') }}
+            {{ __('Номера') }}
         </h2>
     </x-slot>
 
@@ -26,12 +26,12 @@
                                 <span class="text-lg font-bold text-green-400">
                                     @if($minPrice && $maxPrice)
                                         @if($minPrice == $maxPrice)
-                                            §{{ number_format($minPrice, 0, '.', ' ') }}
+                                            {{ number_format($minPrice, 0, '.', ' ') }} лей
                                         @else
-                                            §{{ number_format($minPrice, 0, '.', ' ') }} - лей{{ number_format($maxPrice, 0, '.', ' ') }}
+                                            {{ number_format($minPrice, 0, '.', ' ') }} - {{ number_format($maxPrice, 0, '.', ' ') }} лей
                                         @endif
                                     @else
-                                        §{{ number_format($type->base_price, 0, '.', ' ') }}
+                                        {{ number_format($type->base_price, 0, '.', ' ') }} лей
                                     @endif
                                     <span class="text-xs text-gray-500">/ сутки</span>
                                 </span>
@@ -42,7 +42,7 @@
             </div>
 
             <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-800">
-                <h3 class="text-lg font-bold text-white mb-4">Доступные Номера</h3>
+                <h3 class="text-lg font-bold text-white mb-4">Доступные номера</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @foreach($rooms as $room)
                         <div class="border border-gray-800 rounded-lg p-5 flex flex-col sm:flex-row gap-5 hover:border-gray-700 transition shadow-sm bg-gray-950/40">

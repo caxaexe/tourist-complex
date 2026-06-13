@@ -83,7 +83,7 @@
                                     @endif
 
                                     @if($room->roomType)
-                                        — {{ $room->roomType->name }}
+                                        - {{ $room->roomType->name }}
                                     @endif
 
                                     @if(isset($room->price_per_night))
