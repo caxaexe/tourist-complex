@@ -22,7 +22,6 @@
         financeOpen:false,
         adminOpen:false,
         myOpen:false,
-        catalogOpen:false,
         userMenu:false,
     }" class="bg-gray-950 border-b border-gray-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -209,10 +208,10 @@
                         </div>
                     </div>
                 @else
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('login') }}" class="text-sm text-gray-200 hover:text-white hover:underline">Login</a>
-                        <a href="{{ route('register') }}" class="text-sm text-gray-200 hover:text-white hover:underline">Register</a>
-                    </div>
+                    {{-- Здесь был блок с Login/Register. Теперь тут секретный пиксель-фантом для персонала --}}
+                    @if (Route::has('login'))
+                        <a href="{{ route('login') }}" class="w-2 h-2 block opacity-0 cursor-default select-none" title=""></a>
+                    @endif
                 @endif
             </div>
 
@@ -347,11 +346,6 @@
                             Выйти
                         </button>
                     </form>
-                </div>
-            @else
-                <div class="space-y-1">
-                    <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Login</a>
-                    <a href="{{ route('register') }}" class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Register</a>
                 </div>
             @endif
         </div>
