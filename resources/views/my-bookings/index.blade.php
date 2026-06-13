@@ -54,7 +54,7 @@
                                 </td>
 
                                 <td class="py-3 text-gray-800 dark:text-gray-200">
-                                    №{{ $b->room->number ?? '—' }}
+                                    №{{ $b->room->number ?? '-' }}
                                     @if($b->room?->roomType)
                                         <div class="text-xs text-gray-500 dark:text-gray-400">
                                             {{ $b->room->roomType->name }}
@@ -64,7 +64,7 @@
 
                                 <td class="py-3 text-gray-800 dark:text-gray-200">
                                     {{ optional($b->date_from)->format('d.m.Y') }}
-                                    —
+                                    -
                                     {{ optional($b->date_to)->format('d.m.Y') }}
                                 </td>
 
@@ -74,7 +74,7 @@
                                     </span>
                                 </td>
 
-                                <<td class="py-3 text-gray-800 dark:text-gray-200">
+                                <td class="py-3 text-gray-800 dark:text-gray-200">
                                     {{ number_format((float)$b->total, 2, '.', ' ') }} лей
                                 </td>
                             </tr>

@@ -39,10 +39,19 @@
                     <span style="color: #9ca3af;">Заезд:</span> 
                     <strong style="color: #f3f4f6;">{{ \Carbon\Carbon::parse($booking->date_from)->format('d.m.Y') }}</strong>
                 </li>
-                <li>
+                <li style="margin-bottom: 10px;">
                     <span style="color: #9ca3af;">Выезд:</span> 
                     <strong style="color: #f3f4f6;">{{ \Carbon\Carbon::parse($booking->date_to)->format('d.m.Y') }}</strong>
                 </li>
+
+                @if(!empty($booking->note))
+                    <li style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #374151;">
+                        <span style="color: #9ca3af; display: block; margin-bottom: 6px; font-size: 14px;">Пожелания гостя:</span>
+                        <div style="color: #d1d5db; font-style: italic; background-color: #111827; padding: 12px; border-radius: 4px; border: 1px solid #1f2937; line-height: 1.5; font-size: 14px;">
+                            {{ $booking->note }}
+                        </div>
+                    </li>
+                @endif
             </ul>
         </div>
 
