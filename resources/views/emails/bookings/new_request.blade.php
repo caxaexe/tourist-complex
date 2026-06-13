@@ -7,7 +7,7 @@
     <div style="max-width: 600px; margin: 0 auto; background-color: #111827; padding: 30px; border-radius: 8px; border: 1px solid #1f2937;">
         
         <h2 style="color: #60a5fa; margin-top: 0; border-bottom: 1px solid #1f2937; padding-bottom: 10px;">
-            🔮 Поступила новая заявка!
+            Поступила новая заявка!
         </h2>
         
         <p style="color: #9ca3af; font-size: 16px;">Уважаемый администратор,</p>

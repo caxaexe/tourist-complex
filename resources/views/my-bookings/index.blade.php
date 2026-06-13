@@ -74,8 +74,8 @@
                                     </span>
                                 </td>
 
-                                <td class="py-3 text-gray-800 dark:text-gray-200">
-                                    {{ number_format((float)$b->total, 2, '.', ' ') }}
+                                <<td class="py-3 text-gray-800 dark:text-gray-200">
+                                    {{ number_format((float)$b->total, 2, '.', ' ') }} лей
                                 </td>
                             </tr>
                         @empty

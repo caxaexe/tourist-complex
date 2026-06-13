@@ -24,158 +24,103 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
 
-            <div class="flex items-center gap-6">
+            {{-- ЛЕВАЯ ЧАСТЬ: Логотип --}}
+            <div class="flex items-center gap-1">
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2">
-                    <span class="text-gray-200 font-semibold">
+                    <span class="text-gray-200 font-semibold tracking-wide">
                         Castle Noctem
                     </span>
                 </a>
-
-                <div class="hidden sm:flex sm:items-center sm:space-x-2">
-
-                    @if(!$isStaffOrAdmin)
-                        <a href="{{ route('public.rooms') }}"
-                           class="px-3 py-2 rounded-md text-sm font-medium transition
-                           {{ request()->routeIs('public.rooms') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                            Номера и Удобства
-                        </a>
-                        <a href="{{ route('public.services') }}"
-                           class="px-3 py-2 rounded-md text-sm font-medium transition
-                           {{ request()->routeIs('public.services') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                            Услуги
-                        </a>
-                        {{-- Прямая ссылка на мои заявки вместо дропдауна --}}
-                        <a href="{{ route('my.bookings.index') }}"
-                           class="px-3 py-2 rounded-md text-sm font-medium transition
-                           {{ request()->routeIs('my.bookings.*') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                            Мои заявки
-                        </a>
-                    @endif
-
-                    @if($workPrefix)
-                        <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
-                            <button @click="dd=!dd"
-                                class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
-                                :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                                Номера
-                                <span class="text-gray-400">▾</span>
-                            </button>
-
-                            <div x-show="dd" x-transition @click.outside="dd=false"
-                                 class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                                <a href="{{ route($workPrefix.'room-types.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Типы номеров
-                                </a>
-                                <a href="{{ route($workPrefix.'rooms.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Номера
-                                </a>
-                                <a href="{{ route($workPrefix.'amenities.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Удобства
-                                </a>
-                                <a href="{{ route($workPrefix.'services.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Услуги
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
-                            <button @click="dd=!dd"
-                                class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
-                                :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                                Бронирование
-                                <span class="text-gray-400">▾</span>
-                            </button>
-
-                            <div x-show="dd" x-transition @click.outside="dd=false"
-                                 class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                                <a href="{{ route($workPrefix.'bookings.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Бронирования
-                                </a>
-                                <a href="{{ route($workPrefix.'clients.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Клиенты
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
-                            <button @click="dd=!dd"
-                                class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
-                                :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                                Финансы
-                                <span class="text-gray-400">▾</span>
-                            </button>
-
-                            <div x-show="dd" x-transition @click.outside="dd=false"
-                                 class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                                <a href="{{ route($workPrefix.'invoices.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Счета
-                                </a>
-                                <a href="{{ route($workPrefix.'payments.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Оплаты
-                                </a>
-                                @if($isAdmin && Route::has('admin.reports.index'))
-                                    <a href="{{ route('admin.reports.index') }}"
-                                       class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                        Отчёты
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-
-                        @if($isAdmin)
-                            <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
-                                <button @click="dd=!dd"
-                                    class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
-                                    :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                                    Администрирование
-                                    <span class="text-gray-400">▾</span>
-                                </button>
-
-                                <div x-show="dd" x-transition @click.outside="dd=false"
-                                     class="absolute z-50 mt-2 w-64 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                                    <a href="{{ route('admin.users.index') }}"
-                                       class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                        Персонал
-                                    </a>
-                                    <a href="{{ route('admin.audit-logs.index') }}"
-                                       class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                        Журнал действий
-                                    </a>
-                                </div>
-                            </div>
-                        @endif
-                    @endif
-
-                </div>
             </div>
 
-            <div class="hidden sm:flex sm:items-center">
+            {{-- ПРАВАЯ ЧАСТЬ: Навигация и профиль --}}
+            <div class="hidden sm:flex sm:items-center sm:gap-2">
+
+                @if(!$isStaffOrAdmin)
+                    <a href="{{ route('public.rooms') }}"
+                       class="px-3 py-2 rounded-md text-sm font-medium transition
+                       {{ request()->routeIs('public.rooms') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                        Номера и Удобства
+                    </a>
+                    <a href="{{ route('public.services') }}"
+                       class="px-3 py-2 rounded-md text-sm font-medium transition
+                       {{ request()->routeIs('public.services') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                        Услуги
+                    </a>
+                    <a href="{{ route('my.bookings.index') }}"
+                       class="px-3 py-2 rounded-md text-sm font-medium transition
+                       {{ request()->routeIs('my.bookings.*') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                        Мои заявки
+                    </a>
+                @endif
+
+                @if($workPrefix)
+                    {{-- Дропдаун: Номера --}}
+                    <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
+                        <button @click="dd=!dd" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition" :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
+                            Номера <span class="text-gray-400">▾</span>
+                        </button>
+                        <div x-show="dd" x-transition @click.outside="dd=false" class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
+                            <a href="{{ route($workPrefix.'room-types.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Типы номеров</a>
+                            <a href="{{ route($workPrefix.'rooms.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Номера</a>
+                            <a href="{{ route($workPrefix.'amenities.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Удобства</a>
+                            <a href="{{ route($workPrefix.'services.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Услуги</a>
+                        </div>
+                    </div>
+
+                    {{-- Дропдаун: Бронирование --}}
+                    <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
+                        <button @click="dd=!dd" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition" :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
+                            Бронирование <span class="text-gray-400">▾</span>
+                        </button>
+                        <div x-show="dd" x-transition @click.outside="dd=false" class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
+                            <a href="{{ route($workPrefix.'bookings.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Бронирования</a>
+                            <a href="{{ route($workPrefix.'clients.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Клиенты</a>
+                        </div>
+                    </div>
+
+                    {{-- Дропдаун: Финансы --}}
+                    <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
+                        <button @click="dd=!dd" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition" :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
+                            Финансы <span class="text-gray-400">▾</span>
+                        </button>
+                        <div x-show="dd" x-transition @click.outside="dd=false" class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
+                            <a href="{{ route($workPrefix.'invoices.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Счета</a>
+                            <a href="{{ route($workPrefix.'payments.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Оплаты</a>
+                            @if($isAdmin && Route::has('admin.reports.index'))
+                                <a href="{{ route('admin.reports.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Отчёты</a>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Дропдаун: Администрирование --}}
+                    @if($isAdmin)
+                        <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
+                            <button @click="dd=!dd" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition" :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
+                                Администрирование <span class="text-gray-400">▾</span>
+                            </button>
+                            <div x-show="dd" x-transition @click.outside="dd=false" class="absolute z-50 mt-2 w-64 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
+                                <a href="{{ route('admin.users.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Персонал</a>
+                                <a href="{{ route('admin.audit-logs.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Журнал действий</a>
+                            </div>
+                        </div>
+                    @endif
+                @endif
+
+                {{-- Профиль пользователя --}}
                 @if($isAuth)
-                    <div class="relative" @keydown.escape.window="userMenu=false">
+                    <div class="relative ml-2" @keydown.escape.window="userMenu=false">
                         <button @click="userMenu=!userMenu"
                                 class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition">
                             <span>{{ $u->name }}</span>
                             <span class="text-gray-400">▾</span>
                         </button>
-
                         <div x-show="userMenu" x-transition @click.outside="userMenu=false"
                              class="absolute right-0 mt-2 w-48 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                            <a href="{{ route('profile.edit') }}"
-                               class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                Профиль
-                            </a>
+                            <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Профиль</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit"
-                                        class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
                                     Выйти
                                 </button>
                             </form>
@@ -197,7 +142,6 @@
                     </svg>
                 </button>
             </div>
-
         </div>
     </div>
 

@@ -28,7 +28,7 @@
                                         @if($minPrice == $maxPrice)
                                             §{{ number_format($minPrice, 0, '.', ' ') }}
                                         @else
-                                            §{{ number_format($minPrice, 0, '.', ' ') }} - §{{ number_format($maxPrice, 0, '.', ' ') }}
+                                            §{{ number_format($minPrice, 0, '.', ' ') }} - лей{{ number_format($maxPrice, 0, '.', ' ') }}
                                         @endif
                                     @else
                                         §{{ number_format($type->base_price, 0, '.', ' ') }}
@@ -87,7 +87,7 @@
 
                                 <div class="mt-6 pt-3 border-t border-gray-900/60 flex justify-between items-center gap-4">
                                     <div class="flex flex-col">
-                                        <span class="text-xs text-gray-500">Вместимость: {{ $room->capacity ?? $room->roomType->max_capacity ?? 2 }} сим-гостя</span>
+                                        <span class="text-xs text-gray-500">Вместимость: {{ $room->capacity ?? $room->roomType->max_capacity ?? 2 }} человека</span>
                                         <span class="text-base font-bold text-green-400">§{{ number_format($room->price_per_night, 0, '.', ' ') }} <span class="text-xs text-gray-500">/ ночь</span></span>
                                     </div>
                                     

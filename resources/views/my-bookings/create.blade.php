@@ -72,16 +72,22 @@
                         </label>
                         <select name="room_id" required
                                 class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
-                                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                                       focus:border-blue-500 focus:ring-blue-500">
+                                    bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                                    focus:border-blue-500 focus:ring-blue-500">
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}" @selected(old('room_id') == $room->id)>
-                                    №{{ $room->number }}
+                                    @if($room->title)
+                                        {{ $room->title }} (№{{ $room->number }})
+                                    @else
+                                        Комната №{{ $room->number }}
+                                    @endif
+
                                     @if($room->roomType)
                                         — {{ $room->roomType->name }}
                                     @endif
+
                                     @if(isset($room->price_per_night))
-                                        ({{ number_format((float)$room->price_per_night, 2, '.', ' ') }}/ночь)
+                                        ({{ number_format((float)$room->price_per_night, 2, '.', ' ') }} лей/ночь)
                                     @endif
                                 </option>
                             @endforeach

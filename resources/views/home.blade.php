@@ -22,7 +22,6 @@
                         Castle Noctem
                     </span>
                 </a>
-                {{-- СЕКРЕТНАЯ ТОЧКА ВХОДА --}}
                 @if (!auth()->check() && Route::has('login'))
                     <a href="{{ route('login') }}" class="text-gray-600/30 hover:text-blue-500/50 transition-colors cursor-default text-sm select-none" title="">.</a>
                 @endif
@@ -49,9 +48,9 @@
                     Контакты
                 </a>
 
-                <a href="{{ route('my.bookings.create') }}"
-                   class="ml-2 inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
-                    Подать заявку
+                <a href="{{ route('my.bookings.index') }}"
+                    class="ml-2 inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+                    Мои заявки
                 </a>
 
                 @if (auth()->check())
@@ -72,9 +71,9 @@
                    class="px-2 py-1 rounded border border-gray-800 text-gray-300 text-xs hover:text-white">
                     Услуги
                 </a>
-                <a href="{{ route('my.bookings.create') }}"
-                   class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-sm">
-                    Заявка
+                <a href="{{ route('my.bookings.index') }}"
+                    class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-sm">
+                    Мои заявки
                 </a>
             </div>
         </div>
@@ -135,7 +134,6 @@
         </div>
     </section>
 
-    {{-- 2) ABOUT --}}
 <section id="about" class="py-20">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 
@@ -191,7 +189,6 @@
 </section>
 
 
-    {{-- 3) BOOKING BLOCK --}}
     <section class="py-20 border-t border-gray-900">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
