@@ -12,13 +12,30 @@
                 <h3 class="text-lg font-bold text-white mb-4">Категории номеров</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($roomTypes as $type)
+                        @php
+                            // Вычисляем минимальную и максимальную стоимость среди привязанных активных комнат
+                            $minPrice = $type->rooms->min('price_per_night');
+                            $maxPrice = $type->rooms->max('price_per_night');
+                        @endphp
+                        
                         <div class="border border-gray-800 rounded-lg p-4 bg-gray-950/50 shadow-sm flex flex-col justify-between">
                             <div>
                                 <h4 class="font-semibold text-xl text-blue-400">{{ $type->name }}</h4>
                                 <p class="text-gray-400 mt-2 text-sm">{{ $type->description }}</p>
                             </div>
                             <div class="mt-4 pt-2 border-t border-gray-800 flex justify-between items-center">
-                                <span class="text-lg font-bold text-green-400">§{{ number_format($type->base_price, 0, '.', ' ') }} <span class="text-xs text-gray-500">/ сутки</span></span>
+                                <span class="text-lg font-bold text-green-400">
+                                    @if($minPrice && $maxPrice)
+                                        @if($minPrice == $maxPrice)
+                                            §{{ number_format($minPrice, 0, '.', ' ') }}
+                                        @else
+                                            §{{ number_format($minPrice, 0, '.', ' ') }} - §{{ number_format($maxPrice, 0, '.', ' ') }}
+                                        @endif
+                                    @else
+                                        §{{ number_format($type->base_price, 0, '.', ' ') }}
+                                    @endif
+                                    <span class="text-xs text-gray-500">/ сутки</span>
+                                </span>
                             </div>
                         </div>
                     @endforeach
@@ -40,7 +57,6 @@
                             <div class="flex-1 flex flex-col justify-between">
                                 <div>
                                     <div class="flex justify-between items-start gap-2">
-                                        {{-- Вместо номера комнаты выводим Название (title) --}}
                                         <h4 class="text-xl font-bold text-white">
                                             {{ $room->title ?? 'Покои Замка' }}
                                         </h4>
@@ -49,7 +65,6 @@
                                         </span>
                                     </div>
                                     
-                                    {{-- Вместо этажа выводим Номер комнаты --}}
                                     <p class="text-sm text-gray-400 mt-1 font-medium">
                                         Комната №{{ $room->number }}
                                     </p>

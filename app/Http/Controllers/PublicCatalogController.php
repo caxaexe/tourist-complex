@@ -11,9 +11,11 @@ class PublicCatalogController extends Controller
 {
     public function rooms()
     {
-        // Используем is_active = true согласно вашей миграции комнат
         $rooms = Room::with(['roomType', 'amenities'])->where('is_active', true)->get();
-        $roomTypes = RoomType::with('rooms')->get();
+
+        $roomTypes = RoomType::with(['rooms' => function ($query) {
+            $query->where('is_active', true);
+        }])->get();
 
         return view('public.rooms', compact('rooms', 'roomTypes'));
     }
