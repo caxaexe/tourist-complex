@@ -8,8 +8,6 @@
 
     $workPrefix = $isAdmin ? 'admin.' : ($isStaff ? 'staff.' : null);
 
-    $dashboardUrl = $isStaffOrAdmin ? route('dashboard') : route('my.bookings.index');
-
     $isActivePrefix = function (string $prefix) {
         return request()->routeIs($prefix . '*');
     };
@@ -21,9 +19,8 @@
         bookingOpen:false,
         financeOpen:false,
         adminOpen:false,
-        myOpen:false,
         userMenu:false,
-    }" class="bg-gray-950 border-b border-gray-800">
+    }" class="sticky top-0 z-50 border-b border-gray-800/80 bg-gray-950/80 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
 
@@ -36,12 +33,6 @@
 
                 <div class="hidden sm:flex sm:items-center sm:space-x-2">
 
-                    <a href="{{ $dashboardUrl }}"
-                       class="px-3 py-2 rounded-md text-sm font-medium transition
-                       {{ (request()->routeIs('dashboard') || request()->routeIs('my.bookings.*')) ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                        Главная
-                    </a>
-
                     @if(!$isStaffOrAdmin)
                         <a href="{{ route('public.rooms') }}"
                            class="px-3 py-2 rounded-md text-sm font-medium transition
@@ -52,6 +43,12 @@
                            class="px-3 py-2 rounded-md text-sm font-medium transition
                            {{ request()->routeIs('public.services') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
                             Услуги
+                        </a>
+                        {{-- Прямая ссылка на мои заявки вместо дропдауна --}}
+                        <a href="{{ route('my.bookings.index') }}"
+                           class="px-3 py-2 rounded-md text-sm font-medium transition
+                           {{ request()->routeIs('my.bookings.*') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                            Мои заявки
                         </a>
                     @endif
 
@@ -157,29 +154,6 @@
                         @endif
                     @endif
 
-                    @if(!$isStaffOrAdmin)
-                        <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
-                            <button @click="dd=!dd"
-                                class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
-                                :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                                Мои заявки
-                                <span class="text-gray-400">▾</span>
-                            </button>
-
-                            <div x-show="dd" x-transition @click.outside="dd=false"
-                                 class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                                <a href="{{ route('my.bookings.index') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Список заявок
-                                </a>
-                                <a href="{{ route('my.bookings.create') }}"
-                                   class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Подать заявку
-                                </a>
-                            </div>
-                        </div>
-                    @endif
-
                 </div>
             </div>
 
@@ -208,7 +182,6 @@
                         </div>
                     </div>
                 @else
-                    {{-- Здесь был блок с Login/Register. Теперь тут секретный пиксель-фантом для персонала --}}
                     @if (Route::has('login'))
                         <a href="{{ route('login') }}" class="w-2 h-2 block opacity-0 cursor-default select-none" title=""></a>
                     @endif
@@ -231,12 +204,6 @@
     <div x-show="open" class="sm:hidden border-t border-gray-800">
         <div class="pt-2 pb-3 space-y-1 px-2">
 
-            <a href="{{ $dashboardUrl }}"
-               class="block px-3 py-2 rounded-md text-sm font-medium transition
-               {{ (request()->routeIs('dashboard') || request()->routeIs('my.bookings.*')) ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                Главная
-            </a>
-
             @if(!$isStaffOrAdmin)
                 <a href="{{ route('public.rooms') }}"
                    class="block px-3 py-2 rounded-md text-sm font-medium transition
@@ -247,6 +214,11 @@
                    class="block px-3 py-2 rounded-md text-sm font-medium transition
                    {{ request()->routeIs('public.services') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
                     Услуги
+                </a>
+                <a href="{{ route('my.bookings.index') }}"
+                   class="block px-3 py-2 rounded-md text-sm font-medium transition
+                   {{ request()->routeIs('my.bookings.*') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                    Мои заявки
                 </a>
             @endif
 
@@ -312,21 +284,6 @@
                         </div>
                     </div>
                 @endif
-            @endif
-
-            @if(!$isStaffOrAdmin)
-                <div class="space-y-1">
-                    <button @click="myOpen=!myOpen"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-md text-left text-gray-200 hover:text-white hover:bg-gray-800 transition">
-                        <span>Мои заявки</span><span class="text-gray-400" x-text="myOpen ? '▴' : '▾'"></span>
-                    </button>
-                    <div x-show="myOpen" class="pl-3 space-y-1">
-                        <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route('my.bookings.index') }}">Список заявок</a>
-                        <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route('my.bookings.create') }}">Подать заявку</a>
-                    </div>
-                </div>
             @endif
 
         </div>
