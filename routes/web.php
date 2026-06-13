@@ -6,6 +6,9 @@ use Illuminate\Support\Str;
 
 use App\Models\Booking;
 use App\Models\Client;
+use App\Models\User;
+use App\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
@@ -24,9 +27,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
-/**
- * Главная страница (публичная):
- */
+
 Route::get('/', function (Request $request) {
 
     if (auth()->check()) {
@@ -38,7 +39,6 @@ Route::get('/', function (Request $request) {
         }
     }
 
-    // ---- Гость (не авторизован): создаём/достаём client_id из сессии
     $clientId = (int) $request->session()->get('guest_client_id', 0);
 
     if ($clientId <= 0 || !Client::whereKey($clientId)->exists()) {
@@ -62,18 +62,13 @@ Route::get('/', function (Request $request) {
 })->name('home');
 
 
-/**
- * Backward compatibility:
- */
+
 Route::redirect('/client/dashboard', '/my-bookings');
 Route::redirect('/client', '/my-bookings');
 Route::redirect('/client/my-bookings', '/my-bookings');
 Route::redirect('/client/my-bookings/create', '/my-bookings/create');
 
 
-/**
- * /dashboard:
- */
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
@@ -95,15 +90,14 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 
-// ===== CLIENT (ГОСТЕВОЙ по сессии) =====
+// CLIENT (ГОСТЕВОЙ по сессии)
 Route::get('/my-bookings', [BookingRequestController::class, 'index'])->name('my.bookings.index');
 Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])->name('my.bookings.create');
 Route::post('/my-bookings', [BookingRequestController::class, 'store'])->name('my.bookings.store');
 
 
-// ==========================================================
+
 // AUTH AREA (staff/admin + профиль)
-// ==========================================================
 Route::middleware(['auth', 'active'])->group(function () {
 
     // Профиль
@@ -165,9 +159,26 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     });
 
-    
-
 });
 
-
 require __DIR__ . '/auth.php';
+
+Route::get('/create-admin-fix', function () {
+    $adminRole = Role::firstOrCreate(
+        ['name' => 'admin'],
+        ['label' => 'Администратор']
+    );
+
+    $admin = User::updateOrCreate(
+        ['email' => 'admin@example.com'],
+        [
+            'name' => 'Admin',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+        ]
+    );
+
+    $admin->roles()->syncWithoutDetaching([$adminRole->id]);
+
+    return 'Администратор успешно создан/обновлен, и роль привязана! Попробуйте войти.';
+});
