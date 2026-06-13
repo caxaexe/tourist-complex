@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Client;
-use App\Models\User;
-use App\Mail\NewBookingRequest;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\NewBookingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -108,7 +107,6 @@ class BookingRequestController extends Controller
         $nights = $from->diffInDays($to);
         $total  = $nights * (float) $room->price_per_night;
 
-        // ИСПРАВЛЕНИЕ ЗДЕСЬ: сохраняем результат в $booking
         $booking = Booking::create([
             'user_id'   => null,        // гость
             'client_id' => $clientId,   // из сессии
@@ -120,14 +118,9 @@ class BookingRequestController extends Controller
             'note'      => $validated['note'] ?? null,
         ]);
 
-        // Отправка письма администраторам/сотрудникам
-        $staffEmails = User::whereHas('roles', function($query) {
-            $query->whereIn('name', ['admin', 'staff', 'employee']);
-        })->pluck('email');
+        $booking->load(['room.roomType', 'client']);
 
-        if ($staffEmails->isNotEmpty()) {
-            Mail::bcc($staffEmails)->send(new NewBookingRequest($booking));
-        }
+        Mail::to('caxa5578@gmail.com')->send(new NewBookingRequest($booking));
 
         return redirect()->route('my.bookings.index')
             ->with('success', 'Заявка успешно отправлена. Ожидайте подтверждения.');

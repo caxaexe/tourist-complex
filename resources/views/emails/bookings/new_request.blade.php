@@ -12,7 +12,7 @@
         
         <p style="color: #9ca3af; font-size: 16px;">Уважаемый администратор,</p>
         <p style="color: #d1d5db; font-size: 15px; line-height: 1.6;">
-            В системе <strong>Castle Noctem</strong> только что зарегистрирована новая заявка на бронирование от гостя.
+            В системе <strong>Castle Noctem</strong> зарегистрирована новая заявка на бронирование от гостя.
         </p>
         
         <div style="background-color: #030712; padding: 20px; border-radius: 6px; border: 1px solid #1f2937; margin: 20px 0;">
@@ -31,15 +31,17 @@
                 </li>
                 <li style="margin-bottom: 10px; padding-top: 10px; border-top: 1px dashed #374151;">
                     <span style="color: #9ca3af;">Покои:</span> 
-                    <strong style="color: #60a5fa;">{{ $booking->room->title ?? 'Комната №' . ($booking->room->number ?? '') }}</strong>
+                    <strong style="color: #60a5fa;">
+                        {{ $booking->room->title ?? 'Покои Замка' }} (Комната №{{ $booking->room->number ?? '—' }})
+                    </strong>
                 </li>
                 <li style="margin-bottom: 10px;">
                     <span style="color: #9ca3af;">Заезд:</span> 
-                    <strong style="color: #f3f4f6;">{{ \Carbon\Carbon::parse($booking->check_in_date)->format('d.m.Y') }}</strong>
+                    <strong style="color: #f3f4f6;">{{ \Carbon\Carbon::parse($booking->date_from)->format('d.m.Y') }}</strong>
                 </li>
                 <li>
                     <span style="color: #9ca3af;">Выезд:</span> 
-                    <strong style="color: #f3f4f6;">{{ \Carbon\Carbon::parse($booking->check_out_date)->format('d.m.Y') }}</strong>
+                    <strong style="color: #f3f4f6;">{{ \Carbon\Carbon::parse($booking->date_to)->format('d.m.Y') }}</strong>
                 </li>
             </ul>
         </div>
