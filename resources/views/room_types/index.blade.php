@@ -5,8 +5,8 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
-            Тип номеров
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Тип номеров') }}
         </h2>
     </x-slot>
 
@@ -14,7 +14,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded">
+                <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded text-gray-800 dark:text-gray-200">
                     {{ session('success') }}
                 </div>
             @endif
@@ -22,46 +22,46 @@
             <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
                 <a href="{{ route($prefix.'room-types.create') }}"
                    class="sm:ml-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                    + Добавить тип
+                    {{ __('+ Добавить тип') }}
                 </a>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow rounded p-4 text-gray-800 dark:text-gray-200">
+            <div class="bg-white dark:bg-gray-800 shadow rounded p-4 overflow-auto text-gray-800 dark:text-gray-200">
                 <table class="w-full">
                     <thead>
-                        <tr class="text-left border-b border-gray-200 dark:border-gray-700 dark:border-gray-700">
-                            <th class="py-2 text-gray-700 dark:text-gray-200 dark:text-gray-200">ID</th>
-                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Название</th>
-                            <th class="text-gray-700 dark:text-gray-200 dark:text-gray-200">Описание</th>
-                            <th class="text-right text-gray-700 dark:text-gray-200 dark:text-gray-200">Действия</th>
+                        <tr class="text-left border-b border-gray-200 dark:border-gray-700">
+                            <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
+                            <th class="text-gray-700 dark:text-gray-200">{{ __('Название') }}</th>
+                            <th class="text-gray-700 dark:text-gray-200">{{ __('Описание') }}</th>
+                            <th class="text-right text-gray-700 dark:text-gray-200">{{ __('Действия') }}</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @forelse($roomTypes as $type)
-                            <tr class="border-b border-gray-200 dark:border-gray-700 dark:border-gray-700">
-                                <td class="py-2 text-gray-800 dark:text-gray-200 dark:text-gray-200">{{ $type->id }}</td>
+                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                <td class="py-2 text-gray-800 dark:text-gray-200">{{ $type->id }}</td>
 
-                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">{{ $type->name }}</td>
+                                <td class="text-gray-800 dark:text-gray-200">{{ $type->name }}</td>
 
-                                <td class="text-gray-800 dark:text-gray-200 dark:text-gray-200">
+                                <td class="text-gray-800 dark:text-gray-200">
                                     {{ $type->description ?? '—' }}
                                 </td>
 
                                 <td class="text-right whitespace-nowrap">
                                     <a href="{{ route($prefix.'room-types.edit', $type) }}"
                                        class="text-blue-600 dark:text-blue-300">
-                                        Редактировать
+                                        {{ __('Редактировать') }}
                                     </a>
 
                                     <form method="POST"
                                           action="{{ route($prefix.'room-types.destroy', $type) }}"
                                           class="inline"
-                                          onsubmit="return confirm('Удалить тип?')">
+                                          onsubmit="return confirm('{{ __('Удалить тип?') }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button class="text-red-600 dark:text-red-300 ml-3">
-                                            Удалить
+                                            {{ __('Удалить') }}
                                         </button>
                                     </form>
                                 </td>
@@ -69,7 +69,7 @@
                         @empty
                             <tr>
                                 <td colspan="4" class="py-4 text-center text-gray-500 dark:text-gray-400">
-                                    Нет типов номеров
+                                    {{ __('Нет типов номеров') }}
                                 </td>
                             </tr>
                         @endforelse

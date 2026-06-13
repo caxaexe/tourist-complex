@@ -9,7 +9,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-800">
                 <p class="text-gray-400 mb-6 text-sm md:text-base">
-                    Чтобы сделать ваше пребывание в Castle Noctem максимально запоминающимся, мы рады предложить вам спектр дополнительных услуг. Вы можете активировать их на стойке регистрации замка или указать при бронировании.
+                    {{ __('Чтобы сделать ваше пребывание в Castle Noctem максимально запоминающимся, мы рады предложить вам спектр дополнительных услуг. Вы можете активировать их на стойке регистрации замка или указать при бронировании.') }}
                 </p>
 
                 <div class="divide-y divide-gray-800">
@@ -30,12 +30,12 @@
 
                             <div class="text-right flex-shrink-0">
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-950 text-green-400 border border-green-900/50">
-                                    §{{ number_format($service->price, 0, '.', ' ') }}
+                                    {{ number_format($service->price, 0, '.', ' ') }} {{ __('лей') }}
                                 </span>
                             </div>
                         </div>
                     @empty
-                        <p class="text-gray-500 italic py-4 text-center">На данный момент список дополнительных услуг пуст.</p>
+                        <p class="text-gray-500 italic py-4 text-center">{{ __('На данный момент список дополнительных услуг пуст.') }}</p>
                     @endforelse
                 </div>
             </div>

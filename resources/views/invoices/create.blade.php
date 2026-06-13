@@ -5,8 +5,8 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
-            Создать счёт
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Создать счёт') }}
         </h2>
     </x-slot>
 
@@ -18,16 +18,16 @@
                     @csrf
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Выбери бронирование *</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200">{{ __('Выбери бронирование *') }}</label>
 
                         <select name="booking_id"
-                                class="border rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:text-gray-200 border-gray-200 dark:border-gray-700 dark:border-gray-700">
-                            <option value="">— выбрать —</option>
+                                class="border rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
+                            <option value="">{{ __('— выбрать —') }}</option>
                             @foreach($bookings as $b)
                                 <option value="{{ $b->id }}" @selected(old('booking_id') == $b->id)>
                                     #{{ $b->id }} — {{ $b->client->full_name ?? '—' }}
                                     ({{ $b->date_from?->format('d.m.Y') }}–{{ $b->date_to?->format('d.m.Y') }})
-                                    | status: {{ $b->status }}
+                                    | {{ __('статус:') }} {{ $b->status }}
                                 </option>
                             @endforeach
                         </select>
@@ -37,20 +37,20 @@
                         @enderror
 
                         @if($bookings->isEmpty())
-                            <div class="mt-3 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400">
-                                Нет броней без счета (или подходящих статусов). Создай бронь / подтверди бронь — и появится здесь.
+                            <div class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                                {{ __('Нет броней без счета (или подходящих статусов). Создай бронь / подтверди бронь — и появится здесь.') }}
                             </div>
                         @endif
                     </div>
 
                     <div class="flex gap-3">
                         <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                            Создать
+                            {{ __('Создать') }}
                         </button>
 
                         <a href="{{ route($prefix.'invoices.index') }}"
-                           class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200 dark:text-gray-200 border-gray-200 dark:border-gray-700 dark:border-gray-700">
-                            Назад
+                           class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">
+                            {{ __('Назад') }}
                         </a>
                     </div>
                 </form>

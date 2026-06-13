@@ -2,19 +2,19 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">
-                Персонал
+                {{ __('Персонал') }}
             </h2>
 
             <div class="flex gap-2">
                 <form method="GET" class="flex gap-2">
-                    <input name="q" value="{{ $q }}" placeholder="Поиск..."
+                    <input name="q" value="{{ $q }}" placeholder="{{ __('Поиск...') }}"
                            class="border border-gray-300 dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <button class="px-3 py-2 border rounded">Найти</button>
+                    <button class="px-3 py-2 border rounded">{{ __('Найти') }}</button>
                 </form>
 
                 <a href="{{ route('admin.users.create') }}"
                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                    + Добавить
+                    {{ __('+ Добавить') }}
                 </a>
             </div>
         </div>
@@ -33,13 +33,13 @@
                 <thead>
                     <tr class="text-left border-b">
                         <th class="py-2">ID</th>
-                        <th>Имя</th>
-                        <th>Email</th>
-                        <th>Роли</th>
-                        <th>Должность</th>
-                        <th>ЗП</th>
-                        <th>Активен</th>
-                        <th class="text-right">Действия</th>
+                        <th>{{ __('Имя') }}</th>
+                        <th>{{ __('Email') }}</th>
+                        <th>{{ __('Роли') }}</th>
+                        <th>{{ __('Должность') }}</th>
+                        <th>{{ __('ЗП') }}</th>
+                        <th>{{ __('Активен') }}</th>
+                        <th class="text-right">{{ __('Действия') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,26 +58,26 @@
                         <td>{{ $u->salary !== null ? number_format($u->salary,2,'.',' ') : '—' }}</td>
                         <td>
                             @if($u->is_active)
-                                <span class="px-2 py-1 rounded bg-green-100 text-green-800 text-sm">да</span>
+                                <span class="px-2 py-1 rounded bg-green-100 text-green-800 text-sm">{{ __('да') }}</span>
                             @else
-                                <span class="px-2 py-1 rounded bg-gray-200 text-gray-800 dark:text-gray-200 text-sm">нет</span>
+                                <span class="px-2 py-1 rounded bg-gray-200 text-gray-800 dark:text-gray-200 text-sm">{{ __('нет') }}</span>
                             @endif
                         </td>
                         <td class="text-right">
-                            <a class="text-blue-600" href="{{ route('admin.users.edit', $u) }}">Редактировать</a>
+                            <a class="text-blue-600" href="{{ route('admin.users.edit', $u) }}">{{ __('Редактировать') }}</a>
 
                             <form class="inline"
                                   method="POST"
                                   action="{{ route('admin.users.destroy', $u) }}"
-                                  onsubmit="return confirm('Удалить пользователя?')">
+                                  onsubmit="return confirm('{{ __('Удалить пользователя?') }}')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="text-red-600 ml-3">Удалить</button>
+                                <button class="text-red-600 ml-3">{{ __('Удалить') }}</button>
                             </form>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="py-4 text-center text-gray-500 dark:text-gray-400">Нет пользователей</td></tr>
+                    <tr><td colspan="8" class="py-4 text-center text-gray-500 dark:text-gray-400">{{ __('Нет пользователей') }}</td></tr>
                 @endforelse
                 </tbody>
             </table>

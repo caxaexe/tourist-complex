@@ -5,8 +5,8 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
-            Создать бронирование
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Создать бронирование') }}
         </h2>
     </x-slot>
 
@@ -19,9 +19,9 @@
 
                     {{-- Клиент --}}
                     <div>
-                        <label class="block mb-1">Клиент *</label>
+                        <label class="block mb-1 text-gray-800 dark:text-gray-200">{{ __('Клиент *') }}</label>
                         <select name="client_id" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">— выбрать —</option>
+                            <option value="">{{ __('— выбрать —') }}</option>
                             @foreach($clients as $client)
                                 <option value="{{ $client->id }}"
                                     @selected(old('client_id') == $client->id)>
@@ -34,14 +34,14 @@
 
                     {{-- Номер --}}
                     <div>
-                        <label class="block mb-1">Номер *</label>
+                        <label class="block mb-1 text-gray-800 dark:text-gray-200">{{ __('Номер *') }}</label>
                         <select name="room_id" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">— выбрать —</option>
+                            <option value="">{{ __('— выбрать —') }}</option>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}"
                                     @selected(old('room_id') == $room->id)>
                                     №{{ $room->number }}
-                                    ({{ $room->roomType?->name ?? 'без типа' }})
+                                    ({{ $room->roomType?->name ?? __('без типа') }})
                                 </option>
                             @endforeach
                         </select>
@@ -51,7 +51,7 @@
                     {{-- Даты --}}
                     <div class="flex gap-4">
                         <div class="w-1/2">
-                            <label class="block mb-1">Дата заезда *</label>
+                            <label class="block mb-1 text-gray-800 dark:text-gray-200">{{ __('Дата заезда *') }}</label>
                             <input type="date"
                                    name="date_from"
                                    value="{{ old('date_from') }}"
@@ -60,7 +60,7 @@
                         </div>
 
                         <div class="w-1/2">
-                            <label class="block mb-1">Дата выезда *</label>
+                            <label class="block mb-1 text-gray-800 dark:text-gray-200">{{ __('Дата выезда *') }}</label>
                             <input type="date"
                                    name="date_to"
                                    value="{{ old('date_to') }}"
@@ -71,7 +71,7 @@
 
                     {{-- Статус --}}
                     <div>
-                        <label class="block mb-1">Статус</label>
+                        <label class="block mb-1 text-gray-800 dark:text-gray-200">{{ __('Статус') }}</label>
                         <select name="status" class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="pending">pending</option>
                             <option value="confirmed">confirmed</option>
@@ -83,7 +83,7 @@
 
                     {{-- Примечание --}}
                     <div>
-                        <label class="block mb-1">Примечание</label>
+                        <label class="block mb-1 text-gray-800 dark:text-gray-200">{{ __('Примечание') }}</label>
                         <textarea name="note"
                                   class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                   rows="3">{{ old('note') }}</textarea>
@@ -92,11 +92,11 @@
 
                     <div class="flex gap-3">
                         <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                            Сохранить
+                            {{ __('Сохранить') }}
                         </button>
                         <a href="{{ route($prefix.'bookings.index') }}"
-                           class="px-4 py-2 border rounded">
-                            Назад
+                           class="px-4 py-2 border rounded text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700">
+                            {{ __('Назад') }}
                         </a>
                     </div>
 

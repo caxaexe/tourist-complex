@@ -40,17 +40,17 @@
                     <a href="{{ route('public.rooms') }}"
                        class="px-3 py-2 rounded-md text-sm font-medium transition
                        {{ request()->routeIs('public.rooms') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                        Номера и Удобства
+                        {{ __('Номера и Удобства') }}
                     </a>
                     <a href="{{ route('public.services') }}"
                        class="px-3 py-2 rounded-md text-sm font-medium transition
                        {{ request()->routeIs('public.services') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                        Услуги
+                        {{ __('Услуги') }}
                     </a>
                     <a href="{{ route('my.bookings.index') }}"
                        class="px-3 py-2 rounded-md text-sm font-medium transition
                        {{ request()->routeIs('my.bookings.*') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                        Мои заявки
+                        {{ __('Мои заявки') }}
                     </a>
                 @endif
 
@@ -58,37 +58,37 @@
                     {{-- Дропдаун: Номера --}}
                     <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                         <button @click="dd=!dd" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition" :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                            Номера <span class="text-gray-400">▾</span>
+                            {{ __('Номера') }} <span class="text-gray-400">▾</span>
                         </button>
                         <div x-show="dd" x-transition @click.outside="dd=false" class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                            <a href="{{ route($workPrefix.'room-types.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Типы номеров</a>
-                            <a href="{{ route($workPrefix.'rooms.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Номера</a>
-                            <a href="{{ route($workPrefix.'amenities.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Удобства</a>
-                            <a href="{{ route($workPrefix.'services.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Услуги</a>
+                            <a href="{{ route($workPrefix.'room-types.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Типы номеров') }}</a>
+                            <a href="{{ route($workPrefix.'rooms.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Номера') }}</a>
+                            <a href="{{ route($workPrefix.'amenities.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Удобства') }}</a>
+                            <a href="{{ route($workPrefix.'services.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Услуги') }}</a>
                         </div>
                     </div>
 
                     {{-- Дропдаун: Бронирование --}}
                     <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                         <button @click="dd=!dd" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition" :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                            Бронирование <span class="text-gray-400">▾</span>
+                            {{ __('Бронирование') }} <span class="text-gray-400">▾</span>
                         </button>
                         <div x-show="dd" x-transition @click.outside="dd=false" class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                            <a href="{{ route($workPrefix.'bookings.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Бронирования</a>
-                            <a href="{{ route($workPrefix.'clients.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Клиенты</a>
+                            <a href="{{ route($workPrefix.'bookings.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Бронирования') }}</a>
+                            <a href="{{ route($workPrefix.'clients.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Клиенты') }}</a>
                         </div>
                     </div>
 
                     {{-- Дропдаун: Финансы --}}
                     <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                         <button @click="dd=!dd" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition" :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                            Финансы <span class="text-gray-400">▾</span>
+                            {{ __('Финансы') }} <span class="text-gray-400">▾</span>
                         </button>
                         <div x-show="dd" x-transition @click.outside="dd=false" class="absolute z-50 mt-2 w-56 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                            <a href="{{ route($workPrefix.'invoices.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Счета</a>
-                            <a href="{{ route($workPrefix.'payments.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Оплаты</a>
+                            <a href="{{ route($workPrefix.'invoices.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Счета') }}</a>
+                            <a href="{{ route($workPrefix.'payments.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Оплаты') }}</a>
                             @if($isAdmin && Route::has('admin.reports.index'))
-                                <a href="{{ route('admin.reports.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Отчёты</a>
+                                <a href="{{ route('admin.reports.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Отчёты') }}</a>
                             @endif
                         </div>
                     </div>
@@ -97,15 +97,26 @@
                     @if($isAdmin)
                         <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                             <button @click="dd=!dd" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition" :class="dd ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800'">
-                                Администрирование <span class="text-gray-400">▾</span>
+                                {{ __('Администрирование') }} <span class="text-gray-400">▾</span>
                             </button>
                             <div x-show="dd" x-transition @click.outside="dd=false" class="absolute z-50 mt-2 w-64 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                                <a href="{{ route('admin.users.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Персонал</a>
-                                <a href="{{ route('admin.audit-logs.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Журнал действий</a>
+                                <a href="{{ route('admin.users.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Персонал') }}</a>
+                                <a href="{{ route('admin.audit-logs.index') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Журнал действий') }}</a>
                             </div>
                         </div>
                     @endif
                 @endif
+
+                <div class="relative ml-2" x-data="{ langMenu: false }" @keydown.escape.window="langMenu=false">
+                    <button @click="langMenu=!langMenu" class="inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition uppercase">
+                        {{ app()->getLocale() }} <span class="text-gray-400">▾</span>
+                    </button>
+                    <div x-show="langMenu" x-transition @click.outside="langMenu=false" class="absolute right-0 mt-2 w-32 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden z-50">
+                        <a href="{{ route('lang.switch', 'ru') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white {{ app()->getLocale() === 'ru' ? 'bg-gray-800 text-white font-bold' : '' }}">Русский</a>
+                        <a href="{{ route('lang.switch', 'ro') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white {{ app()->getLocale() === 'ro' ? 'bg-gray-800 text-white font-bold' : '' }}">Română</a>
+                        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white {{ app()->getLocale() === 'en' ? 'bg-gray-800 text-white font-bold' : '' }}">English</a>
+                    </div>
+                </div>
 
                 {{-- Профиль пользователя --}}
                 @if($isAuth)
@@ -117,11 +128,11 @@
                         </button>
                         <div x-show="userMenu" x-transition @click.outside="userMenu=false"
                              class="absolute right-0 mt-2 w-48 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden">
-                            <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Профиль</a>
+                            <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">{{ __('Профиль') }}</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                                    Выйти
+                                    {{ __('Выйти') }}
                                 </button>
                             </form>
                         </div>
@@ -152,17 +163,17 @@
                 <a href="{{ route('public.rooms') }}"
                    class="block px-3 py-2 rounded-md text-sm font-medium transition
                    {{ request()->routeIs('public.rooms') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                    Номера и Удобства
+                    {{ __('Номера и Удобства') }}
                 </a>
                 <a href="{{ route('public.services') }}"
                    class="block px-3 py-2 rounded-md text-sm font-medium transition
                    {{ request()->routeIs('public.services') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                    Услуги
+                    {{ __('Услуги') }}
                 </a>
                 <a href="{{ route('my.bookings.index') }}"
                    class="block px-3 py-2 rounded-md text-sm font-medium transition
                    {{ request()->routeIs('my.bookings.*') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
-                    Мои заявки
+                    {{ __('Мои заявки') }}
                 </a>
             @endif
 
@@ -170,46 +181,46 @@
                 <div class="space-y-1">
                     <button @click="roomsOpen=!roomsOpen"
                             class="w-full flex items-center justify-between px-3 py-2 rounded-md text-left text-gray-200 hover:text-white hover:bg-gray-800 transition">
-                        <span>Номера</span><span class="text-gray-400" x-text="roomsOpen ? '▴' : '▾'"></span>
+                        <span>{{ __('Номера') }}</span><span class="text-gray-400" x-text="roomsOpen ? '▴' : '▾'"></span>
                     </button>
                     <div x-show="roomsOpen" class="pl-3 space-y-1">
                         <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route($workPrefix.'room-types.index') }}">Типы номеров</a>
+                           href="{{ route($workPrefix.'room-types.index') }}">{{ __('Типы номеров') }}</a>
                         <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route($workPrefix.'rooms.index') }}">Номера</a>
+                           href="{{ route($workPrefix.'rooms.index') }}">{{ __('Номера') }}</a>
                         <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route($workPrefix.'amenities.index') }}">Удобства</a>
+                           href="{{ route($workPrefix.'amenities.index') }}">{{ __('Удобства') }}</a>
                         <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route($workPrefix.'services.index') }}">Услуги</a>
+                           href="{{ route($workPrefix.'services.index') }}">{{ __('Услуги') }}</a>
                     </div>
                 </div>
 
                 <div class="space-y-1">
                     <button @click="bookingOpen=!bookingOpen"
                             class="w-full flex items-center justify-between px-3 py-2 rounded-md text-left text-gray-200 hover:text-white hover:bg-gray-800 transition">
-                        <span>Бронирование</span><span class="text-gray-400" x-text="bookingOpen ? '▴' : '▾'"></span>
+                        <span>{{ __('Бронирование') }}</span><span class="text-gray-400" x-text="bookingOpen ? '▴' : '▾'"></span>
                     </button>
                     <div x-show="bookingOpen" class="pl-3 space-y-1">
                         <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route($workPrefix.'bookings.index') }}">Бронирования</a>
+                           href="{{ route($workPrefix.'bookings.index') }}">{{ __('Бронирования') }}</a>
                         <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route($workPrefix.'clients.index') }}">Клиенты</a>
+                           href="{{ route($workPrefix.'clients.index') }}">{{ __('Клиенты') }}</a>
                     </div>
                 </div>
 
                 <div class="space-y-1">
                     <button @click="financeOpen=!financeOpen"
                             class="w-full flex items-center justify-between px-3 py-2 rounded-md text-left text-gray-200 hover:text-white hover:bg-gray-800 transition">
-                        <span>Финансы</span><span class="text-gray-400" x-text="financeOpen ? '▴' : '▾'"></span>
+                        <span>{{ __('Финансы') }}</span><span class="text-gray-400" x-text="financeOpen ? '▴' : '▾'"></span>
                     </button>
                     <div x-show="financeOpen" class="pl-3 space-y-1">
                         <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route($workPrefix.'invoices.index') }}">Счета</a>
+                           href="{{ route($workPrefix.'invoices.index') }}">{{ __('Счета') }}</a>
                         <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                           href="{{ route($workPrefix.'payments.index') }}">Оплаты</a>
+                           href="{{ route($workPrefix.'payments.index') }}">{{ __('Оплаты') }}</a>
                         @if($isAdmin && Route::has('admin.reports.index'))
                             <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                               href="{{ route('admin.reports.index') }}">Отчёты</a>
+                               href="{{ route('admin.reports.index') }}">{{ __('Отчёты') }}</a>
                         @endif
                     </div>
                 </div>
@@ -218,13 +229,13 @@
                     <div class="space-y-1">
                         <button @click="adminOpen=!adminOpen"
                                 class="w-full flex items-center justify-between px-3 py-2 rounded-md text-left text-gray-200 hover:text-white hover:bg-gray-800 transition">
-                            <span>Администрирование</span><span class="text-gray-400" x-text="adminOpen ? '▴' : '▾'"></span>
+                            <span>{{ __('Администрирование') }}</span><span class="text-gray-400" x-text="adminOpen ? '▴' : '▾'"></span>
                         </button>
                         <div x-show="adminOpen" class="pl-3 space-y-1">
                             <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                               href="{{ route('admin.users.index') }}">Персонал</a>
+                               href="{{ route('admin.users.index') }}">{{ __('Персонал') }}</a>
                             <a class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-                               href="{{ route('admin.audit-logs.index') }}">Журнал действий</a>
+                               href="{{ route('admin.audit-logs.index') }}">{{ __('Журнал действий') }}</a>
                         </div>
                     </div>
                 @endif
@@ -239,12 +250,12 @@
 
                 <div class="mt-3 space-y-1">
                     <a href="{{ route('profile.edit') }}" class="block px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                        Профиль
+                        {{ __('Профиль') }}
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="w-full text-left px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-800 hover:text-white">
-                            Выйти
+                            {{ __('Выйти') }}
                         </button>
                     </form>
                 </div>

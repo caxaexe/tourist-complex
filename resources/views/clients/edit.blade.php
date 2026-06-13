@@ -5,8 +5,8 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 dark:text-gray-200 leading-tight">
-            Редактировать клиента #{{ $client->id }}
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Редактировать клиента #') }}{{ $client->id }}
         </h2>
     </x-slot>
 
@@ -19,7 +19,7 @@
                     @method('PUT')
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">ФИО *</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200">{{ __('ФИО *') }}</label>
                         <input name="full_name"
                                value="{{ old('full_name', $client->full_name) }}"
                                class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -27,7 +27,7 @@
                     </div>
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Телефон</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200">{{ __('Телефон') }}</label>
                         <input name="phone"
                                value="{{ old('phone', $client->phone) }}"
                                class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -35,7 +35,7 @@
                     </div>
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Email</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200">{{ __('Email') }}</label>
                         <input name="email"
                                value="{{ old('email', $client->email) }}"
                                class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -44,14 +44,14 @@
 
                     <div class="flex gap-4">
                         <div class="w-1/2">
-                            <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Серия паспорта</label>
+                            <label class="block mb-1 text-gray-700 dark:text-gray-200">{{ __('Серия паспорта') }}</label>
                             <input name="passport_series"
                                    value="{{ old('passport_series', $client->passport_series) }}"
                                    class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             @error('passport_series') <div class="text-red-600">{{ $message }}</div> @enderror
                         </div>
                         <div class="w-1/2">
-                            <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Номер паспорта</label>
+                            <label class="block mb-1 text-gray-700 dark:text-gray-200">{{ __('Номер паспорта') }}</label>
                             <input name="passport_number"
                                    value="{{ old('passport_number', $client->passport_number) }}"
                                    class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -60,7 +60,7 @@
                     </div>
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Дата рождения</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200">{{ __('Дата рождения') }}</label>
                         <input type="date"
                                name="birth_date"
                                value="{{ old('birth_date', $client->birth_date) }}"
@@ -69,7 +69,7 @@
                     </div>
 
                     <div>
-                        <label class="block mb-1 text-gray-700 dark:text-gray-200 dark:text-gray-200">Адрес</label>
+                        <label class="block mb-1 text-gray-700 dark:text-gray-200">{{ __('Адрес') }}</label>
                         <textarea name="address"
                                   class="border border-gray-300 dark:border-gray-700 rounded w-full px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                   rows="3">{{ old('address', $client->address) }}</textarea>
@@ -78,11 +78,11 @@
 
                     <div class="flex gap-3">
                         <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                            Сохранить
+                            {{ __('Сохранить') }}
                         </button>
                         <a href="{{ route($prefix.'clients.index') }}"
-                           class="px-4 py-2 border rounded text-gray-700 dark:text-gray-200 dark:text-gray-200">
-                            Назад
+                           class="px-4 py-2 border rounded text-gray-700 dark:text-gray-200">
+                            {{ __('Назад') }}
                         </a>
                     </div>
 

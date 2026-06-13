@@ -2,10 +2,8 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                Подать заявку на бронирование
+                {{ __('Подать заявку на бронирование') }}
             </h2>
-
-
         </div>
     </x-slot>
 
@@ -19,7 +17,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            ФИО <span class="text-red-500">*</span>
+                            {{ __('ФИО') }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="full_name"
                                value="{{ old('full_name') }}"
@@ -36,7 +34,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Телефон <span class="text-red-500">*</span>
+                                {{ __('Телефон') }} <span class="text-red-500">*</span>
                             </label>
                             <input type="text" name="phone"
                                    value="{{ old('phone') }}"
@@ -51,7 +49,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Email <span class="text-red-500">*</span>
+                                {{ __('Email') }} <span class="text-red-500">*</span>
                             </label>
                             <input type="email" name="email"
                                    value="{{ old('email') }}"
@@ -68,7 +66,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            Номер <span class="text-red-500">*</span>
+                            {{ __('Номер *') }}
                         </label>
                         <select name="room_id" required
                                 class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
@@ -77,9 +75,9 @@
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}" @selected(old('room_id') == $room->id)>
                                     @if($room->title)
-                                        {{ $room->title }} (№{{ $room->number }})
+                                        {{ $room->title }} ({{ __('Комната №') }}{{ $room->number }})
                                     @else
-                                        Комната №{{ $room->number }}
+                                        {{ __('Комната №') }}{{ $room->number }}
                                     @endif
 
                                     @if($room->roomType)
@@ -87,7 +85,7 @@
                                     @endif
 
                                     @if(isset($room->price_per_night))
-                                        ({{ number_format((float)$room->price_per_night, 2, '.', ' ') }} лей/ночь)
+                                        ({{ number_format((float)$room->price_per_night, 2, '.', ' ') }} {{ __('лей/ночь') }})
                                     @endif
                                 </option>
                             @endforeach
@@ -101,7 +99,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Дата заезда <span class="text-red-500">*</span>
+                                {{ __('Дата заезда *') }}
                             </label>
                             <input type="date" name="date_from"
                                    value="{{ old('date_from') }}"
@@ -116,7 +114,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Дата выезда <span class="text-red-500">*</span>
+                                {{ __('Дата выезда *') }}
                             </label>
                             <input type="date" name="date_to"
                                    value="{{ old('date_to') }}"
@@ -133,13 +131,13 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            Комментарий
+                            {{ __('Комментарий') }}
                         </label>
                         <textarea name="note" rows="4"
                                   class="mt-1 w-full rounded border-gray-300 dark:border-gray-700
                                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
                                          focus:border-blue-500 focus:ring-blue-500"
-                                  placeholder="Например: поздний заезд, пожелания по номеру...">{{ old('note') }}</textarea>
+                                  placeholder="{{ __('Например: поздний заезд, пожелания по номеру...') }}">{{ old('note') }}</textarea>
                         @error('note')
                             <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
                         @enderror
@@ -151,14 +149,14 @@
                                   border-gray-200 dark:border-gray-700
                                   text-gray-700 dark:text-gray-200
                                   hover:bg-gray-50 dark:hover:bg-gray-700/40">
-                            Отмена
+                            {{ __('Отмена') }}
                         </a>
 
                         <button type="submit"
                                 class="inline-flex justify-center px-5 py-2 rounded bg-blue-600 text-white
                                        hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
                                        focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                            Отправить заявку
+                            {{ __('Отправить заявку') }}
                         </button>
                     </div>
 
