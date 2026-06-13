@@ -112,9 +112,9 @@
                         {{ app()->getLocale() }} <span class="text-gray-400">▾</span>
                     </button>
                     <div x-show="langMenu" x-transition @click.outside="langMenu=false" class="absolute right-0 mt-2 w-32 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden z-50">
-                        <a href="{{ route('lang.switch', 'ru') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white {{ app()->getLocale() === 'ru' ? 'bg-gray-800 text-white font-bold' : '' }}">Русский</a>
-                        <a href="{{ route('lang.switch', 'ro') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white {{ app()->getLocale() === 'ro' ? 'bg-gray-800 text-white font-bold' : '' }}">Română</a>
-                        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white {{ app()->getLocale() === 'en' ? 'bg-gray-800 text-white font-bold' : '' }}">English</a>
+                        <a href="{{ route('lang.switch', 'ru') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Русский</a>
+                        <a href="{{ route('lang.switch', 'ro') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">Română</a>
+                        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white">English</a>
                     </div>
                 </div>
 

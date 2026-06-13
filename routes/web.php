@@ -90,6 +90,13 @@ Route::get('/dashboard', function () {
     return redirect()->route('home');
 })->name('dashboard');
 
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['ru', 'ro', 'en'])) {
+        session()->put('locale', $locale);
+    }
+    return redirect()->back();
+})->name('lang.switch');
+
 
 // CLIENT (ГОСТЕВОЙ по сессии)
 Route::get('/rooms', [PublicCatalogController::class, 'rooms'])->name('public.rooms');
