@@ -22,11 +22,23 @@
                 </span>
             </a>
 
+            {{-- Десктопное меню --}}
             <nav class="hidden sm:flex items-center gap-2">
                 <a href="#about"
                    class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition">
                     Об отеле
                 </a>
+                
+                {{-- НОВЫЕ ССЫЛКИ ДЛЯ КЛИЕНТОВ --}}
+                <a href="{{ route('public.rooms') }}"
+                   class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition">
+                    Номера и Удобства
+                </a>
+                <a href="{{ route('public.services') }}"
+                   class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition">
+                    Услуги
+                </a>
+
                 <a href="#contacts"
                    class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition">
                     Контакты
@@ -37,15 +49,32 @@
                     Подать заявку
                 </a>
 
-                @if (Route::has('login'))
-                    <a href="{{ route('login') }}"
+                @if (auth()->check())
+                    {{-- Если пользователь авторизован, показываем ссылку в его личный кабинет/панель --}}
+                    <a href="{{ auth()->user()->hasRole('admin') || (method_exists(auth()->user(), 'isStaff') ? auth()->user()->isStaff() : auth()->user()->hasAnyRole(['staff', 'employee'])) ? route('dashboard') : route('my.bookings.index') }}"
                        class="inline-flex items-center px-4 py-2 rounded-md border border-gray-700 text-gray-200 hover:text-white hover:bg-gray-800 transition">
-                        Вход
+                        Личный кабинет
                     </a>
+                @else
+                    @if (Route::has('login'))
+                        <a href="{{ route('login') }}"
+                           class="inline-flex items-center px-4 py-2 rounded-md border border-gray-700 text-gray-200 hover:text-white hover:bg-gray-800 transition">
+                            Вход
+                        </a>
+                    @endif
                 @endif
             </nav>
 
+            {{-- Мобильное меню --}}
             <div class="flex sm:hidden items-center gap-2">
+                <a href="{{ route('public.rooms') }}"
+                   class="px-2 py-1 rounded border border-gray-800 text-gray-300 text-xs hover:text-white">
+                    Номера
+                </a>
+                <a href="{{ route('public.services') }}"
+                   class="px-2 py-1 rounded border border-gray-800 text-gray-300 text-xs hover:text-white">
+                    Услуги
+                </a>
                 <a href="{{ route('my.bookings.create') }}"
                    class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-sm">
                     Заявка
