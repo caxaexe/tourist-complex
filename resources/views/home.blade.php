@@ -54,6 +54,17 @@
                     {{ __('Мои заявки') }}
                 </a>
 
+                <div class="relative ml-2" x-data="{ langMenu: false }" @keydown.escape.window="langMenu=false">
+                    <button @click="langMenu=!langMenu" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition uppercase">
+                        {{ app()->getLocale() }} ▾
+                    </button>
+                    <div x-show="langMenu" x-transition @click.outside="langMenu=false" class="absolute right-0 mt-2 w-32 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden z-50">
+                        <a href="{{ route('lang.switch', 'ru') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800">Русский</a>
+                        <a href="{{ route('lang.switch', 'ro') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800">Română</a>
+                        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800">English</a>
+                    </div>
+                </div>
+
                 @if (auth()->check())
                     <a href="{{ auth()->user()->hasRole('admin') || (method_exists(auth()->user(), 'isStaff') ? auth()->user()->isStaff() : auth()->user()->hasAnyRole(['staff', 'employee'])) ? route('dashboard') : route('my.bookings.index') }}"
                        class="inline-flex items-center px-4 py-2 rounded-md border border-gray-700 text-gray-200 hover:text-white hover:bg-gray-800 transition">
@@ -76,6 +87,16 @@
                    class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-sm">
                     {{ __('Заявки') }}
                 </a>
+                <div class="relative ml-2" x-data="{ langMenu: false }" @keydown.escape.window="langMenu=false">
+                    <button @click="langMenu=!langMenu" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition uppercase">
+                        {{ app()->getLocale() }} ▾
+                    </button>
+                    <div x-show="langMenu" x-transition @click.outside="langMenu=false" class="absolute right-0 mt-2 w-32 rounded-md border border-gray-800 bg-gray-900 shadow-lg overflow-hidden z-50">
+                        <a href="{{ route('lang.switch', 'ru') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800">Русский</a>
+                        <a href="{{ route('lang.switch', 'ro') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800">Română</a>
+                        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800">English</a>
+                    </div>
+                </div>
             </div>
         </div>
     </header>

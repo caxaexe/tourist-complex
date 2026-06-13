@@ -316,7 +316,27 @@
     "+ Добавить услугу": "+ Add Service",
     "Удалить услугу «": "Delete service «",
     "Нет услуг": "No services available",
-    "Удалить услугу?": "Delete service?"
+    "Удалить услугу?": "Delete service?",
+
+    "Castle Noctem": "Castle Noctem",
+    "Номера и удобства": "Rooms & Amenities",
+    "Открыты для бронирования": "Open for booking",
+    "Мистический замок в сердце гор Трасильвании. Старинная архитектура, туман над вершинами, тишина хвойных лесов и комфорт современного курорта. Здесь легенды оживают, а отдых становится по-настоящему незабываемым.": "A mystical castle in the heart of the Transylvanian mountains. Ancient architecture, fog over the peaks, the silence of coniferous forests, and the comfort of a modern resort. Here legends come to life, and a vacation becomes truly unforgettable.",
+    "Подробнее об отеле": "More about the hotel",
+    "Заезд": "Check-in",
+    "С 14:00": "From 14:00",
+    "До 12:00": "Until 12:00",
+    "Поддержка": "Support",
+    "Как подать заявку": "How to submit a request",
+    "Выберите номер и даты.": "Select a room and dates.",
+    "Укажите телефон и email.": "Provide a phone number and email.",
+    "Отправьте заявку - мы подтвердим её.": "Send the request - we will confirm it.",
+    "Свяжитесь с нами и забронируйте пребывание в замке, где легенды становятся частью реальности.": "Contact us and book a stay at the castle, where legends become part of reality.",
+    "Ежедневно 09:00–21:00": "Daily 09:00–21:00",
+    "Ответ в течение дня": "Response within the day",
+    "Важно": "Important",
+    "Для подтверждения заявки мы используем указанные телефон и email.": "We use the provided phone and email to confirm your request.",
+    "Между горами и мифами.": "Between mountains and myths."
  
 }
 
