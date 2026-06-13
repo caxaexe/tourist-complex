@@ -8,6 +8,9 @@ use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Mail\NewBookingRequest;
+use Illuminate\Support\Facades\Mail;
 
 class BookingRequestController extends Controller
 {
@@ -74,14 +77,12 @@ class BookingRequestController extends Controller
         $clientId = $this->getOrCreateGuestClientId($request);
 
         $validated = $request->validate([
-            // Добавили обязательное ФИО
             'full_name' => 'required|string|min:3|max:255',
             'room_id'   => 'required|exists:rooms,id',
             'date_from' => 'required|date|after_or_equal:today',
             'date_to'   => 'required|date|after:date_from',
             'note'      => 'nullable|string|max:1000',
 
-            // обязательные контакты
             'phone'     => 'required|string|min:5|max:30',
             'email'     => 'required|email:rfc,dns|max:255',
         ], [
@@ -89,7 +90,6 @@ class BookingRequestController extends Controller
             'full_name.min'      => 'ФИО должно содержать минимум 3 символа.',
         ]);
 
-        // сохраняем контакты и ФИО гостя в клиенте (важно!)
         $client = \App\Models\Client::findOrFail($clientId);
         $client->update([
             'full_name' => $validated['full_name'],
@@ -106,8 +106,8 @@ class BookingRequestController extends Controller
         $total  = $nights * (float) $room->price_per_night;
 
         \App\Models\Booking::create([
-            'user_id'   => null,        // гость
-            'client_id' => $clientId,   // из сессии
+            'user_id'   => null,      
+            'client_id' => $clientId,   
             'room_id'   => $room->id,
             'date_from' => $validated['date_from'],
             'date_to'   => $validated['date_to'],
@@ -115,6 +115,15 @@ class BookingRequestController extends Controller
             'total'     => $total,
             'note'      => $validated['note'] ?? null,
         ]);
+
+        $staffEmails = User::whereHas('roles', function($query) {
+            $query->whereIn('name', ['admin', 'staff', 'employee']);
+        })->pluck('email');
+
+    
+        if ($staffEmails->isNotEmpty()) {
+            Mail::bcc($staffEmails)->send(new NewBookingRequest($booking));
+        }
 
         return redirect()->route('my.bookings.index')
             ->with('success', 'Заявка успешно отправлена. Ожидайте подтверждения.');
