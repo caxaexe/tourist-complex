@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-200 leading-tight">
-            {{ __('Наши Номера и Удобства') }}
+            {{ __('Номера и Удобства') }}
         </h2>
     </x-slot>
 
@@ -13,7 +13,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($roomTypes as $type)
                         @php
-                            // Вычисляем минимальную и максимальную стоимость среди привязанных активных комнат
                             $minPrice = $type->rooms->min('price_per_night');
                             $maxPrice = $type->rooms->max('price_per_night');
                         @endphp
@@ -94,7 +93,7 @@
                                     
                                     <a href="{{ route('my.bookings.create', ['room_id' => $room->id]) }}" 
                                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition ease-in-out duration-150">
-                                        Занять
+                                        Забронировать
                                     </a>
                                 </div>
                             </div>

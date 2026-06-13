@@ -14,10 +14,17 @@ class ClientController extends Controller
         $q = $request->query('q');
 
         $clients = Client::query()
+            ->where(function ($query) {
+                $query->whereNotNull('phone')
+                      ->orWhereNotNull('email')
+                      ->orWhere('full_name', 'not like', 'Гость %');
+            })
             ->when($q, function ($query) use ($q) {
-                $query->where('full_name', 'like', "%{$q}%")
-                      ->orWhere('phone', 'like', "%{$q}%")
-                      ->orWhere('email', 'like', "%{$q}%");
+                $query->where(function ($subQuery) use ($q) {
+                    $subQuery->where('full_name', 'like', "%{$q}%")
+                             ->orWhere('phone', 'like', "%{$q}%")
+                             ->orWhere('email', 'like', "%{$q}%");
+                });
             })
             ->orderBy('id', 'desc')
             ->paginate(10)
