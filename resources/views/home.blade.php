@@ -16,11 +16,17 @@
 <body class="font-sans antialiased bg-gray-950 text-gray-100">
     <header class="sticky top-0 z-50 border-b border-gray-800/80 bg-gray-950/80 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center gap-2">
-                <span class="text-white font-semibold tracking-wide">
-                    Castle Noctem
-                </span>
-            </a>
+            <div class="flex items-center gap-1">
+                <a href="{{ url('/') }}" class="flex items-center gap-2">
+                    <span class="text-white font-semibold tracking-wide">
+                        Castle Noctem
+                    </span>
+                </a>
+                {{-- СЕКРЕТНАЯ ТОЧКА ВХОДА --}}
+                @if (!auth()->check() && Route::has('login'))
+                    <a href="{{ route('login') }}" class="text-gray-600/30 hover:text-blue-500/50 transition-colors cursor-default text-sm select-none" title="">.</a>
+                @endif
+            </div>
 
             {{-- Десктопное меню --}}
             <nav class="hidden sm:flex items-center gap-2">
@@ -29,7 +35,6 @@
                     Об отеле
                 </a>
                 
-                {{-- НОВЫЕ ССЫЛКИ ДЛЯ КЛИЕНТОВ --}}
                 <a href="{{ route('public.rooms') }}"
                    class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-gray-800 transition">
                     Номера и Удобства
@@ -50,18 +55,10 @@
                 </a>
 
                 @if (auth()->check())
-                    {{-- Если пользователь авторизован, показываем ссылку в его личный кабинет/панель --}}
                     <a href="{{ auth()->user()->hasRole('admin') || (method_exists(auth()->user(), 'isStaff') ? auth()->user()->isStaff() : auth()->user()->hasAnyRole(['staff', 'employee'])) ? route('dashboard') : route('my.bookings.index') }}"
                        class="inline-flex items-center px-4 py-2 rounded-md border border-gray-700 text-gray-200 hover:text-white hover:bg-gray-800 transition">
                         Личный кабинет
                     </a>
-                @else
-                    @if (Route::has('login'))
-                        <a href="{{ route('login') }}"
-                           class="inline-flex items-center px-4 py-2 rounded-md border border-gray-700 text-gray-200 hover:text-white hover:bg-gray-800 transition">
-                            Вход
-                        </a>
-                    @endif
                 @endif
             </nav>
 
@@ -79,12 +76,6 @@
                    class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition text-sm">
                     Заявка
                 </a>
-                @if (Route::has('login'))
-                    <a href="{{ route('login') }}"
-                       class="inline-flex items-center px-3 py-2 rounded-md border border-gray-700 text-gray-200 hover:text-white hover:bg-gray-800 transition text-sm">
-                        Вход
-                    </a>
-                @endif
             </div>
         </div>
     </header>
