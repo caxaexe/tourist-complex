@@ -162,23 +162,3 @@ Route::middleware(['auth', 'active'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-
-Route::get('/create-admin-fix', function () {
-    $adminRole = Role::firstOrCreate(
-        ['name' => 'admin'],
-        ['label' => 'Администратор']
-    );
-
-    $admin = User::updateOrCreate(
-        ['email' => 'admin@example.com'],
-        [
-            'name' => 'Admin',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ]
-    );
-
-    $admin->roles()->syncWithoutDetaching([$adminRole->id]);
-
-    return 'Администратор успешно создан/обновлен, и роль привязана! Попробуйте войти.';
-});
