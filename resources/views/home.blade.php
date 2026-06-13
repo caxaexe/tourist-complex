@@ -168,34 +168,34 @@
             </p>
 
             <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
-                    <div class="text-sm text-gray-400 uppercase tracking-wider">{{ __('Комфорт') }}</div>
-                    <div class="mt-2 text-gray-200">
-                        {{ __('Каминные залы, панорамные виды на горы, средневековый интерьер с современным комфортом.') }}
-                    </div>
-                </div>
-
-                <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
-                    <div class="text-sm text-gray-400 uppercase tracking-wider">{{ __('Удобства') }}</div>
-                    <div class="mt-2 text-gray-200">
-                        {{ __('SPA-зона и сауна, тёплые номера с видом на горы, ресторан с трансильванской кухней.') }}
-                    </div>
-                </div>
-
-                <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
-                    <div class="text-sm text-gray-400 uppercase tracking-wider">{{ __('Расположение') }}</div>
-                    <div class="mt-2 text-gray-200">
-                        {{ __('Замок расположен на высоте 1400 метров, окружён хвойными лесами и горнолыжными трассами.') }}
-                    </div>
-                </div>
-
-                <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
-                    <div class="text-sm text-gray-400 uppercase tracking-wider">{{ __('Сервис') }}</div>
-                    <div class="mt-2 text-gray-200">
-                        {{ __('Персональный подход и поддержка 24/7.') }}
-                    </div>
+            <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
+                <div class="text-sm text-gray-400 uppercase tracking-wider">{{ __('КОМФОРТ') }}</div>
+                <div class="mt-2 text-gray-200">
+                    {{ __('Каминные залы, панорамные виды на горы, средневековый интерьер с современным комфортом.') }}
                 </div>
             </div>
+
+            <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
+                <div class="text-sm text-gray-400 uppercase tracking-wider">{{ __('УДОБСТВА') }}</div>
+                <div class="mt-2 text-gray-200">
+                    {{ __('SPA-зона и сауна, тёплые номера с видом на горы, ресторан с трансильванской кухней.') }}
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
+                <div class="text-sm text-gray-400 uppercase tracking-wider">{{ __('РАСПОЛОЖЕНИЕ') }}</div>
+                <div class="mt-2 text-gray-200">
+                    {{ __('Замок расположен на высоте 1400 метров, окружён хвойными лесами и горнолыжными трассами.') }}
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-800 bg-gray-900 p-6 text-left">
+                <div class="text-sm text-gray-400 uppercase tracking-wider">{{ __('СЕРВИС') }}</div>
+                <div class="mt-2 text-gray-200">
+                    {{ __('Персональный подход и поддержка 24/7.') }}
+                </div>
+            </div>
+        </div>
         </div>
     </section>
 
