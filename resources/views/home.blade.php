@@ -229,7 +229,7 @@
 
                     <div class="rounded-lg border border-gray-800 bg-gray-900 p-5">
                         <div class="text-sm text-gray-400">Email</div>
-                        <div class="mt-1 text-gray-200 font-medium">caxa5578@example.com</div>
+                        <div class="mt-1 text-gray-200 font-medium">caxa5578@gmail.com</div>
                         <div class="mt-2 text-sm text-gray-400">Ответ в течение дня</div>
                     </div>
 

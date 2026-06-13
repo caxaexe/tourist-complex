@@ -22,20 +22,19 @@
         financeOpen:false,
         adminOpen:false,
         myOpen:false,
+        catalogOpen:false,
         userMenu:false,
     }" class="bg-gray-950 border-b border-gray-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
 
-            <!-- Left -->
             <div class="flex items-center gap-6">
-                <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2">
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2">
                     <span class="text-gray-200 font-semibold">
                         Castle Noctem
                     </span>
                 </a>
 
-                <!-- Desktop menu -->
                 <div class="hidden sm:flex sm:items-center sm:space-x-2">
 
                     <a href="{{ $dashboardUrl }}"
@@ -44,8 +43,20 @@
                         Главная
                     </a>
 
+                    @if(!$isStaffOrAdmin)
+                        <a href="{{ route('public.rooms') }}"
+                           class="px-3 py-2 rounded-md text-sm font-medium transition
+                           {{ request()->routeIs('public.rooms') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                            Номера и Удобства
+                        </a>
+                        <a href="{{ route('public.services') }}"
+                           class="px-3 py-2 rounded-md text-sm font-medium transition
+                           {{ request()->routeIs('public.services') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                            Услуги
+                        </a>
+                    @endif
+
                     @if($workPrefix)
-                        <!-- Rooms dropdown -->
                         <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                             <button @click="dd=!dd"
                                 class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
@@ -75,7 +86,6 @@
                             </div>
                         </div>
 
-                        <!-- Booking dropdown -->
                         <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                             <button @click="dd=!dd"
                                 class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
@@ -97,7 +107,6 @@
                             </div>
                         </div>
 
-                        <!-- Finance dropdown -->
                         <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                             <button @click="dd=!dd"
                                 class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
@@ -125,7 +134,6 @@
                             </div>
                         </div>
 
-                        <!-- Admin dropdown -->
                         @if($isAdmin)
                             <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                                 <button @click="dd=!dd"
@@ -151,7 +159,6 @@
                     @endif
 
                     @if(!$isStaffOrAdmin)
-                        <!-- Client dropdown -->
                         <div class="relative" x-data="{ dd:false }" @keydown.escape.window="dd=false">
                             <button @click="dd=!dd"
                                 class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition"
@@ -177,7 +184,6 @@
                 </div>
             </div>
 
-            <!-- Right -->
             <div class="hidden sm:flex sm:items-center">
                 @if($isAuth)
                     <div class="relative" @keydown.escape.window="userMenu=false">
@@ -210,7 +216,6 @@
                 @endif
             </div>
 
-            <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = !open"
                         class="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-800 focus:outline-none transition">
@@ -224,7 +229,6 @@
         </div>
     </div>
 
-    <!-- Mobile menu -->
     <div x-show="open" class="sm:hidden border-t border-gray-800">
         <div class="pt-2 pb-3 space-y-1 px-2">
 
@@ -233,6 +237,19 @@
                {{ (request()->routeIs('dashboard') || request()->routeIs('my.bookings.*')) ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
                 Главная
             </a>
+
+            @if(!$isStaffOrAdmin)
+                <a href="{{ route('public.rooms') }}"
+                   class="block px-3 py-2 rounded-md text-sm font-medium transition
+                   {{ request()->routeIs('public.rooms') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                    Номера и Удобства
+                </a>
+                <a href="{{ route('public.services') }}"
+                   class="block px-3 py-2 rounded-md text-sm font-medium transition
+                   {{ request()->routeIs('public.services') ? 'bg-gray-800 text-white' : 'text-gray-200 hover:text-white hover:bg-gray-800' }}">
+                    Услуги
+                </a>
+            @endif
 
             @if($workPrefix)
                 <div class="space-y-1">

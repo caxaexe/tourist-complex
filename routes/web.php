@@ -23,6 +23,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\PublicCatalogController;
 
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -91,6 +92,8 @@ Route::get('/dashboard', function () {
 
 
 // CLIENT (ГОСТЕВОЙ по сессии)
+Route::get('/rooms', [PublicCatalogController::class, 'rooms'])->name('public.rooms');
+Route::get('/services', [PublicCatalogController::class, 'services'])->name('public.services');
 Route::get('/my-bookings', [BookingRequestController::class, 'index'])->name('my.bookings.index');
 Route::get('/my-bookings/create', [BookingRequestController::class, 'create'])->name('my.bookings.create');
 Route::post('/my-bookings', [BookingRequestController::class, 'store'])->name('my.bookings.store');
