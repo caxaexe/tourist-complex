@@ -1,63 +1,89 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-200 leading-tight">
             {{ __('Наши Номера и Удобства') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 bg-gray-950 min-h-screen text-gray-100">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Категории номеров</h3>
+            <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-800">
+                <h3 class="text-lg font-bold text-white mb-4">Категории номеров</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($roomTypes as $type)
-                        <div class="border rounded-lg p-4 bg-gray-50 shadow-sm">
-                            <h4 class="font-semibold text-xl text-indigo-600">{{ $type->name }}</h4>
-                            <p class="text-gray-600 mt-2 text-sm">{{ $type->description }}</p>
-                            <div class="mt-4 flex justify-between items-center">
-                                <span class="text-lg font-bold text-gray-900">{{ number_format($type->base_price, 2) }} ₽ / сутки</span>
+                        <div class="border border-gray-800 rounded-lg p-4 bg-gray-950/50 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-semibold text-xl text-blue-400">{{ $type->name }}</h4>
+                                <p class="text-gray-400 mt-2 text-sm">{{ $type->description }}</p>
+                            </div>
+                            <div class="mt-4 pt-2 border-t border-gray-800 flex justify-between items-center">
+                                <span class="text-lg font-bold text-green-400">§{{ number_format($type->base_price, 0, '.', ' ') }} <span class="text-xs text-gray-500">/ сутки</span></span>
                             </div>
                         </div>
                     @endforeach
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Доступные Номера</h3>
+            <div class="bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-800">
+                <h3 class="text-lg font-bold text-white mb-4">Доступные Номера</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @foreach($rooms as $room)
-                        <div class="border rounded-lg p-5 flex flex-col justify-between hover:shadow-md transition shadow-sm bg-white">
-                            <div>
-                                <div class="flex justify-between items-start">
-                                    <h4 class="text-xl font-bold text-gray-800">Комната №{{ $room->room_number }}</h4>
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                        {{ $room->roomType->name }}
-                                    </span>
-                                </div>
-                                
-                                <p class="text-sm text-gray-500 mt-1">Этаж: {{ $room->floor }}</p>
+                        <div class="border border-gray-800 rounded-lg p-5 flex flex-col sm:flex-row gap-5 hover:border-gray-700 transition shadow-sm bg-gray-950/40">
+                            
+                            <div class="w-full sm:w-32 h-32 flex-shrink-0 bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
+                                <img src="{{ asset('images/hotel.jpg') }}" 
+                                     alt="{{ $room->title }}" 
+                                     class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
+                            </div>
 
-                                <div class="mt-4">
-                                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Удобства в номере:</span>
-                                    <div class="flex flex-wrap gap-2 mt-1">
-                                        @forelse($room->amenities as $amenity)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
-                                                {{ $amenity->name }}
-                                            </span>
-                                        @empty
-                                            <span class="text-xs text-gray-400 italic">Стандартный набор удобств</span>
-                                        @endforelse
+                            <div class="flex-1 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-start gap-2">
+                                        {{-- Вместо номера комнаты выводим Название (title) --}}
+                                        <h4 class="text-xl font-bold text-white">
+                                            {{ $room->title ?? 'Покои Замка' }}
+                                        </h4>
+                                        <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-950 text-blue-300 border border-blue-800/60 flex-shrink-0">
+                                            {{ $room->roomType->name ?? 'Классика' }}
+                                        </span>
+                                    </div>
+                                    
+                                    {{-- Вместо этажа выводим Номер комнаты --}}
+                                    <p class="text-sm text-gray-400 mt-1 font-medium">
+                                        Комната №{{ $room->number }}
+                                    </p>
+
+                                    @if($room->description)
+                                        <p class="text-xs text-gray-400 mt-2 line-clamp-2">{{ $room->description }}</p>
+                                    @endif
+
+                                    <div class="mt-4">
+                                        <div class="flex flex-wrap gap-1.5 mt-1">
+                                            @forelse($room->amenities as $amenity)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-900 text-gray-300 border border-gray-800">
+                                                    {{ $amenity->name }}
+                                                </span>
+                                            @empty
+                                                <span class="text-xs text-gray-500 italic">Стандартные удобства замка</span>
+                                            @endforelse
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div class="mt-6 pt-3 border-t border-gray-900/60 flex justify-between items-center gap-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-500">Вместимость: {{ $room->capacity ?? $room->roomType->max_capacity ?? 2 }} сим-гостя</span>
+                                        <span class="text-base font-bold text-green-400">§{{ number_format($room->price_per_night, 0, '.', ' ') }} <span class="text-xs text-gray-500">/ ночь</span></span>
+                                    </div>
+                                    
+                                    <a href="{{ route('my.bookings.create', ['room_id' => $room->id]) }}" 
+                                       class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition ease-in-out duration-150">
+                                        Занять
+                                    </a>
+                                </div>
                             </div>
 
-                            <div class="mt-6 pt-4 border-t flex justify-between items-center">
-                                <span class="text-sm text-gray-500">Макс. гостей: {{ $room->roomType->max_capacity ?? 'Не указано' }}</span>
-                                <a href="{{ route('my.bookings.create', ['room_id' => $room->id]) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    Забронировать
-                                </a>
-                            </div>
                         </div>
                     @endforeach
                 </div>
