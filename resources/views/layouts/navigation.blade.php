@@ -83,7 +83,7 @@
                     @endif
                 @endif
 
-                {{-- Языки и Профиль --}}
+                {{-- Языки и Профиль (десктоп) --}}
                 <div class="relative ml-2">
                     <button @click="langMenu=!langMenu" class="inline-flex items-center px-3 py-2 text-sm text-gray-200 uppercase"> {{ app()->getLocale() }} ▾ </button>
                     <div x-show="langMenu" @click.outside="langMenu=false" class="absolute right-0 mt-2 w-32 rounded-md bg-gray-900 border border-gray-800 z-50">
@@ -96,7 +96,7 @@
                 @if($isAuth)
                     <div class="relative ml-2">
                         <button @click="userMenu=!userMenu" class="inline-flex items-center px-3 py-2 text-sm text-gray-200"> {{ $u->name }} ▾ </button>
-                        <div x-show="userMenu" @click.outside="userMenu=false" class="absolute right-0 mt-2 w-48 rounded-md bg-gray-900 border border-gray-800">
+                        <div x-show="userMenu" @click.outside="userMenu=false" class="absolute right-0 mt-2 w-48 rounded-md bg-gray-900 border border-gray-800 z-50">
                             <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800">{{ __('Профиль') }}</a>
                             <form method="POST" action="{{ route('logout') }}"> @csrf <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-800">{{ __('Выйти') }}</button></form>
                         </div>
@@ -104,9 +104,9 @@
                 @endif
             </div>
 
-            {{-- Мобильное меню (иконка) --}}
+            {{-- Мобильное меню (кнопка) --}}
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = !open" class="p-2 rounded-md text-gray-300 hover:text-white">
+                <button @click="open = !open" class="p-2 text-gray-300">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path :class="{'hidden': open, 'inline-flex': !open }" d="M4 6h16M4 12h16M4 18h16" /><path :class="{'hidden': !open, 'inline-flex': open }" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
@@ -123,6 +123,21 @@
             @else
                 <a href="{{ route($workPrefix.'bookings.index') }}" class="block px-3 py-2 text-gray-200 hover:bg-gray-800">{{ __('Бронирования') }}</a>
                 <a href="{{ route($workPrefix.'rooms.index') }}" class="block px-3 py-2 text-gray-200 hover:bg-gray-800">{{ __('Номера') }}</a>
+            @endif
+
+            <div class="border-t border-gray-700 mt-2 pt-2">
+                <p class="px-3 text-xs text-gray-500 uppercase">{{ __('Язык') }}</p>
+                @foreach(['ru' => 'Русский', 'ro' => 'Română', 'en' => 'English'] as $code => $name)
+                    <a href="{{ route('lang.switch', $code) }}" class="block px-3 py-2 text-gray-200 hover:bg-gray-800">{{ $name }}</a>
+                @endforeach
+            </div>
+
+            @if($isAuth)
+                <div class="border-t border-gray-700 mt-2 pt-2">
+                    <p class="px-3 text-xs text-gray-500 uppercase">{{ $u->name }}</p>
+                    <a href="{{ route('profile.edit') }}" class="block px-3 py-2 text-gray-200 hover:bg-gray-800">{{ __('Профиль') }}</a>
+                    <form method="POST" action="{{ route('logout') }}"> @csrf <button type="submit" class="w-full text-left px-3 py-2 text-gray-200 hover:bg-gray-800">{{ __('Выйти') }}</button></form>
+                </div>
             @endif
         </div>
     </div>

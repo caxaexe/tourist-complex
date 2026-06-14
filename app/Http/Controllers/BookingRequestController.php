@@ -58,13 +58,17 @@ class BookingRequestController extends Controller
 {
     $this->forbidStaffAdmin();
     
-    $disabledRanges = Booking::whereIn('status', ['confirmed', 'checked_in'])
-        ->get(['date_from', 'date_to'])
-        ->map(fn($b) => ['from' => $b->date_from, 'to' => $b->date_to]);
+    $disabledByRoom = Booking::whereIn('status', ['confirmed', 'checked_in'])
+        ->get()
+        ->groupBy('room_id')
+        ->map(function ($bookings) {
+            return $bookings->map(fn($b) => [
+                'from' => $b->date_from,
+                'to'   => $b->date_to 
+            ]);
+        });
 
-    $rooms = Room::where('is_active', true)->get();
-
-    return view('my-bookings.create', compact('rooms', 'disabledRanges'));
+    return view('my-bookings.create', compact('rooms', 'disabledByRoom'));
 }
 
     public function store(Request $request)

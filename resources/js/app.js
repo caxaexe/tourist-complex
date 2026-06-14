@@ -1,6 +1,5 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
-// Обязательно импортируем flatpickr (убедитесь, что он установлен через npm)
 import flatpickr from "flatpickr"; 
 import "flatpickr/dist/flatpickr.min.css";
 
@@ -9,22 +8,29 @@ Alpine.start();
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('booking-form');
-    
+    const roomSelect = document.getElementById('room_select');
     if (!form) return;
 
-    let disabledRanges = [];
-    try {
-        disabledRanges = JSON.parse(form.dataset.disabled);
-    } catch (e) {
-        console.error("Ошибка парсинга дат:", e);
+    const disabledByRoom = JSON.parse(form.dataset.disabled);
+    let fpFrom, fpTo;
+
+    function updateFlatpickr() {
+        const roomId = roomSelect.value;
+        const ranges = disabledByRoom[roomId] || [];
+
+        const config = {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: ranges,
+        };
+
+        if (fpFrom) fpFrom.destroy();
+        if (fpTo) fpTo.destroy();
+        
+        fpFrom = flatpickr("input[name='date_from']", config);
+        fpTo = flatpickr("input[name='date_to']", config);
     }
 
-    const config = {
-        dateFormat: "Y-m-d",
-        minDate: "today",
-        disable: disabledRanges 
-    };
-
-    flatpickr("input[name='date_from']", config);
-    flatpickr("input[name='date_to']", config);
+    roomSelect.addEventListener('change', updateFlatpickr);
+    updateFlatpickr(); 
 });
