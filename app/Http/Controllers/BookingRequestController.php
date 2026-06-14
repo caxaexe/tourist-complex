@@ -52,27 +52,24 @@ class BookingRequestController extends Controller
     }
 
     public function create(Request $request)
-    {
-        $this->forbidStaffAdmin();
-        $this->getOrCreateGuestClientId($request);
+{
+    $this->forbidStaffAdmin();
+    $this->getOrCreateGuestClientId($request);
 
-        $rooms = Room::where('is_active', true)
-            ->with('roomType')
-            ->orderBy('number')
-            ->get();
+    $rooms = Room::where('is_active', true)->with('roomType')->orderBy('number')->get();
 
-        $disabledByRoom = Booking::whereIn('status', ['confirmed', 'checked_in'])
-            ->get(['room_id', 'date_from', 'date_to'])
-            ->groupBy('room_id')
-            ->map(function ($bookings) {
-                return $bookings->map(fn($b) => [
-                    'from' => $b->date_from,
-                    'to'   => $b->date_to
-                ]);
-            });
+    $disabledByRoom = Booking::whereIn('status', ['confirmed', 'checked_in'])
+        ->get(['room_id', 'date_from', 'date_to'])
+        ->groupBy('room_id')
+        ->map(function ($bookings) {
+            return $bookings->map(fn($b) => [
+                'from' => Carbon::parse($b->date_from)->format('Y-m-d'),
+                'to'   => Carbon::parse($b->date_to)->format('Y-m-d')
+            ]);
+        });
 
-        return view('my-bookings.create', compact('rooms', 'disabledByRoom'));
-    }
+    return view('my-bookings.create', compact('rooms', 'disabledByRoom'));
+}
 
     public function store(Request $request)
     {
