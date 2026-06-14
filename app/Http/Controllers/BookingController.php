@@ -32,7 +32,7 @@ class BookingController extends Controller
         $payment = $request->query('payment');
 
         $query = Booking::query()
-            ->with(['client', 'room.roomType', 'invoice'])
+            ->with(['client', 'room.roomType', 'invoice']) 
             ->withSum('payments', 'amount');
 
         if ($payment === 'unpaid') {

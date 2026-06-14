@@ -51,7 +51,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            {{ __('Дата заезда') }} <span class="text-red-500">*</span>
+                            {{ __('Дата заезда') }} *
                         </label>
                         <input type="text" name="date_from" id="date_from" 
                             value="{{ old('date_from') }}" 
@@ -65,7 +65,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            {{ __('Дата выезда') }} <span class="text-red-500">*</span>
+                            {{ __('Дата выезда') }} *
                         </label>
                         <input type="text" name="date_to" id="date_to" 
                             value="{{ old('date_to') }}" 

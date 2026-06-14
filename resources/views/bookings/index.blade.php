@@ -49,62 +49,21 @@
             {{-- Фильтр по оплате --}}
             <div class="mb-4 flex flex-wrap items-center gap-2">
                 <a href="{{ route($prefix.'bookings.index') }}"
-                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
-                          {{ empty($payment) ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
-                          text-gray-800 dark:text-gray-200">
+                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700 {{ empty($payment) ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }} text-gray-800 dark:text-gray-200">
                     {{ __('Все') }}
                 </a>
-
                 <a href="{{ route($prefix.'bookings.index', ['payment' => 'unpaid']) }}"
-                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
-                          {{ ($payment ?? '') === 'unpaid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
-                          text-gray-800 dark:text-gray-200">
+                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700 {{ ($payment ?? '') === 'unpaid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }} text-gray-800 dark:text-gray-200">
                     {{ __('НЕОПЛАЧЕНО') }}
                 </a>
-
                 <a href="{{ route($prefix.'bookings.index', ['payment' => 'partial']) }}"
-                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
-                          {{ ($payment ?? '') === 'partial' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
-                          text-gray-800 dark:text-gray-200">
+                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700 {{ ($payment ?? '') === 'partial' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }} text-gray-800 dark:text-gray-200">
                     {{ __('ЧАСТИЧНО') }}
                 </a>
-
                 <a href="{{ route($prefix.'bookings.index', ['payment' => 'paid']) }}"
-                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700
-                          {{ ($payment ?? '') === 'paid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }}
-                          text-gray-800 dark:text-gray-200">
+                   class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700 {{ ($payment ?? '') === 'paid' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800' }} text-gray-800 dark:text-gray-200">
                     {{ __('ОПЛАЧЕНО') }}
                 </a>
-            </div>
-
-            {{-- Мини-статистика --}}
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4 text-gray-800 dark:text-gray-200">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Активные') }}</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $activeCount }}</div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4 text-gray-800 dark:text-gray-200">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Заезд сегодня') }}</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $checkInToday }}</div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4 text-gray-800 dark:text-gray-200">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Выезд сегодня') }}</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $checkOutToday }}</div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4 text-gray-800 dark:text-gray-200">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Подтверждено') }}</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $confirmedCount }}</div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 shadow rounded p-4 text-gray-800 dark:text-gray-200">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Сумма всего') }}</div>
-                    <div class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                        {{ number_format($sumTotal, 2, '.', ' ') }}
-                    </div>
-                </div>
             </div>
 
             {{-- Таблица --}}
@@ -112,16 +71,15 @@
                 <table class="w-full">
                     <thead>
                         <tr class="text-left border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-2 text-gray-700 dark:text-gray-200">ID</th>
-                            <th class="text-gray-700 dark:text-gray-200">{{ __('Клиент') }}</th>
-                            <th class="text-gray-700 dark:text-gray-200">{{ __('Номер') }}</th>
-                            <th class="text-gray-700 dark:text-gray-200">{{ __('Даты') }}</th>
-                            <th class="text-gray-700 dark:text-gray-200">{{ __('Ночей') }}</th>
-                            <th class="text-gray-700 dark:text-gray-200">{{ __('Цена/ночь') }}</th>
-                            <th class="text-gray-700 dark:text-gray-200">{{ __('Статус') }}</th>
-                            <th class="text-gray-700 dark:text-gray-200">{{ __('Оплата') }}</th>
-                            <th class="text-gray-700 dark:text-gray-200">{{ __('Сумма') }}</th>
-                            <th class="text-right text-gray-700 dark:text-gray-200">{{ __('Действия') }}</th>
+                            <th class="py-2">ID</th>
+                            <th>{{ __('Клиент') }}</th>
+                            <th>{{ __('Комната') }}</th>
+                            <th>{{ __('Даты') }}</th>
+                            <th>{{ __('Ночей') }}</th>
+                            <th>{{ __('Статус') }}</th>
+                            <th>{{ __('Оплата') }}</th>
+                            <th>{{ __('Сумма') }}</th>
+                            <th class="text-right">{{ __('Действия') }}</th>
                         </tr>
                     </thead>
 
@@ -136,191 +94,50 @@
                                     'checked_out' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
                                 ];
                                 $cls = $map[$booking->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-200';
-
                                 $nights = max(1, $booking->date_from->diffInDays($booking->date_to));
-
                                 $invoice = $booking->invoice ?? null;
-
-                                // К оплате: если есть счёт — он главный, иначе total брони
-                                $due  = (float) ($invoice->total ?? $booking->total ?? 0);
-
-                                // Оплачено: берём withSum из bookings
+                                $due = (float) ($invoice->total ?? $booking->total ?? 0);
                                 $paid = (float) ($booking->payments_sum_amount ?? 0);
 
                                 if ($due <= 0 || $paid <= 0) {
-                                    $payText = __('НЕОПЛАЧЕНО');
-                                    $payCls  = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                                    $payText = __('НЕОПЛАЧЕНО'); $payCls = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
                                 } elseif ($paid + 0.01 < $due) {
-                                    $payText = __('ЧАСТИЧНО');
-                                    $payCls  = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200';
+                                    $payText = __('ЧАСТИЧНО'); $payCls = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200';
                                 } else {
-                                    $payText = __('ОПЛАЧЕНО');
-                                    $payCls  = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+                                    $payText = __('ОПЛАЧЕНО'); $payCls = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
                                 }
                             @endphp
 
                             <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <td class="py-2 text-gray-800 dark:text-gray-200">{{ $booking->id }}</td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    {{ $booking->client->full_name }}
-                                </td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    №{{ $booking->room->number }}
+                                <td class="py-2">{{ $booking->id }}</td>
+                                <td>{{ $booking->client->full_name }}</td>
+                                
+                                {{-- ВЫВОД НАЗВАНИЯ КОМНАТЫ --}}
+                                <td>
+                                    <div class="font-semibold">{{ $booking->room->title ?? __('Номер ') . $booking->room->number }}</div>
                                     @if($booking->room->roomType)
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $booking->room->roomType->name }}
-                                        </div>
+                                        <div class="text-xs text-gray-500">{{ $booking->room->roomType->name }}</div>
                                     @endif
                                 </td>
 
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    {{ $booking->date_from->format('d.m.Y') }} — {{ $booking->date_to->format('d.m.Y') }}
+                                <td>{{ $booking->date_from->format('d.m.Y') }} — {{ $booking->date_to->format('d.m.Y') }}</td>
+                                <td>{{ $nights }}</td>
+                                <td><span class="px-2 py-1 rounded text-sm {{ $cls }}">{{ $booking->status }}</span></td>
+                                <td>
+                                    <span class="px-2 py-1 rounded text-sm {{ $payCls }}">{{ $payText }}</span>
                                 </td>
-
-                                <td class="text-gray-800 dark:text-gray-200">{{ $nights }}</td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    {{ number_format($booking->room->price_per_night, 2, '.', ' ') }}
-                                </td>
-
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    <span class="px-2 py-1 rounded text-sm {{ $cls }}">
-                                        {{ $booking->status }}
-                                    </span>
-                                </td>
-
-                                {{-- Оплата --}}
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    <span class="inline-block px-2 py-1 rounded text-sm {{ $payCls }}">
-                                        {{ $payText }}
-                                    </span>
-
-                                    @if($invoice)
-                                        <div class="mt-2">
-                                            <a href="{{ route($prefix.'invoices.show', $invoice) }}"
-                                               class="inline-block px-2 py-1 rounded text-sm border border-gray-200 dark:border-gray-700
-                                                      text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/40">
-                                                {{ __('Счёт:') }} {{ $invoice->number }}
-                                            </a>
-                                        </div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            {{ __('Статус:') }} <b>{{ $invoice->status }}</b>
-                                        </div>
-                                    @else
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                            {{ __('Нет счёта (оплаты добавляются через счёт)') }}
-                                        </div>
-                                    @endif
-
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        {{ number_format($paid, 2, '.', ' ') }} / {{ number_format($due, 2, '.', ' ') }}
-                                    </div>
-                                </td>
-
-                                {{-- Сумма --}}
-                                <td class="text-gray-800 dark:text-gray-200">
-                                    {{ number_format($due, 2, '.', ' ') }}
-                                </td>
-
-                                {{-- Действия --}}
-                                <td class="text-right whitespace-nowrap">
-                                    <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
-                                        
-                                        @if($booking->status === 'pending')
-                                            {{-- Кнопка Подтвердить --}}
-                                            <form method="POST" action="{{ route($prefix.'bookings.confirm', $booking) }}" class="inline">
-                                                @csrf
-                                                <button class="px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-                                                        onclick="return confirm('{{ __('Подтвердить бронирование #') }}{{ $booking->id }}?')">
-                                                    {{ __('Подтвердить') }}
-                                                </button>
-                                            </form>
-
-                                            {{-- Кнопка Отменить --}}
-                                            <form method="POST" action="{{ route($prefix.'bookings.cancel', $booking) }}" class="inline" id="cancel-form-{{$booking->id}}">
-                                                @csrf
-                                                <input type="hidden" name="reason" id="cancel-reason-{{$booking->id}}">
-                                                <button type="button" class="px-3 py-1 rounded bg-gray-500 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-                                                        onclick="cancelBooking({{ $booking->id }})">
-                                                    {{ __('Отменить') }}
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                        <a class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700
-                                                  text-blue-700 dark:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-900/30"
-                                           href="{{ route($prefix.'bookings.edit', $booking) }}">
-                                            {{ __('Редактировать') }}
-                                        </a>
-
-                                        @if($booking->status === 'confirmed')
-                                            <form method="POST" action="{{ route($prefix.'bookings.checkin', $booking) }}" class="inline">
-                                                @csrf
-                                                <button class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-                                                        onclick="return confirm('{{ __('Заселить гостя (Check-in)?') }}')">
-                                                    Check-in
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                        @if($booking->status === 'checked_in')
-                                            <form method="POST" action="{{ route($prefix.'bookings.checkout', $booking) }}" class="inline">
-                                                @csrf
-                                                <button class="px-3 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
-                                                        onclick="return confirm('{{ __('Оформить выезд (Check-out)?') }}')">
-                                                    Check-out
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                        @if(!$invoice && !in_array($booking->status, ['confirmed','checked_in'], true))
-                                            <form method="POST"
-                                                  action="{{ route($prefix.'bookings.destroy', $booking) }}"
-                                                  class="inline"
-                                                  onsubmit="return confirm('{{ __('Удалить бронирование #') }}{{ $booking->id }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                                                    {{ __('Удалить') }}
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
+                                <td>{{ number_format($due, 2, '.', ' ') }}</td>
+                                <td class="text-right">
+                                    <a href="{{ route($editRoute, $booking) }}" class="text-blue-500 hover:underline">{{ __('Редактировать') }}</a>
                                 </td>
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="10" class="py-4 text-center text-gray-500 dark:text-gray-400">
-                                    {{ __('Нет бронирований') }}
-                                </td>
-                            </tr>
+                            <tr><td colspan="9" class="py-4 text-center text-gray-500">{{ __('Нет бронирований') }}</td></tr>
                         @endforelse
                     </tbody>
-
                 </table>
-
-                <div class="mt-4">
-                    {{ $bookings->links() }}
-                </div>
+                <div class="mt-4">{{ $bookings->links() }}</div>
             </div>
-
         </div>
     </div>
-
-    <script>
-        function cancelBooking(id) {
-            let reason = prompt('{{ __('Пожалуйста, укажите причину отмены бронирования (она будет отправлена клиенту):') }}');
-            
-            if (reason !== null) {
-                if (reason.trim() !== '') {
-                    document.getElementById('cancel-reason-' + id).value = reason;
-                    document.getElementById('cancel-form-' + id).submit();
-                } else {
-                    alert('{{ __('Для отмены необходимо обязательно указать причину.') }}');
-                }
-            }
-        }
-    </script>
 </x-app-layout>

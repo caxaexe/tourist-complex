@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const roomId = roomSelect.value;
         const ranges = disabledByRoom[roomId] || [];
         
-        console.log("Выбран номер:", roomId, "Занятые даты:", ranges); // <-- СМОТРИТЕ ЭТО В КОНСОЛИ
+        console.log("Выбран номер:", roomId, "Занятые даты:", ranges); 
 
         const config = {
             dateFormat: "Y-m-d",
