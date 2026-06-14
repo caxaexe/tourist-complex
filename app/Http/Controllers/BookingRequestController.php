@@ -52,27 +52,27 @@ class BookingRequestController extends Controller
     }
 
     public function create(Request $request)
-{
-    $this->forbidStaffAdmin();
-    $this->getOrCreateGuestClientId($request);
+    {
+        $this->forbidStaffAdmin();
+        $this->getOrCreateGuestClientId($request);
 
-    $rooms = Room::where('is_active', true)
-        ->with('roomType')
-        ->orderBy('number')
-        ->get();
+        $rooms = Room::where('is_active', true)
+            ->with('roomType')
+            ->orderBy('number')
+            ->get();
 
-    $disabledByRoom = Booking::whereIn('status', ['confirmed', 'checked_in'])
-        ->get(['room_id', 'date_from', 'date_to'])
-        ->groupBy('room_id')
-        ->map(function ($bookings) {
-            return $bookings->map(fn($b) => [
-                'from' => $b->date_from,
-                'to'   => $b->date_to
-            ]);
-        });
+        $disabledByRoom = Booking::whereIn('status', ['confirmed', 'checked_in'])
+            ->get(['room_id', 'date_from', 'date_to'])
+            ->groupBy('room_id')
+            ->map(function ($bookings) {
+                return $bookings->map(fn($b) => [
+                    'from' => $b->date_from,
+                    'to'   => $b->date_to
+                ]);
+            });
 
-    return view('my-bookings.create', compact('rooms', 'disabledByRoom'));
-}
+        return view('my-bookings.create', compact('rooms', 'disabledByRoom'));
+    }
 
     public function store(Request $request)
     {
@@ -90,6 +90,7 @@ class BookingRequestController extends Controller
         ]);
 
         return DB::transaction(function () use ($validated, $clientId, $request) {
+            // ОДНА правильная проверка на пересечение
             $hasOverlap = Booking::where('room_id', $validated['room_id'])
                 ->whereIn('status', ['pending', 'confirmed', 'checked_in'])
                 ->where('date_from', '<', $validated['date_to'])
@@ -98,12 +99,16 @@ class BookingRequestController extends Controller
 
             if ($hasOverlap) {
                 throw ValidationException::withMessages([
-                    'date_from' => 'Выбранный номер уже занят на эти даты.'
+                    'date_from' => 'Этот номер уже занят на выбранные даты. Пожалуйста, выберите другие.'
                 ]);
             }
 
             $client = Client::findOrFail($clientId);
-            $client->update($validated);
+            $client->update([
+                'full_name' => $validated['full_name'],
+                'phone'     => $validated['phone'],
+                'email'     => $validated['email'],
+            ]);
 
             $room = Room::findOrFail($validated['room_id']);
             $from = Carbon::parse($validated['date_from']);

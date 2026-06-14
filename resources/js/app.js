@@ -6,14 +6,13 @@ import "flatpickr/dist/flatpickr.min.css";
 window.Alpine = Alpine;
 Alpine.start();
 
-
-
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('booking-form');
     const roomSelect = document.getElementById('room_select');
-    if (!form || !roomSelect) return;
+    if (!form) return;
 
-    const disabledByRoom = JSON.parse(form.dataset.disabled);
+    const disabledByRoom = JSON.parse(form.dataset.disabled || "{}");
+    
     let fpFrom, fpTo;
 
     function updateFlatpickr() {
@@ -23,7 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const config = {
             dateFormat: "Y-m-d",
             minDate: "today",
-            disable: ranges
+            disable: ranges, 
+            onChange: function(selectedDates, dateStr, instance) {
+                if (instance.element.name === "date_from") {
+                    fpTo.set("minDate", dateStr);
+                }
+            }
         };
 
         if (fpFrom) fpFrom.destroy();
