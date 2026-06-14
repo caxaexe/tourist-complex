@@ -56,6 +56,8 @@ class BookingRequestController extends Controller
     $this->forbidStaffAdmin();
     $this->getOrCreateGuestClientId($request);
 
+    $selectedRoomId = $request->query('room_id');
+
     $rooms = Room::where('is_active', true)->with('roomType')->orderBy('number')->get();
 
     $disabledByRoom = Booking::whereIn('status', ['confirmed', 'checked_in'])
@@ -68,7 +70,7 @@ class BookingRequestController extends Controller
             ]);
         });
 
-    return view('my-bookings.create', compact('rooms', 'disabledByRoom'));
+    return view('my-bookings.create', compact('rooms', 'disabledByRoom', 'selectedRoomId'));
 }
 
     public function store(Request $request)
