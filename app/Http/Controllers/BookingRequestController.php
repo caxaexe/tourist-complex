@@ -55,84 +55,64 @@ class BookingRequestController extends Controller
     }
 
     public function create(Request $request)
-    {
-        $this->forbidStaffAdmin();
+{
+    $this->forbidStaffAdmin();
+    
+    $disabledRanges = Booking::whereIn('status', ['confirmed', 'checked_in'])
+        ->get(['date_from', 'date_to'])
+        ->map(fn($b) => ['from' => $b->date_from, 'to' => $b->date_to]);
 
-        $this->getOrCreateGuestClientId($request);
+    $rooms = Room::where('is_active', true)->get();
 
-        $rooms = Room::where('is_active', true)
-            ->with('roomType')
-            ->orderBy('number')
-            ->get();
-
-        return view('my-bookings.create', compact('rooms'));
-    }
+    return view('my-bookings.create', compact('rooms', 'disabledRanges'));
+}
 
     public function store(Request $request)
-    {
-        $this->forbidStaffAdmin();
+{
+    $this->forbidStaffAdmin();
+    $clientId = $this->getOrCreateGuestClientId($request);
 
-        $clientId = $this->getOrCreateGuestClientId($request);
+    $validated = $request->validate([
+        'full_name' => 'required|string|min:3|max:255',
+        'room_id'   => 'required|exists:rooms,id',
+        'date_from' => 'required|date|after_or_equal:today',
+        'date_to'   => 'required|date|after:date_from',
+        'phone'     => 'required|string|min:5|max:30',
+        'email'     => 'required|email:rfc,dns|max:255',
+    ]);
 
-        $validated = $request->validate([
-            'full_name' => 'required|string|min:3|max:255',
-            'room_id'   => 'required|exists:rooms,id',
-            'date_from' => 'required|date|after_or_equal:today',
-            'date_to'   => 'required|date|after:date_from',
-            'note'      => 'nullable|string|max:1000',
-            'phone'     => 'required|string|min:5|max:30',
-            'email'     => 'required|email:rfc,dns|max:255',
-        ], [
-            'full_name.required' => 'Пожалуйста, укажите ваше ФИО.',
-            'full_name.min'      => 'ФИО должно содержать минимум 3 символа.',
-        ]);
-
+    return \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $clientId) {
         $hasOverlap = Booking::where('room_id', $validated['room_id'])
-            ->whereIn('status', ['pending', 'confirmed', 'checked_in']) // Игнорируем отмененные и выехавшие
-            ->where(function ($query) use ($validated) {
-                $query->where('date_from', '<', $validated['date_to'])
-                      ->where('date_to', '>', $validated['date_from']);
-            })
+            ->whereIn('status', ['pending', 'confirmed', 'checked_in'])
+            ->where('date_from', '<', $validated['date_to'])
+            ->where('date_to', '>', $validated['date_from'])
             ->exists();
 
         if ($hasOverlap) {
-            return back()->withInput()->withErrors([
-                'date_from' => 'К сожалению, этот номер уже занят или забронирован на выбранные даты.',
-                'date_to'   => 'Пожалуйста, выберите другие даты или другой номер.',
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'date_from' => 'Выбранный номер уже занят на эти даты.'
             ]);
         }
 
         $client = Client::findOrFail($clientId);
-        $client->update([
-            'full_name' => $validated['full_name'],
-            'phone'     => $validated['phone'],
-            'email'     => $validated['email'],
-        ]);
+        $client->update($validated);
 
         $room = Room::findOrFail($validated['room_id']);
-
-        $from = Carbon::parse($validated['date_from']);
-        $to   = Carbon::parse($validated['date_to']);
-
-        $nights = $from->diffInDays($to);
-        $total  = $nights * (float) $room->price_per_night;
-
+        $nights = Carbon::parse($validated['date_from'])->diffInDays(Carbon::parse($validated['date_to']));
+        
         $booking = Booking::create([
-            'user_id'   => null,        
-            'client_id' => $clientId,  
+            'client_id' => $clientId,
             'room_id'   => $room->id,
             'date_from' => $validated['date_from'],
             'date_to'   => $validated['date_to'],
             'status'    => 'pending',
-            'total'     => $total,
-            'note'      => $validated['note'] ?? null,
+            'total'     => $nights * (float)$room->price_per_night,
+            'note'      => $request->note,
         ]);
-
-        $booking->load(['room.roomType', 'client']);
 
         Mail::to('caxa5578@gmail.com')->send(new NewBookingRequest($booking));
 
-        return redirect()->route('my.bookings.index')
-            ->with('success', 'Заявка успешно отправлена. Ожидайте подтверждения.');
-    }
+        return redirect()->route('my.bookings.index')->with('success', 'Заявка принята!');
+    });
+}
 }
