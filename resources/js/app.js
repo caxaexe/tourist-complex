@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const config = {
             dateFormat: "Y-m-d",
             minDate: "today",
+            allowInput: false, 
             disable: ranges
         };
 

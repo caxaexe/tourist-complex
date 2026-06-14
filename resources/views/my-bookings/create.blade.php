@@ -49,17 +49,34 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('Дата заезда *') }}</label>
-                            <input type="text" name="date_from" id="date_from" value="{{ old('date_from') }}" required 
-                                   class="mt-1 w-full rounded border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('Дата выезда *') }}</label>
-                            <input type="text" name="date_to" id="date_to" value="{{ old('date_to') }}" required 
-                                   class="mt-1 w-full rounded border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-                        </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                            {{ __('Дата заезда') }} <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="date_from" id="date_from" 
+                            value="{{ old('date_from') }}" 
+                            required 
+                            placeholder="ГГГГ-ММ-ДД"
+                            class="mt-1 w-full rounded border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+                        @error('date_from')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                            {{ __('Дата выезда') }} <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="date_to" id="date_to" 
+                            value="{{ old('date_to') }}" 
+                            required 
+                            placeholder="ГГГГ-ММ-ДД"
+                            class="mt-1 w-full rounded border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+                        @error('date_to')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('Комментарий') }}</label>
