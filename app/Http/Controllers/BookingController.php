@@ -122,8 +122,19 @@ class BookingController extends Controller
     public function confirm(Booking $booking)
     {
         $booking->update(['status' => 'confirmed']);
+        
         $this->ensureInvoiceForBooking($booking);
-        return back()->with('success', 'Подтверждено');
+
+        if ($booking->client && $booking->client->email) {
+            try {
+                Mail::to($booking->client->email)->send(new \App\Mail\BookingConfirmed($booking));
+            } catch (\Exception $e) {
+                \Log::error("Ошибка отправки письма подтверждения: " . $e->getMessage());
+                return back()->with('error', 'Бронирование подтверждено, но не удалось отправить письмо.');
+            }
+        }
+
+        return back()->with('success', 'Бронирование подтверждено, письмо отправлено.');
     }
 
     public function cancel(Request $request, Booking $booking)
