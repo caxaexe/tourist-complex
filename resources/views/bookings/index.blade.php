@@ -14,6 +14,7 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <x-auth-session-status class="mb-4" :status="session('success')" />
+            
             @if ($errors->any())
                 <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-900 dark:text-red-200">
                     <ul class="list-disc pl-5">
@@ -62,12 +63,14 @@
                                 <td class="text-right">
                                     <div class="flex justify-end gap-2">
                                         @if($booking->status === 'pending')
-                                            <form method="POST" action="{{ route($prefix.'bookings.confirm', $booking) }}" onsubmit="return confirm('Подтвердить?')">
+                                            <form method="POST" action="{{ route($prefix.'bookings.confirm', $booking) }}" onsubmit="return confirm('Подтвердить бронь?')">
                                                 @csrf <button class="text-green-500 hover:text-green-400 font-bold">Подтвердить</button>
                                             </form>
-                                            <form method="POST" action="{{ route($prefix.'bookings.cancel', $booking) }}" onsubmit="return confirm('Отменить?')">
-                                                @csrf <input type="hidden" name="reason" value="Отмена администратором">
-                                                <button class="text-gray-400 hover:text-gray-200">Отменить</button>
+                                            
+                                            <form method="POST" action="{{ route($prefix.'bookings.cancel', $booking) }}" id="cancel-form-{{$booking->id}}">
+                                                @csrf
+                                                <input type="hidden" name="reason" id="cancel-reason-{{$booking->id}}">
+                                                <button type="button" onclick="cancelBooking({{ $booking->id }})" class="text-gray-400 hover:text-gray-200">Отменить</button>
                                             </form>
                                         @endif
                                         @if($booking->status === 'confirmed')
@@ -93,4 +96,16 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function cancelBooking(id) {
+            let reason = prompt('Введите причину отмены (она будет отправлена клиенту):');
+            if (reason !== null && reason.trim() !== '') {
+                document.getElementById('cancel-reason-' + id).value = reason;
+                document.getElementById('cancel-form-' + id).submit();
+            } else if (reason !== null) {
+                alert('Причина обязательна для отмены!');
+            }
+        }
+    </script>
 </x-app-layout>
