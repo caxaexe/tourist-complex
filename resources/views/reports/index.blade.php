@@ -75,7 +75,7 @@
             data: {
                 labels: {!! json_encode($chartData->keys()) !!},
                 datasets: [{
-                    label: 'Выручка (руб)',
+                    label: 'Выручка (леи)',
                     data: {!! json_encode($chartData->values()) !!},
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
