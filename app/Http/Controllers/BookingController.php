@@ -139,8 +139,19 @@ class BookingController extends Controller
 
     public function cancel(Request $request, Booking $booking)
     {
-        $booking->update(['status' => 'cancelled']);
-        return back()->with('success', 'Отменено');
+        $request->validate([
+            'reason' => 'required|string|max:255'
+        ]);
+
+        return DB::transaction(function () use ($request, $booking) {
+            $booking->update(['status' => 'cancelled']);
+            
+            if ($booking->client && $booking->client->email) {
+                Mail::to($booking->client->email)->send(new \App\Mail\BookingCancelled($booking, $request->reason));
+            }
+
+            return back()->with('success', 'Бронирование отменено: ' . $request->reason);
+        });
     }
 
     public function checkIn(Booking $booking) { $booking->update(['status' => 'checked_in']); return back(); }
