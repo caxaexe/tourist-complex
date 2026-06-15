@@ -1,3 +1,9 @@
+<div class="p-4 bg-yellow-100 text-black mb-4">
+    Ролей найдено: {{ $roles->count() }}
+    @foreach($roles as $r)
+        <p>{{ $r->name }} (ID: {{ $r->id }})</p>
+    @endforeach
+</div>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">
