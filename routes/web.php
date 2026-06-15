@@ -42,16 +42,16 @@ Route::get('/', function (Request $request) {
 
     $clientId = (int) $request->session()->get('guest_client_id', 0);
 
-    if ($clientId <= 0 || !Client::whereKey($clientId)->exists()) {
-        $client = Client::create([
-            'full_name' => 'Гость ' . Str::upper(Str::random(6)),
-            'phone'     => null,
-            'email'     => null,
-        ]);
+    // if ($clientId <= 0 || !Client::whereKey($clientId)->exists()) {
+    //     $client = Client::create([
+    //         'full_name' => 'Гость ' . Str::upper(Str::random(6)),
+    //         'phone'     => null,
+    //         'email'     => null,
+    //     ]);
 
-        $clientId = $client->id;
-        $request->session()->put('guest_client_id', $clientId);
-    }
+    //     $clientId = $client->id;
+    //     $request->session()->put('guest_client_id', $clientId);
+    // }
 
     $bookings = Booking::query()
         ->where('client_id', $clientId)
