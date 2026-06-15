@@ -20,6 +20,11 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    protected function getRoutePrefix() 
+    { 
+        return auth()->user()->hasRole('admin') ? 'admin.' : 'staff.'; 
+    }
+
     public function index(Request $request)
     {
         $payment = $request->query('payment');
@@ -67,9 +72,11 @@ class BookingController extends Controller
             $data['status'] = $data['status'] ?? 'pending';
 
             $booking = Booking::create($data);
+            if (function_exists('logAudit')) logAudit('created', $booking, null, $booking->toArray());
+
             if ($booking->status === 'confirmed') $this->ensureInvoiceForBooking($booking);
 
-            return redirect()->route($this->routePrefix() . 'bookings.index')->with('success', 'Создано');
+            return redirect()->route($this->getRoutePrefix() . 'bookings.index')->with('success', 'Создано');
         });
     }
 
@@ -91,18 +98,25 @@ class BookingController extends Controller
             $nights = max(1, Carbon::parse($data['date_from'])->diffInDays(Carbon::parse($data['date_to'])));
             $data['total'] = $nights * (float)$room->price_per_night;
 
+            $old = $booking->toArray();
             $booking->update($data);
+            if (function_exists('logAudit')) logAudit('updated', $booking, $old, $booking->fresh()->toArray());
+
             if ($booking->status === 'confirmed') $this->ensureInvoiceForBooking($booking);
 
-            return redirect()->route($this->routePrefix() . 'bookings.index')->with('success', 'Обновлено');
+            return redirect()->route($this->getRoutePrefix() . 'bookings.index')->with('success', 'Обновлено');
         });
     }
 
     public function destroy(Booking $booking)
     {
-        $booking->invoice?->delete();
+        if ($booking->invoice) {
+            $booking->invoice->items()->delete();
+            $booking->invoice->delete();
+        }
+        $booking->services()->detach();
         $booking->delete();
-        return redirect()->route($this->routePrefix() . 'bookings.index')->with('success', 'Удалено');
+        return redirect()->route($this->getRoutePrefix() . 'bookings.index')->with('success', 'Удалено');
     }
 
     public function confirm(Booking $booking)
@@ -121,6 +135,42 @@ class BookingController extends Controller
     public function checkIn(Booking $booking) { $booking->update(['status' => 'checked_in']); return back(); }
     public function checkOut(Booking $booking) { $booking->update(['status' => 'checked_out']); return back(); }
 
-    private function ensureInvoiceForBooking(Booking $booking) { /* Ваша логика создания счета */ }
-    private function routePrefix() { return auth()->user()->hasRole('admin') ? 'admin.' : 'staff.'; }
+    protected function ensureInvoiceForBooking(Booking $booking): void
+    {
+        if (Invoice::where('booking_id', $booking->id)->exists()) return;
+
+        $booking->load(['room', 'services']);
+        $invoice = Invoice::create([
+            'booking_id' => $booking->id,
+            'number' => 'INV-' . now()->format('Ymd') . '-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
+            'issued_at' => now()->toDateString(),
+            'due_at' => now()->addDays(3)->toDateString(),
+            'status' => 'issued',
+            'total' => 0,
+        ]);
+
+        $nights = max(1, $booking->date_from->diffInDays($booking->date_to));
+        $stayPrice = (float)($booking->room->price_per_night ?? 0);
+        
+        InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'type' => 'stay',
+            'title' => 'Проживание №' . $booking->room->number,
+            'quantity' => $nights,
+            'unit_price' => $stayPrice,
+            'total' => $nights * $stayPrice,
+        ]);
+
+        foreach ($booking->services as $service) {
+            InvoiceItem::create([
+                'invoice_id' => $invoice->id,
+                'type' => 'service',
+                'title' => 'Услуга: ' . $service->name,
+                'quantity' => $service->pivot->quantity,
+                'unit_price' => (float)$service->pivot->price_snapshot,
+                'total' => $service->pivot->quantity * (float)$service->pivot->price_snapshot,
+            ]);
+        }
+        $invoice->update(['total' => $invoice->items()->sum('total')]);
+    }
 }
