@@ -34,11 +34,25 @@ class UserController extends Controller
         return view('admin.users.index', compact('users', 'q'));
     }
 
+    // public function create()
+    // {
+    //     $roles = Role::orderBy('name')->get();
+    //     return view('admin.users.create', compact('roles'));
+    // }
     public function create()
-    {
-        $roles = Role::orderBy('name')->get();
-        return view('admin.users.create', compact('roles'));
-    }
+{
+    $allRoles = \App\Models\Role::all();
+    // Это выведет данные прямо на экран и остановит выполнение
+    dd([
+        'connection' => \App\Models\Role::getConnectionName(),
+        'table' => \App\Models\Role::getTable(),
+        'roles_from_model' => $allRoles->toArray(),
+        'roles_from_db_table' => \DB::table('roles')->get()->toArray()
+    ]);
+    
+    $roles = $allRoles;
+    return view('admin.users.create', compact('roles'));
+}
 
     public function store(Request $request)
     {
