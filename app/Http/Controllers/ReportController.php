@@ -21,20 +21,16 @@ class ReportController extends Controller
             ? Carbon::parse($request->query('to'))->endOfDay()
             : now()->endOfDay();
 
-        // 1) Доходы по оплатам
         $paymentsTotal = Payment::whereBetween('paid_at', [$from, $to])->sum('amount');
         $paymentsCount = Payment::whereBetween('paid_at', [$from, $to])->count();
 
-        // 2) Счета по статусам
         $invoicesTotal = Invoice::whereBetween('issued_at', [$from->toDateString(), $to->toDateString()])->sum('total');
-
         $invoicesByStatus = Invoice::select('status', DB::raw('COUNT(*) as cnt'), DB::raw('SUM(total) as sum_total'))
             ->whereBetween('issued_at', [$from->toDateString(), $to->toDateString()])
             ->groupBy('status')
             ->orderBy('status')
             ->get();
 
-        // 3) Топ услуг (по pivot booking_service)
         $topServices = DB::table('booking_service')
             ->join('services', 'services.id', '=', 'booking_service.service_id')
             ->join('bookings', 'bookings.id', '=', 'booking_service.booking_id')
@@ -50,11 +46,6 @@ class ReportController extends Controller
             ->limit(10)
             ->get();
 
-
-
-
-        // 4) Загрузка номеров (кол-во броней и ночей)
-        // nights считаем как diff(date_to, date_from) на уровне SQL
         $roomOccupancy = Booking::query()
             ->join('rooms', 'rooms.id', '=', 'bookings.room_id')
             ->where('bookings.status', '!=', 'cancelled')
@@ -69,18 +60,17 @@ class ReportController extends Controller
             ->groupBy('rooms.id', 'rooms.number')
             ->orderByDesc('nights')
             ->limit(15)
-            ->get();    
+            ->get();
 
+        $chartData = Payment::select(DB::raw('DATE(paid_at) as date'), DB::raw('sum(amount) as total'))
+            ->where('paid_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('total', 'date');
 
         return view('reports.index', compact(
-            'from',
-            'to',
-            'paymentsTotal',
-            'paymentsCount',
-            'invoicesTotal',
-            'invoicesByStatus',
-            'topServices',
-            'roomOccupancy'
+            'from', 'to', 'paymentsTotal', 'paymentsCount', 'invoicesTotal',
+            'invoicesByStatus', 'topServices', 'roomOccupancy', 'chartData'
         ));
     }
 }
