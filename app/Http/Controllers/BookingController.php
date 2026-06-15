@@ -64,7 +64,7 @@ class BookingController extends Controller
                 ->where('date_to', '>', $data['date_from'])
                 ->exists();
 
-            if ($hasConflict) return back()->withInput()->withErrors(['date_from' => 'Номер занят']);
+            if ($hasConflict) return back()->withInput()->withErrors(['date_from' => 'Номер занят на эти даты']);
 
             $room = Room::findOrFail($data['room_id']);
             $nights = max(1, Carbon::parse($data['date_from'])->diffInDays(Carbon::parse($data['date_to'])));
@@ -151,21 +151,25 @@ class BookingController extends Controller
 
         $nights = max(1, $booking->date_from->diffInDays($booking->date_to));
         $stayPrice = (float)($booking->room->price_per_night ?? 0);
+        $stayTitle = 'Проживание №' . $booking->room->number;
         
         InvoiceItem::create([
             'invoice_id' => $invoice->id,
             'type' => 'stay',
-            'title' => 'Проживание №' . $booking->room->number,
+            'title' => $stayTitle,
+            'description' => $stayTitle, // Добавлено поле description
             'quantity' => $nights,
             'unit_price' => $stayPrice,
             'total' => $nights * $stayPrice,
         ]);
 
         foreach ($booking->services as $service) {
+            $desc = 'Услуга: ' . $service->name;
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
                 'type' => 'service',
-                'title' => 'Услуга: ' . $service->name,
+                'title' => $desc,
+                'description' => $desc, // Добавлено поле description
                 'quantity' => $service->pivot->quantity,
                 'unit_price' => (float)$service->pivot->price_snapshot,
                 'total' => $service->pivot->quantity * (float)$service->pivot->price_snapshot,
